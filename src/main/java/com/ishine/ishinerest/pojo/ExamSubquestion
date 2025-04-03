@@ -1,0 +1,19 @@
+package com.ishine.ishinerest.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ExamSubquestion {
+    private int subquestionId;
+    private int questionId;
+    private String subquestionText;
+    private String subquestionImage;
+    private String questionType;
+    private String solution;
+}
