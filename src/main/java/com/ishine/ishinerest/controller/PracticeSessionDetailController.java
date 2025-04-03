@@ -22,14 +22,17 @@ public class PracticeSessionDetailController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PracticeSessionDetail> getSessionDetailById(@PathVariable Long id) {
-        Optional<PracticeSessionDetail> sessionDetail = service.getSessionDetailById(id);
-        return sessionDetail.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public List<PracticeSessionDetail> getSessionDetailByStudentId(@PathVariable Long id) {
+        List<PracticeSessionDetail> sessionDetails = service.getSessionDetailByStudentId(id);
+return sessionDetails;
     }
 
-    @PostMapping
-    public List<PracticeSessionDetail> createSessionDetail(@RequestBody List<PracticeSessionDetail> sessionDetails) {
-        return service.saveSessionDetails(sessionDetails);
+
+    @PostMapping("/{studentId}")
+    public List<PracticeSessionDetail> createSessionDetail(
+            @PathVariable Long studentId,
+            @RequestBody List<PracticeSessionDetail> sessionDetails) {
+        return service.saveSessionDetails(studentId, sessionDetails);
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,7 @@ import com.ishine.ishinerest.entity.Question;
 import com.ishine.ishinerest.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,18 +27,23 @@ public class QuestionController {
     }
 
     @GetMapping("/chapter/{chapterId}")
-    public List<Question> getQuestionsByChapter(@PathVariable Long chapterId) {
+    public List<Question> getQuestionsByChapter(@PathVariable String chapterId) {
         return questionService.getQuestionsByChapter(chapterId);
     }
 
     @GetMapping("/subject/{subjectId}")
-    public List<Question> getQuestionsBySubject(@PathVariable Long subjectId) {
+    public List<Question> getQuestionsBySubject(@PathVariable String subjectId) {
         return questionService.getQuestionsBySubject(subjectId);
     }
 
     @PostMapping
     public List<Question> createQuestions(@RequestBody List<Question> questions) {
         return questionService.saveQuestions(questions);
+    }
+
+    @PostMapping("/upload")
+    public List<Question> uploadQuestionsFromExcel(@RequestParam("file") MultipartFile file) {
+        return questionService.saveQuestionsFromExcel(file);
     }
 
     @PutMapping("/{id}")
@@ -65,13 +71,16 @@ public class QuestionController {
 
     // Endpoint for unpracticed questions by subject
     @GetMapping("/unpracticed/subject")
-    public List<Question> getUnpracticedQuestionsBySubject(@RequestParam Long studentId, @RequestParam Long subjectId) {
+    public List<Question> getUnpracticedQuestionsBySubject(@RequestParam Long studentId, @RequestParam String subjectId) {
         return questionService.getUnpracticedQuestionsBySubject(studentId, subjectId);
     }
 
     // Endpoint for unpracticed questions by chapter
     @GetMapping("/unpracticed/chapter")
-    public List<Question> getUnpracticedQuestionsByChapter(@RequestParam Long studentId, @RequestParam Long chapterId) {
-        return questionService.getUnpracticedQuestionsByChapter(studentId, chapterId);
+    public List<Question> getUnpracticedQuestionsByChapter(
+            @RequestParam Long studentId,
+            @RequestParam String chapterId,
+            @RequestParam(defaultValue = "10") int limit) {
+        return questionService.getUnpracticedQuestionsByChapter(studentId, chapterId, limit);
     }
 }

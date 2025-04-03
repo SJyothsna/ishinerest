@@ -1,5 +1,6 @@
 package com.ishine.ishinerest.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,10 @@ public class PracticeSessionDetail {
     private Long questionId;
 
     @Column(nullable = true)
-    private Long chapterId; // New field for chapter information
+    private String chapterId;
 
+    @Column(nullable = true)
+    private String subjectId;
 
     @Column(nullable = true)
     private String studentAnswer;
@@ -27,7 +30,11 @@ public class PracticeSessionDetail {
     @Column(nullable = false)
     private Boolean isCorrect;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
-    private Student student;
+    @Column(nullable = true)
+    private Long studentId;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JsonIgnore
+//    @JoinColumn(name = "student_id", nullable = false)
+//    private Student student;
 }

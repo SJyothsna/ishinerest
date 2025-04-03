@@ -19,16 +19,20 @@ public class PracticeSessionDetailService {
         return repository.findAll();
     }
 
-    public Optional<PracticeSessionDetail> getSessionDetailById(Long id) {
-        return repository.findById(id);
+    public List<PracticeSessionDetail> getSessionDetailByStudentId(Long studentId) {
+        return repository.findByStudentId(studentId);
     }
 
     public PracticeSessionDetail saveSessionDetail(PracticeSessionDetail sessionDetail) {
         return repository.save(sessionDetail);
     }
-    public List<PracticeSessionDetail> saveSessionDetails(List<PracticeSessionDetail> sessionDetails) {
+    public List<PracticeSessionDetail> saveSessionDetails(Long studentId, List<PracticeSessionDetail> sessionDetails) {
+        sessionDetails.forEach(detail -> {
+            detail.setStudentId(studentId);
+        });
         return repository.saveAll(sessionDetails);
     }
+
     public void deleteSessionDetail(Long id) {
         repository.deleteById(id);
     }
