@@ -33,6 +33,10 @@ public class PracticeSessionDetail {
     @Column(nullable = true)
     private Long studentId;
 
+    @Column(nullable = false)
+    private Integer attemptCount = 1;  // Default 1 for new attempts
+
+
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JsonIgnore
 //    @JoinColumn(name = "student_id", nullable = false)

@@ -5,12 +5,11 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PrevExamQuestionResponse {
-    private String chapterId;
+public class PrevExamPaperResponse {
+    private String subjectId;
     private int year;
     private String paperType;
-    private String section;
-    private String questionnumber;
-    private String question;
+    private String title;
+    private String examUrl;
     private String markingUrl;
 }

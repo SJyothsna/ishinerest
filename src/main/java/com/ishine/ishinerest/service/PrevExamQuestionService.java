@@ -1,6 +1,7 @@
 package com.ishine.ishinerest.service;
 
 
+import com.ishine.ishinerest.entity.ClassEntity;
 import com.ishine.ishinerest.pojo.PrevExamQuestionResponse;
 import com.ishine.ishinerest.entity.PrevExamPaper;
 import com.ishine.ishinerest.entity.PrevExamQuestion;
@@ -20,37 +21,17 @@ public class PrevExamQuestionService {
 
     @Autowired
     private PrevExamQuestionRepository questionRepo;
+    private final PrevExamQuestionRepository prevExamQuestionRepository;
 
-    public List<PrevExamQuestionResponse> getQuestionsByChapterAndLevel(String chapterId, String level) {
-        List<PrevExamPaper> papers = paperRepo.findByLevel(level);
-        Set<Integer> examIds = papers.stream()
-                .map(PrevExamPaper::getExamId)
-                .collect(Collectors.toSet());
 
-        List<PrevExamQuestion> questions = questionRepo.findByChapterId(chapterId);
+    public PrevExamQuestionService(PrevExamQuestionRepository prevExamQuestionRepository) {
+        this.prevExamQuestionRepository = prevExamQuestionRepository;
+    }
 
-        return questions.stream()
-                .filter(q -> examIds.contains(q.getExamId()))
-                .map(q -> {
-                    PrevExamPaper paper = papers.stream()
-                            .filter(p -> p.getExamId().equals(q.getExamId()))
-                            .findFirst()
-                            .orElse(null);
-                    if (paper != null) {
-                        return new PrevExamQuestionResponse(
-                                paper.getExamId(),
-                                paper.getExamYear(),
-                                paper.getType(),
-                                q.getQId(),
-                                q.getSection(),
-                                q.getQuestion(),
-                                q.getMarkingScheme()
-                        );
-                    } else {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+    public List<PrevExamQuestionResponse> getQuestionsByChapterId(String chapterId) {
+        return prevExamQuestionRepository.findQuestionsByChapterId(chapterId);
+    }
+    public List<PrevExamPaper> getAllPrevExamPapers() {
+        return paperRepo.findAll();
     }
 }

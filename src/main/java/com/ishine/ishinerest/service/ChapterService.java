@@ -57,10 +57,15 @@ public class ChapterService {
         try {
             List<Chapter> newChapters = new ArrayList<>();
             InputStream inputStream = file.getInputStream();
-            Workbook workbook = new XSSFWorkbook(inputStream);
-            Sheet sheet = workbook.getSheetAt(0);
+            Workbook workbook = WorkbookFactory.create(inputStream); // Supports .xls and .xlsx
+            Sheet sheet = workbook.getSheet("Chapters");
 
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) { // Skipping header
+            if (sheet == null) {
+                workbook.close();
+                return "Sheet named 'Chapters' not found in the Excel file.";
+            }
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) { // Skip header
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
@@ -68,19 +73,21 @@ public class ChapterService {
                 Cell subidCell = row.getCell(1);
                 Cell nameCell = row.getCell(2);
 
-                if (nameCell == null || nameCell.getCellType() == CellType.BLANK) continue;
+                if (idCell == null || subidCell == null || nameCell == null) continue;
 
-                String chapterId = null;
-                if (idCell != null && idCell.getCellType() == CellType.NUMERIC) {
-                    chapterId = String.valueOf(idCell.getNumericCellValue());
-                }
+                String chapterId = idCell.getStringCellValue().trim();
+                String subjectId = subidCell.getStringCellValue().trim();
+                String chapterName = nameCell.getStringCellValue().trim();
 
-                if (chapterId == null || !chapterRepository.existsById(chapterId)) {
+                if (chapterId.isEmpty() || subjectId.isEmpty() || chapterName.isEmpty()) continue;
+
+                if (!chapterRepository.existsById(chapterId)) {
                     Chapter chapter = new Chapter();
-                    chapter.setChapterName(nameCell.getStringCellValue());
+                    chapter.setChapterId(chapterId);
+                    chapter.setChapterName(chapterName);
 
                     SubjectEntity subject = new SubjectEntity();
-                    subject.setSubjectId(String.valueOf(subidCell.getNumericCellValue()));
+                    subject.setSubjectId(subjectId);
                     chapter.setSubject(subject);
 
                     newChapters.add(chapter);
@@ -99,4 +106,5 @@ public class ChapterService {
             return "Failed to upload chapters: " + e.getMessage();
         }
     }
+
 }

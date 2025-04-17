@@ -58,7 +58,7 @@ public class QuestionService {
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = WorkbookFactory.create(inputStream)) {
 
-            Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheet("Questions");
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) continue;  // Skip header row

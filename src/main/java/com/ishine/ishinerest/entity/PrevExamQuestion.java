@@ -15,7 +15,7 @@ public class PrevExamQuestion {
     private Long id;
 
     @Column(name = "exam_id")
-    private Integer examId;
+    private String examId;
 
     @Column(name = "q_id")
     private String qId;

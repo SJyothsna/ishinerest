@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface SubjectRepository extends JpaRepository<SubjectEntity, String> {
     List<SubjectEntity> findByClassEntity_ClassId(String classId);
-}
+    List<SubjectEntity> findBySubjectIdIn(List<String> subjectIds);
+    }
