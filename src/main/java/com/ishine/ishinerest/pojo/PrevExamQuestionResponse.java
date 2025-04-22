@@ -1,16 +1,44 @@
 package com.ishine.ishinerest.pojo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
+import java.util.Arrays;
+import java.util.List;
+
+@Getter
+@Setter
 public class PrevExamQuestionResponse {
     private String chapterId;
     private int year;
     private String paperType;
     private String section;
     private String questionnumber;
-    private String question;
-    private String markingUrl;
+    private List<String> question;
+    private List<String> markingUrl;
+
+    public PrevExamQuestionResponse(
+            String chapterId,
+            int year,
+            String paperType,
+            String section,
+            String questionnumber,
+            String questionStr,
+            String markingUrlStr
+    ) {
+        this.chapterId = chapterId;
+        this.year = year;
+        this.paperType = paperType;
+        this.section = section;
+        this.questionnumber = questionnumber;
+        this.question = splitByComma(questionStr);
+        this.markingUrl = splitByComma(markingUrlStr);
+    }
+
+    private List<String> splitByComma(String input) {
+        if (input == null || input.isBlank()) return List.of();
+        return Arrays.stream(input.split(","))
+                .map(String::trim)
+                .toList();
+    }
 }

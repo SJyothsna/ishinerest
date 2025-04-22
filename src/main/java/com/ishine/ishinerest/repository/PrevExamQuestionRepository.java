@@ -26,5 +26,21 @@ public interface PrevExamQuestionRepository extends JpaRepository<PrevExamQuesti
 """)
     List<PrevExamQuestionResponse> findQuestionsByChapterId(String chapterId);
 
+    @Query("""
+    SELECT new com.ishine.ishinerest.pojo.PrevExamQuestionResponse(
+        q.chapterId,
+        p.examYear,
+        p.paperType,
+        q.section,
+        q.qId,
+        q.question,
+        q.markingScheme
+    )
+    FROM PrevExamQuestion q
+    JOIN PrevExamPaper p ON q.examId = p.examId
+    WHERE p.subjectId = :subjectId
+""")
+    List<PrevExamQuestionResponse> findQuestionsBySubjectId(String subjectId);
+
 }
 

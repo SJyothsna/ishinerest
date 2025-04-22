@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -21,8 +22,9 @@ public class ChapterService {
     private ChapterRepository chapterRepository;
 
     public List<Chapter> getChaptersBySubject(String subjectId) {
-        return chapterRepository.findBySubject_SubjectId(subjectId);
-    }
+        List<Chapter> chapters = chapterRepository.findBySubject_SubjectId(subjectId);
+        chapters.sort(Comparator.comparing(Chapter::getChapterName));
+        return chapters;    }
 
 //    public List<Question> getQuestionsByChapterId(Long chapterId) {
 //        Chapter chapter = chapterRepository.findById(chapterId)
