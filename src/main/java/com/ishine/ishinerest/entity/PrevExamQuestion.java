@@ -20,8 +20,8 @@ public class PrevExamQuestion {
     @Column(name = "q_id")
     private String qId;
 
-    @Column(name = "section")
-    private String section;
+    @Column(name = "paper_name")
+    private String paperName;
 
     @Column(name = "chapter_id")
     private String chapterId;

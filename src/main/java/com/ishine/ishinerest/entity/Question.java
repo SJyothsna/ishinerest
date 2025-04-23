@@ -43,9 +43,6 @@ public class Question {
     private String explanation;
 
     @Column
-    private String imagePath;
-
-    @Column
     private String difficultyLevel;
 
     @ManyToOne(fetch = FetchType.LAZY)

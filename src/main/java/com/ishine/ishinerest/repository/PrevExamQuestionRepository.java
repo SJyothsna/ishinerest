@@ -15,7 +15,7 @@ public interface PrevExamQuestionRepository extends JpaRepository<PrevExamQuesti
         q.chapterId,
         p.examYear,
         p.paperType,
-        q.section,
+        q.paperName,
         q.qId,
         q.question,
         q.markingScheme
@@ -31,7 +31,7 @@ public interface PrevExamQuestionRepository extends JpaRepository<PrevExamQuesti
         q.chapterId,
         p.examYear,
         p.paperType,
-        q.section,
+        q.paperName,
         q.qId,
         q.question,
         q.markingScheme

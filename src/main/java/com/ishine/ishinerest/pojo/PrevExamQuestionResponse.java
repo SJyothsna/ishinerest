@@ -12,7 +12,7 @@ public class PrevExamQuestionResponse {
     private String chapterId;
     private int year;
     private String paperType;
-    private String section;
+    private String paperName;
     private String questionnumber;
     private List<String> question;
     private List<String> markingUrl;
@@ -21,7 +21,7 @@ public class PrevExamQuestionResponse {
             String chapterId,
             int year,
             String paperType,
-            String section,
+            String paperName,
             String questionnumber,
             String questionStr,
             String markingUrlStr
@@ -29,7 +29,7 @@ public class PrevExamQuestionResponse {
         this.chapterId = chapterId;
         this.year = year;
         this.paperType = paperType;
-        this.section = section;
+        this.paperName = paperName;
         this.questionnumber = questionnumber;
         this.question = splitByComma(questionStr);
         this.markingUrl = splitByComma(markingUrlStr);

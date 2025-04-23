@@ -71,10 +71,9 @@ public class QuestionService {
                 question.setOptionC(getCellValue(row.getCell(6)));
                 question.setOptionD(getCellValue(row.getCell(7)));
                 question.setCorrectAnswer(getCellValue(row.getCell(3)));
-                question.setQuestionType(Integer.parseInt(getCellValue(row.getCell(11))));
+                question.setQuestionType(Integer.parseInt(getCellValue(row.getCell(10))));
                 question.setExplanation(getCellValue(row.getCell(8)));
-                question.setImagePath(getCellValue(row.getCell(9)));
-                question.setDifficultyLevel(getCellValue(row.getCell(10)));
+                question.setDifficultyLevel(getCellValue(row.getCell(9)));
                 String chapterId = getCellValue(row.getCell(1));
                 Chapter chapter = chapterRepository.findById(chapterId)
                         .orElseThrow(() -> new RuntimeException("Chapter not found for ID: " + chapterId));

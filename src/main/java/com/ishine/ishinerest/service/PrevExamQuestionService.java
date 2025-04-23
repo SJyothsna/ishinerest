@@ -57,7 +57,7 @@ public class PrevExamQuestionService {
                 q.setExamId(getStringValue(row.getCell(0)));
                 q.setChapterId(getStringValue(row.getCell(1)));
                 q.setQId(getStringValue(row.getCell(2)));
-                q.setSection(getStringValue(row.getCell(3)));
+                q.setPaperName(getStringValue(row.getCell(3)));
                 q.setQuestion(getStringValue(row.getCell(4)));
                 q.setMarkingScheme(getStringValue(row.getCell(5)));
 
