@@ -34,10 +34,11 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
                 SELECT q FROM Question q 
                 WHERE q.chapter.chapterId = :chapterId 
                 AND q.questionId NOT IN :practicedQuestionIds
+                 AND ( :level IS NULL OR :level = '' OR LOWER(q.difficultyLevel) = LOWER(:level) )
                     ORDER BY q.questionId ASC    
                 LIMIT :limit
             """)
-    List<Question> findUnpracticedQuestionsByChapter(String chapterId, List<Long> practicedQuestionIds, int limit);
+    List<Question> findUnpracticedQuestionsByChapter(String chapterId, List<Long> practicedQuestionIds, int limit, String level);
 
     @Query(value = """
     SELECT * FROM questions 

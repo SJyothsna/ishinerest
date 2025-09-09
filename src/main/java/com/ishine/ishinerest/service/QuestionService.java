@@ -74,6 +74,7 @@ public class QuestionService {
                 question.setQuestionType(Integer.parseInt(getCellValue(row.getCell(10))));
                 question.setExplanation(getCellValue(row.getCell(8)));
                 question.setDifficultyLevel(getCellValue(row.getCell(9)));
+                question.setNotes(getCellValue(row.getCell(11)));
                 String chapterId = getCellValue(row.getCell(1));
                 Chapter chapter = chapterRepository.findById(chapterId)
                         .orElseThrow(() -> new RuntimeException("Chapter not found for ID: " + chapterId));
@@ -126,7 +127,7 @@ public class QuestionService {
     }
 
     // Unpracticed questions by chapter
-    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit) {
+    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level) {
         // Get answered question IDs for the student and chapter
         List<Long> practicedQuestionIds = practiceSessionDetailRepository.findCorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
 
@@ -134,7 +135,7 @@ public class QuestionService {
             return questionRepository.findByChapterIdWithLimit(chapterId, limit);
         }
         // Get unpracticed questions for the chapter
-        return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit);
+        return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit, level);
     }
 
 //    public List<Question> getQuestionsByChapter(Long chapterId) {

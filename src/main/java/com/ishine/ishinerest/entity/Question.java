@@ -44,6 +44,15 @@ public class Question {
 
     @Column
     private String difficultyLevel;
+    @Column
+    private String notes;
+    @Column
+    private String createdBy;
+    @Column
+    private String tags;
+    //section number in chapter
+    @Column
+    private String sectionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id", nullable = false)

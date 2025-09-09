@@ -80,7 +80,8 @@ public class QuestionController {
     public List<Question> getUnpracticedQuestionsByChapter(
             @RequestParam Long studentId,
             @RequestParam String chapterId,
-            @RequestParam(defaultValue = "10") int limit) {
-        return questionService.getUnpracticedQuestionsByChapter(studentId, chapterId, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(name = "level", required = false) String level) {
+        return questionService.getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level);
     }
 }

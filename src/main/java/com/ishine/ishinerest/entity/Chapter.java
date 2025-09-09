@@ -15,9 +15,13 @@ public class Chapter {
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String chapterId;
-
     @Column(nullable = false)
     private String chapterName;
+
+    @Column()
+    private String sectionId;
+    @Column()
+    private String sectionName;
 
      @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id", nullable = false)
