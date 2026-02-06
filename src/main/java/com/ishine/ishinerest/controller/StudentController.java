@@ -3,9 +3,11 @@ package com.ishine.ishinerest.controller;
 import com.ishine.ishinerest.entity.Student;
 import com.ishine.ishinerest.entity.StudentSubject;
 import com.ishine.ishinerest.pojo.StudentPracticeProgressDTO;
+import com.ishine.ishinerest.pojo.StudentProfileDTO;
 import com.ishine.ishinerest.pojo.StudentSelectedSubjectDTO;
 import com.ishine.ishinerest.repository.PracticeSessionDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ishine.ishinerest.service.StudentService;
@@ -32,6 +34,29 @@ public class StudentController {
     public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
         Optional<Student> student = studentService.getStudentById(id);
         return student.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    // NEW: profile for onboarding checks
+    @GetMapping("/{studentId}/profile")
+    public ResponseEntity<StudentProfileDTO> getStudentProfile(@PathVariable Long studentId) {
+        return ResponseEntity.ok(studentService.getProfile(studentId));
+    }
+
+    // NEW: set student's class
+    @PutMapping("/{studentId}/class")
+    public ResponseEntity<Void> setStudentClass(
+            @PathVariable Long studentId,
+            @RequestParam String classId
+    ) {
+        studentService.setStudentClass(studentId, classId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @PutMapping("/{studentId}/subjects")
+    public ResponseEntity<Void> replaceSubjects(
+            @PathVariable Long studentId,
+            @RequestBody List<String> subjectIds
+    ) {
+        studentService.replaceStudentSubjects(studentId, subjectIds);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -56,12 +55,13 @@ public class QuestionService {
         List<Question> questions = new ArrayList<>();
 
         try (InputStream inputStream = file.getInputStream();
-             Workbook workbook = WorkbookFactory.create(inputStream)) {
+                Workbook workbook = WorkbookFactory.create(inputStream)) {
 
             Sheet sheet = workbook.getSheet("Questions");
 
             for (Row row : sheet) {
-                if (row.getRowNum() == 0) continue;  // Skip header row
+                if (row.getRowNum() == 0)
+                    continue; // Skip header row
 
                 Question question = new Question();
                 question.setQuestionId(Long.parseLong(getCellValue(row.getCell(0))));
@@ -92,7 +92,8 @@ public class QuestionService {
 
     // Helper method to get cell values as strings
     private String getCellValue(Cell cell) {
-        if (cell == null) return "";
+        if (cell == null)
+            return "";
 
         switch (cell.getCellType()) {
             case STRING:
@@ -116,20 +117,25 @@ public class QuestionService {
         questionRepository.deleteById(id);
     }
 
-
     // Unpracticed questions by subject
-    public List<Question> getUnpracticedQuestionsBySubject(Long studentId, String subjectId) {
+    public List<Question> getUnpracticedQuestionsBySubject(Long studentId, String subjectId, int limit) {
         // Get practiced question IDs for the student
-        List<Long> practicedQuestionIds = practiceSessionDetailRepository.findIncorrectlyAnsweredQuestionIds(studentId);
+        List<Long> practicedQuestionIds = practiceSessionDetailRepository.findAnsweredQuestionIds(studentId);
+
+        // If no questions have been practiced, return questions with limit
+        if (practicedQuestionIds == null || practicedQuestionIds.isEmpty()) {
+            return questionRepository.findBySubjectIdWithLimit(subjectId, limit);
+        }
 
         // Get unpracticed questions for the subject
-        return questionRepository.findUnpracticedQuestionsBySubject(subjectId, practicedQuestionIds);
+        return questionRepository.findUnpracticedQuestionsBySubject(subjectId, practicedQuestionIds, limit);
     }
 
     // Unpracticed questions by chapter
     public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level) {
         // Get answered question IDs for the student and chapter
-        List<Long> practicedQuestionIds = practiceSessionDetailRepository.findCorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
+        List<Long> practicedQuestionIds = practiceSessionDetailRepository
+                .findCorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
 
         if (practicedQuestionIds == null || practicedQuestionIds.isEmpty()) {
             return questionRepository.findByChapterIdWithLimit(chapterId, limit);
@@ -138,7 +144,7 @@ public class QuestionService {
         return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit, level);
     }
 
-//    public List<Question> getQuestionsByChapter(Long chapterId) {
-//        return questionRepository.findQuestionsByChapterExcludingPractice(chapterId);
-//    }
+    // public List<Question> getQuestionsByChapter(Long chapterId) {
+    // return questionRepository.findQuestionsByChapterExcludingPractice(chapterId);
+    // }
 }

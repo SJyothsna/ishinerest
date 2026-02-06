@@ -8,5 +8,7 @@ import com.ishine.ishinerest.entity.StudentSubject;
 public interface StudentSubjectRepository extends JpaRepository<StudentSubject, Long> {
     List<StudentSubject> findByStudentId(Long studentId);
     boolean existsByStudentIdAndSubjectId(Long studentId, String subjectId);
+    long countByStudentId(Long studentId);
+    void deleteByStudentId(Long studentId);
 
 }

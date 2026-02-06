@@ -12,6 +12,12 @@ import com.ishine.ishinerest.repository.StudentSubjectRepository;
 import com.ishine.ishinerest.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ishine.ishinerest.pojo.StudentProfileDTO;
+import com.ishine.ishinerest.entity.ClassEntity;
+import com.ishine.ishinerest.repository.ClassRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,6 +36,8 @@ public class StudentService {
     private SubjectRepository subjectRepository;
     @Autowired
     private PracticeSessionDetailRepository practiceSessionDetailRepository;
+    @Autowired
+    private ClassRepository classRepository;
 
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
@@ -109,6 +117,30 @@ public class StudentService {
         return savedSubjects;
     }
 
+    // new method: build a light profile for onboarding checks
+    public StudentProfileDTO getProfile(Long studentId) {
+        Student s = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
+        boolean hasClass = s.getClassEntity() != null;
+        String classId = hasClass ? s.getClassEntity().getClassId() : null; // adjust getter if your id is named differently
+        long subjectCount = studentSubjectRepository.countByStudentId(studentId);
+        return new StudentProfileDTO(s.getStudentId(), s.getName(), s.getEmail(), hasClass, classId, subjectCount);
+    }
+
+    // new method: set/update the student's class
+    public void setStudentClass(Long studentId, String classId) {
+        Student s = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
+        ClassEntity ce = classRepository.findById(classId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid classId"));
+        s.setClassEntity(ce);
+        studentRepository.save(s);
+    }
+
+    public void replaceStudentSubjects(Long studentId, List<String> subjectIds) {
+        studentSubjectRepository.deleteByStudentId(studentId);
+        saveStudentSubjects(studentId, subjectIds); // reuse your existing saver
+    }
 
 }
 

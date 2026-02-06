@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "students")
+@Table(name = "students", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 public class Student {
 
     @Id
@@ -22,10 +22,15 @@ public class Student {
     @Column(unique = true, nullable = false)
     private String email;
 
+    // NEW: store a hashed password (BCrypt)
+    @JsonIgnore
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    // Make nullable for initial signup (student can pick class later)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_id", nullable = false)
+    @JoinColumn(name = "class_id", nullable = true) // <-- changed to true
     @JsonBackReference
     @JsonIgnore
     private ClassEntity classEntity;
-
 }

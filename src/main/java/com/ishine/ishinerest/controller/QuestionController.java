@@ -71,8 +71,11 @@ public class QuestionController {
 
     // Endpoint for unpracticed questions by subject
     @GetMapping("/unpracticed/subject")
-    public List<Question> getUnpracticedQuestionsBySubject(@RequestParam Long studentId, @RequestParam String subjectId) {
-        return questionService.getUnpracticedQuestionsBySubject(studentId, subjectId);
+    public List<Question> getUnpracticedQuestionsBySubject(
+            @RequestParam Long studentId,
+            @RequestParam String subjectId,
+            @RequestParam(defaultValue = "10") int limit) {
+        return questionService.getUnpracticedQuestionsBySubject(studentId, subjectId, limit);
     }
 
     // Endpoint for unpracticed questions by chapter
