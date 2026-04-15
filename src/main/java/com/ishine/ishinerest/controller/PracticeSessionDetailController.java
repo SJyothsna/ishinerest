@@ -24,9 +24,8 @@ public class PracticeSessionDetailController {
     @GetMapping("/{id}")
     public List<PracticeSessionDetail> getSessionDetailByStudentId(@PathVariable Long id) {
         List<PracticeSessionDetail> sessionDetails = service.getSessionDetailByStudentId(id);
-return sessionDetails;
+        return sessionDetails;
     }
-
 
     @PostMapping("/{studentId}")
     public List<PracticeSessionDetail> createSessionDetail(
@@ -41,5 +40,12 @@ return sessionDetails;
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/reset/student/{studentId}/chapter/{chapterId}")
+    public ResponseEntity<String> resetChapterProgress(
+            @PathVariable Long studentId,
+            @PathVariable String chapterId) {
+        service.resetChapterProgress(studentId, chapterId);
+        return ResponseEntity.ok("Progress reset successfully for student " + studentId + " in chapter " + chapterId);
+    }
 
 }

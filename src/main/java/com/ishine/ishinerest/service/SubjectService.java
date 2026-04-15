@@ -15,15 +15,19 @@ public class SubjectService {
     @Autowired
     private SubjectRepository subjectRepository;
 
-    public List<SubjectEntity> getSubjectsByClass(String classId) {
-        return subjectRepository.findByClassEntity_ClassId(classId);
+    public List<SubjectEntity> getAllSubjects() {
+        return subjectRepository.findAll();
+    }
+
+    public List<SubjectEntity> getSubjectsByClass(Integer classId) {
+        return subjectRepository.findByClassId(classId);
     }
 
     public SubjectEntity saveSubject(SubjectEntity subject) {
         return subjectRepository.save(subject);
     }
 
-        public List<SubjectEntity> saveSubjects(List<SubjectEntity> subjects) {
+    public List<SubjectEntity> saveSubjects(List<SubjectEntity> subjects) {
         return subjectRepository.saveAll(subjects);
     }
 
@@ -34,7 +38,7 @@ public class SubjectService {
         if (optionalSubject.isPresent()) {
             SubjectEntity subject = optionalSubject.get();
             subject.setSubjectName(subjectDetails.getSubjectName());
-            subject.setClassEntity(subjectDetails.getClassEntity());
+            subject.setClasses(subjectDetails.getClasses());
             return subjectRepository.save(subject);
         } else {
             throw new RuntimeException("Subject not found with ID: " + subjectId);

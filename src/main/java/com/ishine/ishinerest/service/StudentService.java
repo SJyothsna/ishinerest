@@ -1,6 +1,5 @@
 package com.ishine.ishinerest.service;
 
-
 import com.ishine.ishinerest.entity.Student;
 import com.ishine.ishinerest.entity.StudentSubject;
 import com.ishine.ishinerest.entity.SubjectEntity;
@@ -17,7 +16,6 @@ import com.ishine.ishinerest.entity.ClassEntity;
 import com.ishine.ishinerest.repository.ClassRepository;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,7 +52,13 @@ public class StudentService {
     public void deleteStudent(Long id) {
         studentRepository.deleteById(id);
     }
+
     public StudentPracticeProgressDTO getPracticeProgressByChapter(Long studentId, String chapterId) {
+        // Validate student exists
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Student not found with ID: " + studentId));
+
         List<Object[]> results = practiceSessionDetailRepository.getChapterProgress(studentId, chapterId);
 
         if (results == null || results.isEmpty()) {
@@ -66,27 +70,32 @@ public class StudentService {
     }
 
     public StudentPracticeProgressDTO getPracticeProgressBySubject(Long studentId, String subjectId) {
+        // Validate student exists
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Student not found with ID: " + studentId));
+
         List<Object[]> resultList = practiceSessionDetailRepository.getSubjectProgress(studentId, subjectId);
 
         if (resultList == null || resultList.isEmpty()) {
             return new StudentPracticeProgressDTO(0L, 0L, 0L, 0L, 0L);
         }
 
-        Object[] row = resultList.get(0);  // ✅ Extract first row from the result
+        Object[] row = resultList.get(0); // ✅ Extract first row from the result
         return mapToProgressDTO(row);
     }
 
     private StudentPracticeProgressDTO mapToProgressDTO(Object[] row) {
-        Long totalQuestions     = row[0] != null ? ((Number) row[0]).longValue() : 0L;
+        Long totalQuestions = row[0] != null ? ((Number) row[0]).longValue() : 0L;
         Long practicedQuestions = row[1] != null ? ((Number) row[1]).longValue() : 0L;
-        Long correctAnswers     = row[2] != null ? ((Number) row[2]).longValue() : 0L;
-        Long incorrectAnswers   = row[3] != null ? ((Number) row[3]).longValue() : 0L;
-        Long notPracticed       = totalQuestions - practicedQuestions;
+        Long correctAnswers = row[2] != null ? ((Number) row[2]).longValue() : 0L;
+        Long incorrectAnswers = row[3] != null ? ((Number) row[3]).longValue() : 0L;
+        Long notPracticed = totalQuestions - practicedQuestions;
 
         return new StudentPracticeProgressDTO(
-                totalQuestions, practicedQuestions, correctAnswers, incorrectAnswers, notPracticed
-        );
+                totalQuestions, practicedQuestions, correctAnswers, incorrectAnswers, notPracticed);
     }
+
     public List<StudentSelectedSubjectDTO> getSubjectsSelectedByStudent(Long studentId) {
         List<StudentSubject> studentSubjects = studentSubjectRepository.findByStudentId(studentId);
 
@@ -100,6 +109,7 @@ public class StudentService {
                 .map(s -> new StudentSelectedSubjectDTO(s.getSubjectId(), s.getSubjectName()))
                 .toList();
     }
+
     public List<StudentSubject> saveStudentSubjects(Long studentId, List<String> subjectIds) {
         List<StudentSubject> savedSubjects = new ArrayList<>();
 
@@ -122,13 +132,14 @@ public class StudentService {
         Student s = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
         boolean hasClass = s.getClassEntity() != null;
-        String classId = hasClass ? s.getClassEntity().getClassId() : null; // adjust getter if your id is named differently
+        Integer classId = hasClass ? s.getClassEntity().getClassId() : null; // adjust getter if your id is named
+                                                                             // differently
         long subjectCount = studentSubjectRepository.countByStudentId(studentId);
         return new StudentProfileDTO(s.getStudentId(), s.getName(), s.getEmail(), hasClass, classId, subjectCount);
     }
 
     // new method: set/update the student's class
-    public void setStudentClass(Long studentId, String classId) {
+    public void setStudentClass(Long studentId, Integer classId) {
         Student s = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found"));
         ClassEntity ce = classRepository.findById(classId)
@@ -143,4 +154,3 @@ public class StudentService {
     }
 
 }
-

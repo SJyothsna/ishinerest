@@ -133,6 +133,9 @@ public class QuestionService {
 
     // Unpracticed questions by chapter
     public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level) {
+        // Normalize level parameter - treat "all" as null to get all difficulty levels
+        String normalizedLevel = (level != null && level.equalsIgnoreCase("all")) ? null : level;
+
         // Get answered question IDs for the student and chapter
         List<Long> practicedQuestionIds = practiceSessionDetailRepository
                 .findCorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
@@ -141,7 +144,8 @@ public class QuestionService {
             return questionRepository.findByChapterIdWithLimit(chapterId, limit);
         }
         // Get unpracticed questions for the chapter
-        return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit, level);
+        return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit,
+                normalizedLevel);
     }
 
     // public List<Question> getQuestionsByChapter(Long chapterId) {

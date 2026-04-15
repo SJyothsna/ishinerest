@@ -23,16 +23,15 @@ public class ClassController {
     public ClassEntity saveClass(@RequestBody ClassEntity classEntity) {
         return classService.saveClass(classEntity);
     }
-    
-    @PutMapping("/{classId}")
-    public ClassEntity updateClass(@PathVariable String classId, @RequestBody ClassEntity classEntity) {
-    return classService.updateClass(classId, classEntity);
-}
 
-    
+    @PutMapping("/{classId}")
+    public ClassEntity updateClass(@PathVariable Integer classId, @RequestBody ClassEntity classEntity) {
+        return classService.updateClass(classId, classEntity);
+    }
+
     @DeleteMapping("/{classId}")
-    public void deleteClass(@PathVariable String classId) {
-    classService.deleteClassById(classId);
-}
+    public void deleteClass(@PathVariable Integer classId) {
+        classService.deleteClassById(classId);
+    }
 
 }

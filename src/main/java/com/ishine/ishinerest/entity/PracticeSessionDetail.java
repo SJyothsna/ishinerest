@@ -15,14 +15,13 @@ public class PracticeSessionDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sessionDetailId;
 
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id", nullable = false)
+    @JsonIgnore
+    private Question question;
+
+    @Column(name = "question_id", insertable = false, updatable = false)
     private Long questionId;
-
-    @Column(nullable = true)
-    private String chapterId;
-
-    @Column(nullable = true)
-    private String subjectId;
 
     @Column(nullable = true)
     private String studentAnswer;
@@ -30,15 +29,18 @@ public class PracticeSessionDetail {
     @Column(nullable = false)
     private Boolean isCorrect;
 
-    @Column(nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    @JsonIgnore
+    private Student student;
+
+    @Column(name = "student_id", insertable = false, updatable = false)
     private Long studentId;
 
     @Column(nullable = false)
-    private Integer attemptCount = 1;  // Default 1 for new attempts
+    private Integer attemptCount = 1; // Default 1 for new attempts
 
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    @JoinColumn(name = "student_id", nullable = false)
-//    private Student student;
+    // Transient field to accept subjectId from JSON payload but not persist it
+    @Transient
+    private String subjectId;
 }

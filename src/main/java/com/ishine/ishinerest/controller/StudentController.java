@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ishine.ishinerest.service.StudentService;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +34,7 @@ public class StudentController {
         Optional<Student> student = studentService.getStudentById(id);
         return student.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     // NEW: profile for onboarding checks
     @GetMapping("/{studentId}/profile")
     public ResponseEntity<StudentProfileDTO> getStudentProfile(@PathVariable Long studentId) {
@@ -45,16 +45,15 @@ public class StudentController {
     @PutMapping("/{studentId}/class")
     public ResponseEntity<Void> setStudentClass(
             @PathVariable Long studentId,
-            @RequestParam String classId
-    ) {
+            @RequestParam Integer classId) {
         studentService.setStudentClass(studentId, classId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @PutMapping("/{studentId}/subjects")
     public ResponseEntity<Void> replaceSubjects(
             @PathVariable Long studentId,
-            @RequestBody List<String> subjectIds
-    ) {
+            @RequestBody List<String> subjectIds) {
         studentService.replaceStudentSubjects(studentId, subjectIds);
         return ResponseEntity.noContent().build();
     }
@@ -73,18 +72,17 @@ public class StudentController {
     @GetMapping("/{studentId}/practiceProgress/chapter")
     public ResponseEntity<StudentPracticeProgressDTO> getChapterPracticeProgress(
             @PathVariable Long studentId,
-            @RequestParam String chapterId
-    ) {
+            @RequestParam String chapterId) {
         return ResponseEntity.ok(studentService.getPracticeProgressByChapter(studentId, chapterId));
     }
 
     @GetMapping("/{studentId}/practiceProgress/subject")
     public ResponseEntity<StudentPracticeProgressDTO> getSubjectPracticeProgress(
             @PathVariable Long studentId,
-            @RequestParam String subjectId
-    ) {
+            @RequestParam String subjectId) {
         return ResponseEntity.ok(studentService.getPracticeProgressBySubject(studentId, subjectId));
     }
+
     @GetMapping("/{studentId}/subjects")
     public ResponseEntity<List<StudentSelectedSubjectDTO>> getStudentSubjects(@PathVariable Long studentId) {
         List<StudentSelectedSubjectDTO> selections = studentService.getSubjectsSelectedByStudent(studentId);
@@ -94,12 +92,9 @@ public class StudentController {
     @PostMapping("/{studentId}/subjects")
     public ResponseEntity<List<StudentSubject>> selectSubjectsForStudent(
             @PathVariable Long studentId,
-            @RequestBody List<String> subjectIds
-    ) {
-        List<StudentSubject> savedSelections =
-                studentService.saveStudentSubjects(studentId, subjectIds);
+            @RequestBody List<String> subjectIds) {
+        List<StudentSubject> savedSelections = studentService.saveStudentSubjects(studentId, subjectIds);
         return ResponseEntity.ok(savedSelections);
     }
-
 
 }

@@ -22,18 +22,25 @@ public class ClassService {
     }
 
     // Delete a class by ID
-    public void deleteClassById(String classId) {
+    public void deleteClassById(Integer classId) {
         classRepository.deleteById(classId);
     }
 
     // Update a class by ID
-    public ClassEntity updateClass(String classId, ClassEntity classEntity) {
+    public ClassEntity updateClass(Integer classId, ClassEntity classEntity) {
         // Find the existing class
         ClassEntity existingClass = classRepository.findById(classId)
                 .orElseThrow(() -> new RuntimeException("Class not found with id: " + classId));
 
         // Update the existing class with new details
         existingClass.setClassName(classEntity.getClassName());
+        existingClass.setExam(classEntity.getExam());
+        existingClass.setExamId(classEntity.getExamId());
+
+        // Update subjects relationship if provided
+        if (classEntity.getSubjects() != null) {
+            existingClass.setSubjects(classEntity.getSubjects());
+        }
 
         // Save the updated class
         return classRepository.save(existingClass);

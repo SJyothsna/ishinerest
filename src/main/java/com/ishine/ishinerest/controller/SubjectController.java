@@ -15,8 +15,13 @@ public class SubjectController {
     @Autowired
     private SubjectService subjectService;
 
+    @GetMapping
+    public List<SubjectEntity> getAllSubjects() {
+        return subjectService.getAllSubjects();
+    }
+
     @GetMapping("/class/{classId}")
-    public List<SubjectEntity> getSubjectsByClass(@PathVariable String classId) {
+    public List<SubjectEntity> getSubjectsByClass(@PathVariable Integer classId) {
         return subjectService.getSubjectsByClass(classId);
     }
 

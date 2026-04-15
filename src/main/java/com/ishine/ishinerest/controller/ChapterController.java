@@ -23,19 +23,28 @@ public class ChapterController {
     private SubjectService subjectService;
 
     @GetMapping
-    public List<Chapter> getChaptersBySubject(@RequestParam String subjectId) {
-        return chapterService.getChaptersBySubject(subjectId);
+    public List<Chapter> getChapters(@RequestParam(required = false) String subjectId) {
+        if (subjectId != null && !subjectId.isEmpty()) {
+            return chapterService.getChaptersBySubject(subjectId);
+        }
+        return chapterService.getAllChapters();
     }
 
-//    @GetMapping("/{chapterId}/questions")
-//    public List<Question> getQuestionsByChapterId(@PathVariable Long chapterId) {
-//        return chapterService.getQuestionsByChapterId(chapterId);
-//    }
-//
-//    @GetMapping("/{chapterId}/examquestions")
-//    public List<ExamQuestion> getExamQuestionsByChapter(@PathVariable Long chapterId) {
-//        return chapterService.getExamQuestionsByChapter(chapterId);
-//    }
+    // @GetMapping("/{chapterId}/questions")
+    // public List<Question> getQuestionsByChapterId(@PathVariable Long chapterId) {
+    // return chapterService.getQuestionsByChapterId(chapterId);
+    // }
+    //
+    // @GetMapping("/{chapterId}/examquestions")
+    // public List<ExamQuestion> getExamQuestionsByChapter(@PathVariable Long
+    // chapterId) {
+    // return chapterService.getExamQuestionsByChapter(chapterId);
+    // }
+
+    @PostMapping
+    public Chapter saveChapter(@RequestBody Chapter chapter) {
+        return chapterService.saveChapter(chapter);
+    }
 
     @PostMapping("/subject/{subjectId}")
     public List<Chapter> saveChapters(@PathVariable String subjectId, @RequestBody List<Chapter> chapters) {
@@ -47,8 +56,13 @@ public class ChapterController {
         return chapterService.saveChapters(chapters);
     }
 
+    @PutMapping("/{chapterId}")
+    public Chapter updateChapter(@PathVariable String chapterId, @RequestBody Chapter chapterDetails) {
+        return chapterService.updateChapter(chapterId, chapterDetails);
+    }
+
     @DeleteMapping("/{chapterId}")
-    public String deleteSubject(@PathVariable String chapterId) {
+    public String deleteChapter(@PathVariable String chapterId) {
         chapterService.deleteChapter(chapterId);
         return "Chapter with ID " + chapterId + " has been deleted.";
     }
@@ -64,4 +78,3 @@ public class ChapterController {
         return chapterService.uploadChaptersFromExcel(file);
     }
 }
-

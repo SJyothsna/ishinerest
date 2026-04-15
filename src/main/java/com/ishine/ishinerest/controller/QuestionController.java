@@ -58,6 +58,9 @@ public class QuestionController {
             question.setOptionD(questionDetails.getOptionD());
             question.setCorrectAnswer(questionDetails.getCorrectAnswer());
             question.setQuestionType(questionDetails.getQuestionType());
+            question.setDifficultyLevel(questionDetails.getDifficultyLevel());
+            question.setExplanation(questionDetails.getExplanation());
+            question.setNotes(questionDetails.getNotes());
 
             return questionService.saveQuestion(question);
         }

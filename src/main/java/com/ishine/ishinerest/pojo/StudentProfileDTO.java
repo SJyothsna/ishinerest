@@ -2,10 +2,10 @@
 package com.ishine.ishinerest.pojo;
 
 public record StudentProfileDTO(
-        Long id,
-        String name,
-        String email,
-        boolean hasClass,
-        String classId,
-        long subjectCount
-) {}
+                Long id,
+                String name,
+                String email,
+                boolean hasClass,
+                Integer classId,
+                long subjectCount) {
+}
