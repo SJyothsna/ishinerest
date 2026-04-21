@@ -1,0 +1,58 @@
+### ExamQuestionController
+@baseUrl = http://localhost:8080
+@chapterId = LC5H0102
+@examQuestionId = 1
+
+### Get all exam questions
+GET {{baseUrl}}/examquestions
+Accept: application/json
+
+###
+
+### Get exam question by id
+GET {{baseUrl}}/examquestions/{{examQuestionId}}
+Accept: application/json
+
+###
+
+### Get exam questions by chapter
+GET {{baseUrl}}/examquestions/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Create exam questions
+POST {{baseUrl}}/examquestions
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionText": "Solve x + 2 = 5",
+    "questionType": "SHORT",
+    "solution": "x = 3",
+    "questionImage": null,
+    "markingSchemeImage": null
+  }
+]
+
+###
+
+### Update exam question
+PUT {{baseUrl}}/examquestions/{{examQuestionId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "questionText": "Updated solve x + 2 = 5",
+  "questionType": "SHORT",
+  "solution": "x = 3",
+  "questionImage": null,
+  "markingSchemeImage": null
+}
+
+###
+
+### Delete exam question
+DELETE {{baseUrl}}/examquestions/{{examQuestionId}}
+Accept: application/json

@@ -1,0 +1,82 @@
+### StudentNoteController
+@baseUrl = http://localhost:8080
+@studentId = 4
+@chapterId = LC5H0102
+@noteId = 1
+
+### Get notes for student and chapter
+GET {{baseUrl}}/students/{{studentId}}/notes/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get all notes for student
+GET {{baseUrl}}/students/{{studentId}}/notes?limit=50&offset=0&sortBy=updatedAt&order=desc
+Accept: application/json
+
+###
+
+### Get note by id for student
+GET {{baseUrl}}/students/{{studentId}}/notes/note/{{noteId}}
+Accept: application/json
+
+###
+
+### Create student note
+POST {{baseUrl}}/students/{{studentId}}/notes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "title": "My Note",
+  "content": null,
+  "imageUrl": "/uploads/chapters/{{chapterId}}/notes/student_{{studentId}}/note_img_1234567890.png",
+  "color": "#E1BEE7"
+}
+
+###
+
+### Update student note
+PUT {{baseUrl}}/students/{{studentId}}/notes/{{noteId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Updated My Note",
+  "content": null,
+  "imageUrl": "/uploads/chapters/{{chapterId}}/notes/student_{{studentId}}/note_img_9876543210.png",
+  "color": "#E1BEE7"
+}
+
+###
+
+### Delete student note
+DELETE {{baseUrl}}/students/{{studentId}}/notes/{{noteId}}
+Accept: application/json
+
+###
+
+### Migrate student notes
+POST {{baseUrl}}/students/{{studentId}}/notes/migrate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notes": [
+    {
+      "chapterId": "{{chapterId}}",
+      "title": "Migrated Note 1",
+      "content": null,
+      "imageUrl": "/uploads/chapters/{{chapterId}}/notes/student_{{studentId}}/migrated_note_1.png",
+      "color": "#E1BEE7"
+    },
+    {
+      "chapterId": "{{chapterId}}",
+      "title": "Migrated Note 2",
+      "content": "Migrated content 2",
+      "imageUrl": null,
+      "color": "#BBDEFB"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+### SubjectController
+@baseUrl = http://localhost:8080
+@classId = 5
+@subjectId = LC5H01
+
+### Get all subjects
+GET {{baseUrl}}/subjects
+Accept: application/json
+
+###
+
+### Get subjects by class
+GET {{baseUrl}}/subjects/class/{{classId}}
+Accept: application/json
+
+###
+
+### Create subjects
+POST {{baseUrl}}/subjects
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "subjectId": "LC5H01",
+    "subjectName": "Mathematics"
+  }
+]
+
+###
+
+### Update subject
+PUT {{baseUrl}}/subjects/{{subjectId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "subjectName": "Mathematics Updated"
+}
+
+###
+
+### Delete subject
+DELETE {{baseUrl}}/subjects/{{subjectId}}
+Accept: application/json

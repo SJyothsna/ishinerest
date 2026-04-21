@@ -1,0 +1,20 @@
+### PrevExamQuestionController
+@baseUrl = http://localhost:8080
+@subjectId = LC5H01
+@chapterId = LC5H0102
+
+### Get previous exam questions by chapter
+GET {{baseUrl}}/prevexam-questions/by-chapter?chapterId={{chapterId}}
+Accept: application/json
+
+###
+
+### Get previous exam questions by subject
+GET {{baseUrl}}/prevexam-questions/by-subject?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Get all previous exam papers from question endpoint
+GET {{baseUrl}}/prevexam-questions/all
+Accept: application/json

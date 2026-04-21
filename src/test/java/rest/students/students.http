@@ -1,0 +1,87 @@
+### StudentController
+@baseUrl = http://localhost:8080
+@studentId = 1
+@classId = 5
+@subjectId = LC5H01
+@chapterId = LC5H0102
+
+### Get all students
+GET {{baseUrl}}/students
+Accept: application/json
+
+###
+
+### Get student by id
+GET {{baseUrl}}/students/{{studentId}}
+Accept: application/json
+
+###
+
+### Get student profile
+GET {{baseUrl}}/students/{{studentId}}/profile
+Accept: application/json
+
+###
+
+### Get chapter practice progress
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+###
+
+### Get subject practice progress
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/subject?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Get selected subjects for student
+GET {{baseUrl}}/students/{{studentId}}/subjects
+Accept: application/json
+
+###
+
+### Create student
+POST {{baseUrl}}/students
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "VS Code Student",
+  "email": "vscode.student@example.com",
+  "password": "Password123"
+}
+
+###
+
+### Set student's class
+PUT {{baseUrl}}/students/{{studentId}}/class?classId={{classId}}
+Accept: application/json
+
+###
+
+### Replace student subjects
+PUT {{baseUrl}}/students/{{studentId}}/subjects
+Content-Type: application/json
+Accept: application/json
+
+[
+  "{{subjectId}}"
+]
+
+###
+
+### Add student subjects
+POST {{baseUrl}}/students/{{studentId}}/subjects
+Content-Type: application/json
+Accept: application/json
+
+[
+  "{{subjectId}}"
+]
+
+###
+
+### Delete student
+DELETE {{baseUrl}}/students/{{studentId}}
+Accept: application/json

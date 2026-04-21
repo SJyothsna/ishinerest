@@ -1,0 +1,690 @@
+### iShine REST API - Combined HTTP requests for VS Code REST Client
+### Extension required: REST Client (Huachao Mao)
+### Start the Spring Boot app before running requests.
+
+@baseUrl = http://localhost:8080
+@studentId = 1
+@classId = 5
+@subjectId = LC5H01
+@chapterId = LC5H0102
+@questionId = 1
+@examQuestionId = 1
+@noteId = 1
+@commonNoteId = 1
+
+######################################################################
+# HOME / ADMIN
+######################################################################
+
+### Home page
+GET {{baseUrl}}/
+
+###
+
+### Admin page
+GET {{baseUrl}}/admin
+
+######################################################################
+# AUTH
+######################################################################
+
+### Signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test Student",
+  "email": "teststudent@example.com",
+  "password": "Password123"
+}
+
+###
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "teststudent@example.com",
+  "password": "Password123"
+}
+
+######################################################################
+# CLASSES
+######################################################################
+
+### Get all classes
+GET {{baseUrl}}/classes
+Accept: application/json
+
+###
+
+### Create class
+POST {{baseUrl}}/classes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "classId": 5,
+  "className": "5th Year",
+  "exam": "Leaving Cert",
+  "examId": 1
+}
+
+###
+
+### Update class
+PUT {{baseUrl}}/classes/{{classId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "classId": 5,
+  "className": "5th Year Updated",
+  "exam": "Leaving Cert",
+  "examId": 1
+}
+
+###
+
+### Delete class
+DELETE {{baseUrl}}/classes/{{classId}}
+Accept: application/json
+
+######################################################################
+# SUBJECTS
+######################################################################
+
+### Get all subjects
+GET {{baseUrl}}/subjects
+Accept: application/json
+
+###
+
+### Get subjects by class
+GET {{baseUrl}}/subjects/class/{{classId}}
+Accept: application/json
+
+###
+
+### Create subjects
+POST {{baseUrl}}/subjects
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "subjectId": "LC5H01",
+    "subjectName": "Mathematics"
+  }
+]
+
+###
+
+### Update subject
+PUT {{baseUrl}}/subjects/{{subjectId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "subjectId": "{{subjectId}}",
+  "subjectName": "Mathematics Updated"
+}
+
+###
+
+### Delete subject
+DELETE {{baseUrl}}/subjects/{{subjectId}}
+Accept: application/json
+
+######################################################################
+# CHAPTERS
+######################################################################
+
+### Get all chapters
+GET {{baseUrl}}/chapters
+Accept: application/json
+
+###
+
+### Get chapters by subject
+GET {{baseUrl}}/chapters?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Create chapter
+POST {{baseUrl}}/chapters
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "chapterName": "Algebra Basics",
+  "sectionId": "SEC1",
+  "sectionName": "Numbers",
+  "subject": {
+    "subjectId": "{{subjectId}}"
+  }
+}
+
+###
+
+### Create chapters for a subject
+POST {{baseUrl}}/chapters/subject/{{subjectId}}
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "chapterId": "LC5H0102",
+    "chapterName": "Algebra Basics",
+    "sectionId": "SEC1",
+    "sectionName": "Numbers"
+  },
+  {
+    "chapterId": "LC5H0103",
+    "chapterName": "Quadratics",
+    "sectionId": "SEC1",
+    "sectionName": "Numbers"
+  }
+]
+
+###
+
+### Update chapter
+PUT {{baseUrl}}/chapters/{{chapterId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "chapterName": "Algebra Basics Updated",
+  "sectionId": "SEC1",
+  "sectionName": "Numbers",
+  "subject": {
+    "subjectId": "{{subjectId}}"
+  }
+}
+
+###
+
+### Delete chapter by id
+DELETE {{baseUrl}}/chapters/{{chapterId}}
+Accept: application/json
+
+###
+
+### Delete chapters by subject
+DELETE {{baseUrl}}/chapters?subjectId={{subjectId}}
+Accept: application/json
+
+######################################################################
+# CHAPTER IMAGES
+######################################################################
+
+### List chapter images
+GET {{baseUrl}}/chapters/{{chapterId}}/images
+Accept: application/json
+
+######################################################################
+# QUESTIONS
+######################################################################
+
+### Get all questions
+GET {{baseUrl}}/questions
+Accept: application/json
+
+###
+
+### Get question by id
+GET {{baseUrl}}/questions/{{questionId}}
+Accept: application/json
+
+###
+
+### Get questions by chapter
+GET {{baseUrl}}/questions/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get questions by subject
+GET {{baseUrl}}/questions/subject/{{subjectId}}
+Accept: application/json
+
+###
+
+### Get unpracticed questions by subject
+GET {{baseUrl}}/questions/unpracticed/subject?studentId={{studentId}}&subjectId={{subjectId}}&limit=10
+Accept: application/json
+
+###
+
+### Get unpracticed questions by chapter
+GET {{baseUrl}}/questions/unpracticed/chapter?studentId={{studentId}}&chapterId={{chapterId}}&limit=10&level=Easy
+Accept: application/json
+
+###
+
+### Create questions
+POST {{baseUrl}}/questions
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionText": "What is 2 + 2?",
+    "optionA": "3",
+    "optionB": "4",
+    "optionC": "5",
+    "optionD": "6",
+    "correctAnswer": "B",
+    "questionType": "MCQ",
+    "difficultyLevel": "Easy",
+    "explanation": "2 + 2 = 4",
+    "notes": "Sample question"
+  }
+]
+
+###
+
+### Update question
+PUT {{baseUrl}}/questions/{{questionId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "questionText": "Updated: What is 2 + 2?",
+  "optionA": "3",
+  "optionB": "4",
+  "optionC": "5",
+  "optionD": "6",
+  "correctAnswer": "B",
+  "questionType": "MCQ",
+  "difficultyLevel": "Easy",
+  "explanation": "Still 4",
+  "notes": "Updated sample question"
+}
+
+###
+
+### Delete question
+DELETE {{baseUrl}}/questions/{{questionId}}
+Accept: application/json
+
+######################################################################
+# EXAM QUESTIONS
+######################################################################
+
+### Get all exam questions
+GET {{baseUrl}}/examquestions
+Accept: application/json
+
+###
+
+### Get exam question by id
+GET {{baseUrl}}/examquestions/{{examQuestionId}}
+Accept: application/json
+
+###
+
+### Get exam questions by chapter
+GET {{baseUrl}}/examquestions/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Create exam questions
+POST {{baseUrl}}/examquestions
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionText": "Solve x + 2 = 5",
+    "questionType": "SHORT",
+    "solution": "x = 3",
+    "questionImage": null,
+    "markingSchemeImage": null
+  }
+]
+
+###
+
+### Update exam question
+PUT {{baseUrl}}/examquestions/{{examQuestionId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "questionText": "Updated solve x + 2 = 5",
+  "questionType": "SHORT",
+  "solution": "x = 3",
+  "questionImage": null,
+  "markingSchemeImage": null
+}
+
+###
+
+### Delete exam question
+DELETE {{baseUrl}}/examquestions/{{examQuestionId}}
+Accept: application/json
+
+######################################################################
+# PREVIOUS EXAM PAPERS
+######################################################################
+
+### Get all previous exam papers
+GET {{baseUrl}}/prevexam-papers
+Accept: application/json
+
+###
+
+### Get previous exam papers by subject
+GET {{baseUrl}}/prevexam-papers/by-subject?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Create previous exam paper
+POST {{baseUrl}}/prevexam-papers
+Content-Type: application/json
+Accept: application/json
+
+{
+  "year": 2023
+}
+
+######################################################################
+# PREVIOUS EXAM QUESTIONS
+######################################################################
+
+### Get previous exam questions by chapter
+GET {{baseUrl}}/prevexam-questions/by-chapter?chapterId={{chapterId}}
+Accept: application/json
+
+###
+
+### Get previous exam questions by subject
+GET {{baseUrl}}/prevexam-questions/by-subject?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Get all previous exam papers from question endpoint
+GET {{baseUrl}}/prevexam-questions/all
+Accept: application/json
+
+######################################################################
+# STUDENTS
+######################################################################
+
+### Get all students
+GET {{baseUrl}}/students
+Accept: application/json
+
+###
+
+### Get student by id
+GET {{baseUrl}}/students/{{studentId}}
+Accept: application/json
+
+###
+
+### Get student profile
+GET {{baseUrl}}/students/{{studentId}}/profile
+Accept: application/json
+
+###
+
+### Get chapter practice progress
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+###
+
+### Get subject practice progress
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/subject?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Get selected subjects for student
+GET {{baseUrl}}/students/{{studentId}}/subjects
+Accept: application/json
+
+###
+
+### Create student
+POST {{baseUrl}}/students
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "VS Code Student",
+  "email": "vscode.student@example.com",
+  "password": "Password123"
+}
+
+###
+
+### Set student's class
+PUT {{baseUrl}}/students/{{studentId}}/class?classId={{classId}}
+Accept: application/json
+
+###
+
+### Replace student subjects
+PUT {{baseUrl}}/students/{{studentId}}/subjects
+Content-Type: application/json
+Accept: application/json
+
+[
+  "{{subjectId}}"
+]
+
+###
+
+### Add student subjects
+POST {{baseUrl}}/students/{{studentId}}/subjects
+Content-Type: application/json
+Accept: application/json
+
+[
+  "{{subjectId}}"
+]
+
+###
+
+### Delete student
+DELETE {{baseUrl}}/students/{{studentId}}
+Accept: application/json
+
+######################################################################
+# STUDENT NOTES
+######################################################################
+
+### Get notes for student and chapter
+GET {{baseUrl}}/students/{{studentId}}/notes/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get all notes for student
+GET {{baseUrl}}/students/{{studentId}}/notes?limit=50&offset=0&sortBy=updatedAt&order=desc
+Accept: application/json
+
+###
+
+### Get note by id for student
+GET {{baseUrl}}/students/{{studentId}}/notes/note/{{noteId}}
+Accept: application/json
+
+###
+
+### Create student note
+POST {{baseUrl}}/students/{{studentId}}/notes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "title": "My Note",
+  "content": "This is a sample student note",
+  "color": "#E1BEE7"
+}
+
+###
+
+### Update student note
+PUT {{baseUrl}}/students/{{studentId}}/notes/{{noteId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Updated My Note",
+  "content": "Updated content",
+  "color": "#E1BEE7"
+}
+
+###
+
+### Delete student note
+DELETE {{baseUrl}}/students/{{studentId}}/notes/{{noteId}}
+Accept: application/json
+
+###
+
+### Migrate student notes
+POST {{baseUrl}}/students/{{studentId}}/notes/migrate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "notes": [
+    {
+      "chapterId": "{{chapterId}}",
+      "title": "Migrated Note 1",
+      "content": "Migrated content 1",
+      "color": "#E1BEE7"
+    },
+    {
+      "chapterId": "{{chapterId}}",
+      "title": "Migrated Note 2",
+      "content": "Migrated content 2",
+      "color": "#BBDEFB"
+    }
+  ]
+}
+
+######################################################################
+# COMMON NOTES
+######################################################################
+
+### Get active common notes by chapter
+GET {{baseUrl}}/common-notes/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get all common notes
+GET {{baseUrl}}/common-notes
+Accept: application/json
+
+###
+
+### Get common note by id
+GET {{baseUrl}}/common-notes/{{commonNoteId}}
+Accept: application/json
+
+###
+
+### Create common note
+POST {{baseUrl}}/common-notes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "category": "Formula",
+  "title": "Quadratic Formula",
+  "content": "x = (-b ± √(b² - 4ac)) / 2a",
+  "color": "#BBDEFB",
+  "icon": "📚",
+  "displayOrder": 1,
+  "isActive": true,
+  "createdBy": 1
+}
+
+###
+
+### Update common note
+PUT {{baseUrl}}/common-notes/{{commonNoteId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Updated Quadratic Formula",
+  "content": "Updated content from VS Code REST Client",
+  "displayOrder": 2
+}
+
+###
+
+### Deactivate common note
+PATCH {{baseUrl}}/common-notes/{{commonNoteId}}/deactivate
+Accept: application/json
+
+###
+
+### Delete common note
+DELETE {{baseUrl}}/common-notes/{{commonNoteId}}
+Accept: application/json
+
+###
+
+### Get distinct active categories
+GET {{baseUrl}}/common-notes/categories
+Accept: application/json
+
+######################################################################
+# PRACTICE SESSION DETAILS
+######################################################################
+
+### Get all practice session details
+GET {{baseUrl}}/practice-session-details
+Accept: application/json
+
+###
+
+### Get practice session details by student id
+GET {{baseUrl}}/practice-session-details/{{studentId}}
+Accept: application/json
+
+###
+
+### Create practice session details for student
+POST {{baseUrl}}/practice-session-details/{{studentId}}
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "chapterId": "{{chapterId}}"
+  }
+]
+
+###
+
+### Delete practice session detail by id
+DELETE {{baseUrl}}/practice-session-details/1
+Accept: application/json
+
+###
+
+### Reset chapter progress for student
+DELETE {{baseUrl}}/practice-session-details/reset/student/{{studentId}}/chapter/{{chapterId}}
+Accept: application/json

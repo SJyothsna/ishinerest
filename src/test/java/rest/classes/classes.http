@@ -1,0 +1,41 @@
+### ClassController
+@baseUrl = http://localhost:8080
+@classId = 5
+
+### Get all classes
+GET {{baseUrl}}/classes
+Accept: application/json
+
+###
+
+### Create class
+POST {{baseUrl}}/classes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "classId": 5,
+  "className": "5th Year",
+  "exam": "Leaving Cert",
+  "examId": 1
+}
+
+###
+
+### Update class
+PUT {{baseUrl}}/classes/{{classId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "classId": 5,
+  "className": "5th Year Updated",
+  "exam": "Leaving Cert",
+  "examId": 1
+}
+
+###
+
+### Delete class
+DELETE {{baseUrl}}/classes/{{classId}}
+Accept: application/json

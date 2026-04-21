@@ -1,0 +1,66 @@
+### FlaggedQuestionController
+@baseUrl = http://localhost:8080
+@studentId = 4
+@questionId = 204
+@chapterId = LC5H0102
+
+### Flag a question for a student
+POST {{baseUrl}}/flagged-questions/student/{{studentId}}/question/{{questionId}}
+Accept: application/json
+
+###
+
+### Flag another question
+POST {{baseUrl}}/flagged-questions/student/{{studentId}}/question/205
+Accept: application/json
+
+###
+
+### Flag one more question
+POST {{baseUrl}}/flagged-questions/student/{{studentId}}/question/210
+Accept: application/json
+
+###
+
+### Get all flagged questions for a student in a specific chapter
+GET {{baseUrl}}/flagged-questions/student/{{studentId}}/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get all flagged questions for a student (across all chapters)
+GET {{baseUrl}}/flagged-questions/student/{{studentId}}
+Accept: application/json
+
+###
+
+### Unflag a question for a student
+DELETE {{baseUrl}}/flagged-questions/student/{{studentId}}/question/{{questionId}}
+Accept: application/json
+
+###
+
+### Try to flag the same question again (should return existing)
+POST {{baseUrl}}/flagged-questions/student/{{studentId}}/question/205
+Accept: application/json
+
+###
+
+### Unflag another question
+DELETE {{baseUrl}}/flagged-questions/student/{{studentId}}/question/205
+Accept: application/json
+
+###
+
+### Get flagged questions after unflagging (should have fewer)
+GET {{baseUrl}}/flagged-questions/student/{{studentId}}/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get unpracticed flagged questions for a student in a specific chapter
+# This endpoint returns only flagged questions that have NOT been correctly answered
+GET {{baseUrl}}/flagged-questions/student/{{studentId}}/chapter/{{chapterId}}/unpracticed
+Accept: application/json
+
+###

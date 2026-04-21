@@ -1,0 +1,74 @@
+### Common Notes API - IntelliJ HTTP Client
+### Run the Spring Boot app, then click the green run icon beside any request.
+
+@baseUrl = http://localhost:8080
+@chapterId = LC5H0102
+@noteId = 1
+
+### Get active common notes by chapter
+GET {{baseUrl}}/common-notes/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get all common notes
+GET {{baseUrl}}/common-notes
+Accept: application/json
+
+###
+
+### Get common note by id
+GET {{baseUrl}}/common-notes/{{noteId}}
+Accept: application/json
+
+###
+
+### Create common note
+POST {{baseUrl}}/common-notes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "category": "Formula",
+  "title": "Quadratic Formula",
+  "content": null,
+  "imageUrl": "/uploads/chapters/{{chapterId}}/notes/common/note_img_1234567890.png",
+  "color": "#BBDEFB",
+  "icon": "📚",
+  "displayOrder": 1,
+  "isActive": true,
+  "createdBy": 1
+}
+
+###
+
+### Update common note
+PUT {{baseUrl}}/common-notes/{{noteId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Updated Quadratic Formula",
+  "content": null,
+  "imageUrl": "/uploads/chapters/{{chapterId}}/notes/common/note_img_9876543210.png",
+  "displayOrder": 2
+}
+
+###
+
+### Deactivate common note
+PATCH {{baseUrl}}/common-notes/{{noteId}}/deactivate
+Accept: application/json
+
+###
+
+### Delete common note
+DELETE {{baseUrl}}/common-notes/{{noteId}}
+Accept: application/json
+
+###
+
+### Get distinct active categories
+GET {{baseUrl}}/common-notes/categories
+Accept: application/json

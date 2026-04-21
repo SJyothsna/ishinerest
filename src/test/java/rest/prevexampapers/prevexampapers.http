@@ -1,0 +1,24 @@
+### PrevExamPaperController
+@baseUrl = http://localhost:8080
+@subjectId = LC5H01
+
+### Get all previous exam papers
+GET {{baseUrl}}/prevexam-papers
+Accept: application/json
+
+###
+
+### Get previous exam papers by subject
+GET {{baseUrl}}/prevexam-papers/by-subject?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Create previous exam paper
+POST {{baseUrl}}/prevexam-papers
+Content-Type: application/json
+Accept: application/json
+
+{
+  "year": 2023
+}

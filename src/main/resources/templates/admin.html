@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - iShine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .list-section {
+            margin-top: 30px;
+        }
+
+        .list-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .data-table tbody tr:hover {
+            background: #e9ecef;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        .badge-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .multi-select {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .multi-select label {
+            display: grid;
+            grid-template-columns: 30px 100px 1fr;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e0e0e0;
+            gap: 10px;
+        }
+
+        .multi-select label:hover {
+            background: #f8f9fa;
+        }
+
+        .multi-select label:last-child {
+            border-bottom: none;
+        }
+
+        .multi-select input[type="checkbox"] {
+            margin: 0;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .multi-select .subject-id {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .multi-select .subject-name {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .filter-section {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 iShine Admin Panel</h1>
+            <p>Manage Classes, Subjects, Chapters, and Questions</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('classes')">Classes</button>
+            <button class="tab" onclick="showTab('subjects')">Subjects</button>
+            <button class="tab" onclick="showTab('link-class-subject')">Link Class-Subject</button>
+            <button class="tab" onclick="showTab('chapters')">Chapters</button>
+            <button class="tab" onclick="showTab('questions')">Questions</button>
+            <button class="tab" onclick="showTab('common-notes')">Common Notes</button>
+        </div>
+
+        <!-- Classes Tab -->
+        <div id="classes" class="tab-content active">
+            <div class="form-section">
+                <h3 id="classFormTitle">Create New Class</h3>
+                <div id="class-alert"></div>
+                <form id="classForm">
+                    <input type="hidden" id="editClassId">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Class ID *</label>
+                            <input type="number" id="classId" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Class Name *</label>
+                            <input type="text" id="className" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Exam</label>
+                            <input type="text" id="exam" placeholder="e.g., Junior Cert, Leaving Cert">
+                        </div>
+                        <div class="form-group">
+                            <label>Exam ID</label>
+                            <input type="number" id="examId">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="classSubmitBtn">Create Class</button>
+                    <button type="button" class="btn btn-secondary" id="classCancelBtn" onclick="cancelClassEdit()" style="display:none;">Cancel</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h3>Existing Classes</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Class ID</th>
+                            <th>Class Name</th>
+                            <th>Exam</th>
+                            <th>Exam ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classesList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Subjects Tab -->
+        <div id="subjects" class="tab-content">
+            <div class="form-section">
+                <h3 id="subjectFormTitle">Create New Subject</h3>
+                <div id="subject-alert"></div>
+                <form id="subjectForm">
+                    <input type="hidden" id="editSubjectId">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Subject ID *</label>
+                            <input type="text" id="subjectId" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject Name *</label>
+                            <input type="text" id="subjectName" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="subjectSubmitBtn">Create Subject</button>
+                    <button type="button" class="btn btn-secondary" id="subjectCancelBtn" onclick="cancelSubjectEdit()" style="display:none;">Cancel</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h3>Existing Subjects</h3>
+                <div class="filter-section">
+                    <label>Filter by Class:</label>
+                    <select id="filterSubjectByClass" onchange="filterSubjectsByClass()">
+                        <option value="">-- All Subjects --</option>
+                    </select>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Subject ID</th>
+                            <th>Subject Name</th>
+                            <th>Linked Classes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectsList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Link Class-Subject Tab -->
+        <div id="link-class-subject" class="tab-content">
+            <div class="form-section">
+                <h3>Link Subjects to Class</h3>
+                <div id="link-alert"></div>
+                <form id="linkForm">
+                    <div class="form-group">
+                        <label>Select Class *</label>
+                        <select id="linkClassId" required onchange="loadSubjectsForClass()">
+                            <option value="">-- Select Class --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Subjects (check to link, uncheck to unlink) *</label>
+                        <div id="subjectsCheckboxes" class="multi-select"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Class-Subject Links</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h3>Class-Subject Relationships</h3>
+                <div id="classSubjectRelationships"></div>
+            </div>
+        </div>
+
+        <!-- Chapters Tab -->
+        <div id="chapters" class="tab-content">
+            <div class="form-section">
+                <h3 id="chapterFormTitle">Create New Chapter</h3>
+                <div id="chapter-alert"></div>
+                <form id="chapterForm">
+                    <input type="hidden" id="editChapterId">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Chapter ID *</label>
+                            <input type="text" id="chapterId" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Chapter Name *</label>
+                            <input type="text" id="chapterName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Select Subject *</label>
+                            <select id="chapterSubjectId" required>
+                                <option value="">-- Select Subject --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="chapterSubmitBtn">Create Chapter</button>
+                    <button type="button" class="btn btn-secondary" id="chapterCancelBtn" onclick="cancelChapterEdit()" style="display:none;">Cancel</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h3>Existing Chapters</h3>
+                <div class="filter-section">
+                    <label>Filter by Subject:</label>
+                    <select id="filterChapterBySubject" onchange="filterChaptersBySubject()">
+                        <option value="">-- All Chapters --</option>
+                    </select>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Chapter ID</th>
+                            <th>Chapter Name</th>
+                            <th>Subject</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chaptersList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Questions Tab -->
+        <div id="questions" class="tab-content">
+            <div class="form-section">
+                <h3 id="questionFormTitle">Add New Question</h3>
+                <div id="question-alert"></div>
+                <form id="questionForm">
+                    <input type="hidden" id="editQuestionId">
+                    <div class="form-group">
+                        <label>Select Subject *</label>
+                        <select id="questionSubjectId" required onchange="filterChaptersForQuestion()">
+                            <option value="">-- Select Subject --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Chapter *</label>
+                        <select id="questionChapterId" required>
+                            <option value="">-- Select Subject First --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Question Text *</label>
+                        <textarea id="questionText" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Question Type</label>
+                        <select id="questionType" onchange="toggleCorrectAnswersField()">
+                            <option value="1" selected>Choices</option>
+                            <option value="2">Blanks</option>
+                            <option value="3">Self Check</option>
+                            <option value="4">Multi-Select</option>
+                        </select>
+                    </div>
+                    <div class="grid-2" id="optionsGroup">
+                        <div class="form-group">
+                            <label>Option A <span id="optionARequired">*</span></label>
+                            <input type="text" id="optionA" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Option B <span id="optionBRequired">*</span></label>
+                            <input type="text" id="optionB" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Option C</label>
+                            <input type="text" id="optionC">
+                        </div>
+                        <div class="form-group">
+                            <label>Option D</label>
+                            <input type="text" id="optionD">
+                        </div>
+                        <div class="form-group">
+                            <label>Option E</label>
+                            <input type="text" id="optionE">
+                        </div>
+                        <div class="form-group">
+                            <label>Option F</label>
+                            <input type="text" id="optionF">
+                        </div>
+                    </div>
+                    <div class="form-group" id="correctAnswerGroup">
+                        <label>Correct Answer <span id="correctAnswerRequired">*</span></label>
+                        <select id="correctAnswer" style="display: block;">
+                            <option value="">-- Select Correct Answer --</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                            <option value="F">F</option>
+                        </select>
+                        <input type="text" id="correctAnswerText" placeholder="Enter the correct answer" style="display: none; width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small id="correctAnswerHint" style="color: #666; display: block; margin-top: 5px;">For single answer questions only</small>
+                    </div>
+                    <div class="form-group" id="correctAnswersGroup" style="display: none;">
+                        <label>Correct Answers (Multiple) *</label>
+                        <input type="text" id="correctAnswers" placeholder="e.g., A,B,C,D,E,F for multiple answers">
+                        <small style="color: #666; display: block; margin-top: 5px;">For multi-select questions, enter comma-separated values (e.g., A,B,C,D,E,F)</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Difficulty Level</label>
+                        <select id="difficultyLevel">
+                            <option value="Basic" selected>Basic</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Explanation</label>
+                        <textarea id="explanation" rows="3" placeholder="Explain the correct answer..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="notes" rows="2" placeholder="Additional notes or hints..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="questionSubmitBtn">Add Question</button>
+                    <button type="button" class="btn btn-secondary" id="questionCancelBtn" onclick="cancelQuestionEdit()" style="display:none;">Cancel</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h3>Filter Questions</h3>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Filter by Subject:</label>
+                        <select id="filterQuestionSubjectId" onchange="filterChaptersForQuestionFilter()">
+                            <option value="">-- Select Subject --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Filter by Chapter:</label>
+                        <select id="filterChapterId" onchange="loadQuestionsByChapter()">
+                            <option value="">-- Select Subject First --</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="questionsList"></div>
+            </div>
+        </div>
+
+        <!-- Common Notes Tab -->
+        <div id="common-notes" class="tab-content">
+            <div class="form-section">
+                <h3 id="commonNoteFormTitle">Add Common Note</h3>
+                <div id="common-note-alert"></div>
+                <form id="commonNoteForm">
+                    <input type="hidden" id="editCommonNoteId">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Select Subject</label>
+                            <select id="commonNoteSubjectId" onchange="filterChaptersForCommonNotes()">
+                                <option value="">-- Select Subject --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Select Chapter *</label>
+                            <select id="commonNoteChapterId" required>
+                                <option value="">-- Select Subject First --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <input type="text" id="commonNoteCategory" required placeholder="e.g. Formula, Definition, Tip">
+                        </div>
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" id="commonNoteTitle" required placeholder="Enter note title">
+                        </div>
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="text" id="commonNoteColor" value="#BBDEFB" placeholder="#BBDEFB">
+                        </div>
+                        <div class="form-group">
+                            <label>Icon</label>
+                            <input type="text" id="commonNoteIcon" value="📚" placeholder="📚">
+                        </div>
+                        <div class="form-group">
+                            <label>Display Order</label>
+                            <input type="number" id="commonNoteDisplayOrder" value="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Created By</label>
+                            <input type="number" id="commonNoteCreatedBy" placeholder="e.g. 1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Content</label>
+                        <textarea id="commonNoteContent" rows="4" placeholder="Leave empty if using only imageUrl"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" id="commonNoteImageUrl" placeholder="/uploads/chapters/LC5H0102/notes/common/note_img_123.png">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="commonNoteSubmitBtn">Add Common Note</button>
+                    <button type="button" class="btn btn-secondary" id="commonNoteCancelBtn" onclick="cancelCommonNoteEdit()" style="display:none;">Cancel</button>
+                </form>
+            </div>
+
+            <div class="list-section">
+                <h3>View Common Notes</h3>
+                <div class="filter-section">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Filter by Subject:</label>
+                            <select id="filterCommonNoteSubjectId" onchange="filterChaptersForCommonNotesFilter()">
+                                <option value="">-- Select Subject --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Filter by Chapter:</label>
+                            <select id="filterCommonNoteChapterId" onchange="loadCommonNotesByChapter()">
+                                <option value="">-- Select Subject First --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="commonNotesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_BASE = '';
+        
+        // Global data storage
+        let allSubjects = [];
+        let allChapters = [];
+        let allClasses = [];
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            // Load data when switching tabs
+            if (tabName === 'classes') loadClasses();
+            if (tabName === 'subjects') {
+                loadSubjects();
+                loadClassesForFilter();
+            }
+            if (tabName === 'link-class-subject') {
+                loadClasses();
+                loadSubjects();
+                loadClassSubjectRelationships();
+            }
+            if (tabName === 'chapters') {
+                loadChapters();
+                loadSubjectsForDropdown();
+                loadSubjectsForFilter();
+            }
+            if (tabName === 'questions') {
+                loadSubjectsForQuestionDropdown();
+                loadChaptersForDropdown();
+            }
+            if (tabName === 'common-notes') {
+                loadSubjectsForCommonNotesDropdown();
+                loadChaptersForDropdown();
+                loadAllCommonNotes();
+            }
+        }
+
+        // Show alert message
+        function showAlert(elementId, message, type) {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alertDiv.innerHTML = '', 5000);
+        }
+
+        // Classes Management
+        document.getElementById('classForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editClassId').value;
+            const classData = {
+                classId: parseInt(document.getElementById('classId').value),
+                className: document.getElementById('className').value,
+                exam: document.getElementById('exam').value || null,
+                examId: document.getElementById('examId').value ? parseInt(document.getElementById('examId').value) : null
+            };
+
+            try {
+                const url = editId ? `${API_BASE}/classes/${editId}` : `${API_BASE}/classes`;
+                const method = editId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(classData)
+                });
+
+                if (response.ok) {
+                    showAlert('class-alert', `Class ${editId ? 'updated' : 'created'} successfully!`, 'success');
+                    cancelClassEdit();
+                    loadClasses();
+                } else {
+                    showAlert('class-alert', `Error ${editId ? 'updating' : 'creating'} class`, 'error');
+                }
+            } catch (error) {
+                showAlert('class-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        function editClass(classId, className, exam, examId) {
+            document.getElementById('editClassId').value = classId;
+            document.getElementById('classId').value = classId;
+            document.getElementById('classId').readOnly = true;
+            document.getElementById('className').value = className;
+            document.getElementById('exam').value = exam || '';
+            document.getElementById('examId').value = examId || '';
+            document.getElementById('classFormTitle').textContent = 'Edit Class';
+            document.getElementById('classSubmitBtn').textContent = 'Update Class';
+            document.getElementById('classCancelBtn').style.display = 'inline-block';
+            window.scrollTo(0, 0);
+        }
+
+        function cancelClassEdit() {
+            document.getElementById('editClassId').value = '';
+            document.getElementById('classForm').reset();
+            document.getElementById('classId').readOnly = false;
+            document.getElementById('classFormTitle').textContent = 'Create New Class';
+            document.getElementById('classSubmitBtn').textContent = 'Create Class';
+            document.getElementById('classCancelBtn').style.display = 'none';
+        }
+
+        async function deleteClass(classId, className) {
+            if (!confirm(`Are you sure you want to delete class "${className}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/classes/${classId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('class-alert', 'Class deleted successfully!', 'success');
+                    loadClasses();
+                } else {
+                    showAlert('class-alert', 'Error deleting class', 'error');
+                }
+            } catch (error) {
+                showAlert('class-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function loadClasses() {
+            try {
+                const response = await fetch(`${API_BASE}/classes`);
+                const classes = await response.json();
+                allClasses = classes;
+                
+                const tbody = document.getElementById('classesList');
+                tbody.innerHTML = classes.map(c => `
+                    <tr>
+                        <td>${c.classId}</td>
+                        <td>${c.className}</td>
+                        <td>${c.exam || '-'}</td>
+                        <td>${c.examId || '-'}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-warning btn-sm" onclick='editClass(${c.classId}, "${c.className}", "${c.exam || ''}", ${c.examId || 'null'})'>Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick='deleteClass(${c.classId}, "${c.className}")'>Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update dropdowns
+                const linkClassSelect = document.getElementById('linkClassId');
+                linkClassSelect.innerHTML = '<option value="">-- Select Class --</option>' +
+                    classes.map(c => `<option value="${c.classId}">${c.className}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading classes:', error);
+            }
+        }
+
+        async function loadClassesForFilter() {
+            try {
+                const response = await fetch(`${API_BASE}/classes`);
+                const classes = await response.json();
+                
+                const filterSelect = document.getElementById('filterSubjectByClass');
+                filterSelect.innerHTML = '<option value="">-- All Subjects --</option>' +
+                    classes.map(c => `<option value="${c.classId}">${c.className}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading classes for filter:', error);
+            }
+        }
+
+        // Subjects Management
+        document.getElementById('subjectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editSubjectId').value;
+            const subjectData = {
+                subjectId: document.getElementById('subjectId').value,
+                subjectName: document.getElementById('subjectName').value
+            };
+
+            try {
+                const url = editId ? `${API_BASE}/subjects/${editId}` : `${API_BASE}/subjects`;
+                const method = editId ? 'PUT' : 'POST';
+                const body = editId ? JSON.stringify(subjectData) : JSON.stringify([subjectData]);
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body
+                });
+
+                if (response.ok) {
+                    showAlert('subject-alert', `Subject ${editId ? 'updated' : 'created'} successfully!`, 'success');
+                    cancelSubjectEdit();
+                    loadSubjects();
+                } else {
+                    showAlert('subject-alert', `Error ${editId ? 'updating' : 'creating'} subject`, 'error');
+                }
+            } catch (error) {
+                showAlert('subject-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        function editSubject(subjectId, subjectName) {
+            document.getElementById('editSubjectId').value = subjectId;
+            document.getElementById('subjectId').value = subjectId;
+            document.getElementById('subjectId').readOnly = true;
+            document.getElementById('subjectName').value = subjectName;
+            document.getElementById('subjectFormTitle').textContent = 'Edit Subject';
+            document.getElementById('subjectSubmitBtn').textContent = 'Update Subject';
+            document.getElementById('subjectCancelBtn').style.display = 'inline-block';
+            window.scrollTo(0, 0);
+        }
+
+        function cancelSubjectEdit() {
+            document.getElementById('editSubjectId').value = '';
+            document.getElementById('subjectForm').reset();
+            document.getElementById('subjectId').readOnly = false;
+            document.getElementById('subjectFormTitle').textContent = 'Create New Subject';
+            document.getElementById('subjectSubmitBtn').textContent = 'Create Subject';
+            document.getElementById('subjectCancelBtn').style.display = 'none';
+        }
+
+        async function deleteSubject(subjectId, subjectName) {
+            if (!confirm(`Are you sure you want to delete subject "${subjectName}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/subjects/${subjectId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('subject-alert', 'Subject deleted successfully!', 'success');
+                    loadSubjects();
+                } else {
+                    showAlert('subject-alert', 'Error deleting subject', 'error');
+                }
+            } catch (error) {
+                showAlert('subject-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function loadSubjects() {
+            try {
+                // Load classes first if not already loaded
+                if (allClasses.length === 0) {
+                    const classResponse = await fetch(`${API_BASE}/classes`);
+                    allClasses = await classResponse.json();
+                }
+                
+                const response = await fetch(`${API_BASE}/subjects`);
+                const subjects = await response.json();
+                allSubjects = subjects;
+                
+                displaySubjects(subjects);
+
+                // Update checkboxes for linking
+                const checkboxDiv = document.getElementById('subjectsCheckboxes');
+                checkboxDiv.innerHTML = subjects.map(s => `
+                    <label>
+                        <input type="checkbox" name="subjects" value="${s.subjectId}">
+                        <span class="subject-id">${s.subjectId}</span>
+                        <span class="subject-name">${s.subjectName}</span>
+                    </label>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
+        }
+
+        function displaySubjects(subjects) {
+            const tbody = document.getElementById('subjectsList');
+            tbody.innerHTML = subjects.map(s => {
+                // Get classes for this subject
+                const linkedClasses = allClasses.filter(c => 
+                    c.subjects && c.subjects.some(sub => sub.subjectId === s.subjectId)
+                );
+                const classNames = linkedClasses.map(c => c.className).join(', ') || '-';
+                
+                return `
+                    <tr>
+                        <td>${s.subjectId}</td>
+                        <td>${s.subjectName}</td>
+                        <td>${classNames}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-warning btn-sm" onclick='editSubject("${s.subjectId}", "${s.subjectName}")'>Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick='deleteSubject("${s.subjectId}", "${s.subjectName}")'>Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function filterSubjectsByClass() {
+            const classId = document.getElementById('filterSubjectByClass').value;
+            
+            if (!classId) {
+                displaySubjects(allSubjects);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/subjects/class/${classId}`);
+                const filteredSubjects = await response.json();
+                displaySubjects(filteredSubjects);
+            } catch (error) {
+                console.error('Error filtering subjects:', error);
+                displaySubjects(allSubjects);
+            }
+        }
+
+        async function loadSubjectsForDropdown() {
+            try {
+                const response = await fetch(`${API_BASE}/subjects`);
+                const subjects = await response.json();
+                
+                const select = document.getElementById('chapterSubjectId');
+                select.innerHTML = '<option value="">-- Select Subject --</option>' +
+                    subjects.map(s => `<option value="${s.subjectId}">${s.subjectName}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
+        }
+
+        async function loadSubjectsForFilter() {
+            try {
+                const response = await fetch(`${API_BASE}/subjects`);
+                const subjects = await response.json();
+                
+                const filterSelect = document.getElementById('filterChapterBySubject');
+                filterSelect.innerHTML = '<option value="">-- All Chapters --</option>' +
+                    subjects.map(s => `<option value="${s.subjectId}">${s.subjectName}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading subjects for filter:', error);
+            }
+        }
+
+        // Load subjects and check the ones already linked to selected class
+        async function loadSubjectsForClass() {
+            const classId = parseInt(document.getElementById('linkClassId').value);
+            
+            if (!classId) {
+                // If no class selected, show all subjects unchecked
+                const checkboxDiv = document.getElementById('subjectsCheckboxes');
+                checkboxDiv.innerHTML = allSubjects.map(s => `
+                    <label>
+                        <input type="checkbox" name="subjects" value="${s.subjectId}">
+                        <span class="subject-id">${s.subjectId}</span>
+                        <span class="subject-name">${s.subjectName}</span>
+                    </label>
+                `).join('');
+                return;
+            }
+
+            try {
+                // Get the selected class with its subjects
+                const classResponse = await fetch(`${API_BASE}/classes`);
+                const classes = await classResponse.json();
+                const selectedClass = classes.find(c => c.classId === classId);
+                
+                // Get all subjects
+                const subjectsResponse = await fetch(`${API_BASE}/subjects`);
+                const allSubjects = await subjectsResponse.json();
+                
+                // Get linked subject IDs
+                const linkedSubjectIds = selectedClass && selectedClass.subjects
+                    ? selectedClass.subjects.map(s => s.subjectId)
+                    : [];
+                
+                console.log('Selected class:', selectedClass);
+                console.log('Linked subject IDs:', linkedSubjectIds);
+                
+                // Update checkboxes with checked state for linked subjects
+                const checkboxDiv = document.getElementById('subjectsCheckboxes');
+                checkboxDiv.innerHTML = allSubjects.map(s => {
+                    const isChecked = linkedSubjectIds.includes(s.subjectId);
+                    return `
+                        <label>
+                            <input type="checkbox" name="subjects" value="${s.subjectId}" ${isChecked ? 'checked' : ''}>
+                            <span class="subject-id">${s.subjectId}</span>
+                            <span class="subject-name">${s.subjectName}</span>
+                        </label>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading subjects for class:', error);
+            }
+        }
+
+        // Link Class-Subject
+        document.getElementById('linkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const classId = parseInt(document.getElementById('linkClassId').value);
+            const selectedSubjects = Array.from(document.querySelectorAll('input[name="subjects"]:checked'))
+                .map(cb => cb.value);
+
+            console.log('Selected Class ID:', classId);
+            console.log('Selected Subject IDs (checked):', selectedSubjects);
+
+            if (!classId) {
+                showAlert('link-alert', 'Please select a class', 'error');
+                return;
+            }
+
+            // Allow empty selection to unlink all subjects
+            // if (selectedSubjects.length === 0) {
+            //     showAlert('link-alert', 'Please select at least one subject', 'error');
+            //     return;
+            // }
+
+            try {
+                const classResponse = await fetch(`${API_BASE}/classes`);
+                const classes = await classResponse.json();
+                const selectedClass = classes.find(c => c.classId === classId);
+
+                if (!selectedClass) {
+                    showAlert('link-alert', 'Selected class not found', 'error');
+                    return;
+                }
+
+                console.log('Selected Class:', selectedClass);
+
+                const subjectsResponse = await fetch(`${API_BASE}/subjects`);
+                const allSubjects = await subjectsResponse.json();
+                
+                // Get only the checked subjects (this will add new links and remove unchecked ones)
+                const subjectsToLink = allSubjects.filter(s => selectedSubjects.includes(s.subjectId));
+
+                console.log('Subjects to link (final):', subjectsToLink);
+
+                const updateData = {
+                    classId: selectedClass.classId,
+                    className: selectedClass.className,
+                    exam: selectedClass.exam,
+                    examId: selectedClass.examId,
+                    subjects: subjectsToLink
+                };
+
+                console.log('Update data being sent:', JSON.stringify(updateData, null, 2));
+
+                const response = await fetch(`${API_BASE}/classes/${classId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                console.log('Response status:', response.status);
+                const responseText = await response.text();
+                console.log('Response body:', responseText);
+
+                if (response.ok) {
+                    showAlert('link-alert', 'Class-Subject links updated successfully!', 'success');
+                    // Reload the subjects for the selected class to show updated checkboxes
+                    loadSubjectsForClass();
+                    loadClassSubjectRelationships();
+                } else {
+                    showAlert('link-alert', `Error updating links: ${responseText}`, 'error');
+                }
+            } catch (error) {
+                showAlert('link-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        async function loadClassSubjectRelationships() {
+            try {
+                const response = await fetch(`${API_BASE}/classes`);
+                const classes = await response.json();
+                
+                const container = document.getElementById('classSubjectRelationships');
+                container.innerHTML = classes.map(c => `
+                    <div class="form-section">
+                        <h4>${c.className}</h4>
+                        <p>
+                            ${c.subjects && c.subjects.length > 0 
+                                ? c.subjects.map(s => `<span class="badge badge-primary">${s.subjectName}</span>`).join(' ')
+                                : '<span class="badge badge-secondary">No subjects linked</span>'}
+                        </p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading relationships:', error);
+            }
+        }
+
+        // Chapters Management
+        document.getElementById('chapterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editChapterId').value;
+            const chapterData = {
+                chapterId: document.getElementById('chapterId').value,
+                chapterName: document.getElementById('chapterName').value,
+                subject: {
+                    subjectId: document.getElementById('chapterSubjectId').value
+                }
+            };
+
+            try {
+                const url = editId ? `${API_BASE}/chapters/${editId}` : `${API_BASE}/chapters`;
+                const method = editId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(chapterData)
+                });
+
+                if (response.ok) {
+                    showAlert('chapter-alert', `Chapter ${editId ? 'updated' : 'created'} successfully!`, 'success');
+                    cancelChapterEdit();
+                    loadChapters();
+                } else {
+                    showAlert('chapter-alert', `Error ${editId ? 'updating' : 'creating'} chapter`, 'error');
+                }
+            } catch (error) {
+                showAlert('chapter-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        function editChapter(chapterId, chapterName, subjectId) {
+            document.getElementById('editChapterId').value = chapterId;
+            document.getElementById('chapterId').value = chapterId;
+            document.getElementById('chapterId').readOnly = true;
+            document.getElementById('chapterName').value = chapterName;
+            document.getElementById('chapterSubjectId').value = subjectId;
+            document.getElementById('chapterFormTitle').textContent = 'Edit Chapter';
+            document.getElementById('chapterSubmitBtn').textContent = 'Update Chapter';
+            document.getElementById('chapterCancelBtn').style.display = 'inline-block';
+            window.scrollTo(0, 0);
+        }
+
+        function cancelChapterEdit() {
+            document.getElementById('editChapterId').value = '';
+            document.getElementById('chapterForm').reset();
+            document.getElementById('chapterId').readOnly = false;
+            document.getElementById('chapterFormTitle').textContent = 'Create New Chapter';
+            document.getElementById('chapterSubmitBtn').textContent = 'Create Chapter';
+            document.getElementById('chapterCancelBtn').style.display = 'none';
+        }
+
+        async function deleteChapter(chapterId, chapterName) {
+            if (!confirm(`Are you sure you want to delete chapter "${chapterName}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/chapters/${chapterId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('chapter-alert', 'Chapter deleted successfully!', 'success');
+                    loadChapters();
+                } else {
+                    showAlert('chapter-alert', 'Error deleting chapter', 'error');
+                }
+            } catch (error) {
+                showAlert('chapter-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function loadChapters() {
+            try {
+                const response = await fetch(`${API_BASE}/chapters`);
+                const chapters = await response.json();
+                allChapters = chapters;
+                
+                displayChapters(chapters);
+            } catch (error) {
+                console.error('Error loading chapters:', error);
+            }
+        }
+
+        function displayChapters(chapters) {
+            const tbody = document.getElementById('chaptersList');
+            tbody.innerHTML = chapters.map(ch => `
+                <tr>
+                    <td>${ch.chapterId}</td>
+                    <td>${ch.chapterName}</td>
+                    <td>${ch.subject ? ch.subject.subjectName : '-'}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-warning btn-sm" onclick='editChapter("${ch.chapterId}", "${ch.chapterName}", "${ch.subject ? ch.subject.subjectId : ''}")'>Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick='deleteChapter("${ch.chapterId}", "${ch.chapterName}")'>Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterChaptersBySubject() {
+            const subjectId = document.getElementById('filterChapterBySubject').value;
+            
+            if (!subjectId) {
+                displayChapters(allChapters);
+                return;
+            }
+
+            const filteredChapters = allChapters.filter(ch => 
+                ch.subject && ch.subject.subjectId === subjectId
+            );
+            displayChapters(filteredChapters);
+        }
+
+        async function loadChaptersForDropdown() {
+            try {
+                const response = await fetch(`${API_BASE}/chapters`);
+                const chapters = await response.json();
+                allChapters = chapters;
+                
+                console.log('Loaded chapters:', allChapters);
+                
+                const select = document.getElementById('questionChapterId');
+                if (select) {
+                    select.innerHTML = '<option value="">-- Select Subject First --</option>';
+                }
+                
+                const filterSelect = document.getElementById('filterChapterId');
+                if (filterSelect) {
+                    filterSelect.innerHTML = '<option value="">-- Select Subject First --</option>';
+                }
+            } catch (error) {
+                console.error('Error loading chapters:', error);
+            }
+        }
+
+        async function loadSubjectsForQuestionDropdown() {
+            try {
+                const response = await fetch(`${API_BASE}/subjects`);
+                const subjects = await response.json();
+                
+                // Load for question form
+                const select = document.getElementById('questionSubjectId');
+                if (select) {
+                    select.innerHTML = '<option value="">-- Select Subject --</option>' +
+                        subjects.map(s => `<option value="${s.subjectId}">${s.subjectName}</option>`).join('');
+                }
+                
+                // Load for filter section
+                const filterSelect = document.getElementById('filterQuestionSubjectId');
+                if (filterSelect) {
+                    filterSelect.innerHTML = '<option value="">-- All Subjects --</option>' +
+                        subjects.map(s => `<option value="${s.subjectId}">${s.subjectName}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading subjects for questions:', error);
+            }
+        }
+
+        function filterChaptersForQuestion() {
+            const subjectId = document.getElementById('questionSubjectId').value;
+            const chapterSelect = document.getElementById('questionChapterId');
+            
+            console.log('Filtering chapters for subject:', subjectId);
+            console.log('Available chapters:', allChapters);
+            
+            if (!subjectId) {
+                chapterSelect.innerHTML = '<option value="">-- Select Subject First --</option>';
+                return;
+            }
+
+            const filteredChapters = allChapters.filter(ch =>
+                ch.subject && ch.subject.subjectId === subjectId
+            );
+
+            console.log('Filtered chapters:', filteredChapters);
+
+            if (filteredChapters.length === 0) {
+                chapterSelect.innerHTML = '<option value="">-- No Chapters for this Subject --</option>';
+            } else {
+                chapterSelect.innerHTML = '<option value="">-- Select Chapter --</option>' +
+                    filteredChapters.map(ch => `<option value="${ch.chapterId}">${ch.chapterName}</option>`).join('');
+            }
+        }
+
+        function filterChaptersForQuestionFilter() {
+            const subjectId = document.getElementById('filterQuestionSubjectId').value;
+            const chapterSelect = document.getElementById('filterChapterId');
+            
+            if (!subjectId) {
+                chapterSelect.innerHTML = '<option value="">-- All Chapters --</option>' +
+                    allChapters.map(ch => `<option value="${ch.chapterId}">${ch.chapterName} (${ch.subject ? ch.subject.subjectName : 'N/A'})</option>`).join('');
+                return;
+            }
+
+            const filteredChapters = allChapters.filter(ch =>
+                ch.subject && ch.subject.subjectId === subjectId
+            );
+
+            if (filteredChapters.length === 0) {
+                chapterSelect.innerHTML = '<option value="">-- No Chapters for this Subject --</option>';
+            } else {
+                chapterSelect.innerHTML = '<option value="">-- Select Chapter --</option>' +
+                    filteredChapters.map(ch => `<option value="${ch.chapterId}">${ch.chapterName}</option>`).join('');
+            }
+        }
+
+        // Questions Management
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editQuestionId').value;
+            const chapterId = document.getElementById('questionChapterId').value;
+            
+            const questionType = parseInt(document.getElementById('questionType').value);
+            const correctAnswersValue = document.getElementById('correctAnswers').value;
+            const correctAnswerSelectValue = document.getElementById('correctAnswer').value;
+            const correctAnswerTextValue = document.getElementById('correctAnswerText').value;
+            
+            // Determine correct answer based on question type
+            let correctAnswerValue;
+            if (questionType === 2 || questionType === 3) {
+                // Blanks or Self Check: use text input
+                correctAnswerValue = correctAnswerTextValue;
+            } else if (questionType === 4) {
+                // Multi-select: use empty string
+                correctAnswerValue = '';
+            } else {
+                // Choices: use dropdown
+                correctAnswerValue = correctAnswerSelectValue;
+            }
+            
+            const questionData = {
+                questionText: document.getElementById('questionText').value,
+                optionA: document.getElementById('optionA').value,
+                optionB: document.getElementById('optionB').value,
+                optionC: document.getElementById('optionC').value || null,
+                optionD: document.getElementById('optionD').value || null,
+                optionE: document.getElementById('optionE').value || null,
+                optionF: document.getElementById('optionF').value || null,
+                correctAnswer: correctAnswerValue,
+                correctAnswers: questionType === 4 ? correctAnswersValue : null,
+                questionType: questionType,
+                difficultyLevel: document.getElementById('difficultyLevel').value,
+                explanation: document.getElementById('explanation').value || null,
+                notes: document.getElementById('notes').value || null,
+                chapter: {
+                    chapterId: chapterId
+                }
+            };
+
+            try {
+                const url = editId ? `${API_BASE}/questions/${editId}` : `${API_BASE}/questions`;
+                const method = editId ? 'PUT' : 'POST';
+                
+                // For POST, wrap in array; for PUT, send as object
+                const body = method === 'POST' ? JSON.stringify([questionData]) : JSON.stringify(questionData);
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body
+                });
+
+                if (response.ok) {
+                    showAlert('question-alert', `Question ${editId ? 'updated' : 'added'} successfully!`, 'success');
+                    if (editId) {
+                        cancelQuestionEdit();
+                    } else {
+                        // For new questions, only clear question-specific fields, keep subject/chapter/type/difficulty
+                        clearQuestionFields();
+                    }
+                    loadQuestionsByChapter();
+                } else {
+                    showAlert('question-alert', `Error ${editId ? 'updating' : 'adding'} question`, 'error');
+                }
+            } catch (error) {
+                showAlert('question-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        async function editQuestion(questionId) {
+            try {
+                const response = await fetch(`${API_BASE}/questions/${questionId}`);
+                const q = await response.json();
+                
+                // Get the currently filtered chapter ID
+                const currentChapterId = document.getElementById('filterChapterId').value;
+                
+                if (!currentChapterId) {
+                    showAlert('question-alert', 'Please select a chapter first to edit questions', 'error');
+                    return;
+                }
+                
+                // Find the row and replace with edit form
+                const row = document.querySelector(`tr[data-question-id="${questionId}"]`);
+                if (!row) return;
+                
+                // Store original content for cancel
+                row.dataset.originalContent = row.innerHTML;
+                
+                // Create inline edit form
+                row.innerHTML = `
+                    <td colspan="7" style="padding: 20px;">
+                        <div style="display: grid; gap: 15px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Question Text:</label>
+                                    <textarea id="edit-questionText-${questionId}" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${q.questionText}</textarea>
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Explanation:</label>
+                                    <textarea id="edit-explanation-${questionId}" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${q.explanation || ''}</textarea>
+                                </div>
+                            </div>
+                            
+                            <div id="edit-optionsGroup-${questionId}" style="display: ${q.questionType === 2 || q.questionType === 3 ? 'none' : 'grid'}; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Option A:</label>
+                                    <input type="text" id="edit-optionA-${questionId}" value="${q.optionA || ''}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Option B:</label>
+                                    <input type="text" id="edit-optionB-${questionId}" value="${q.optionB || ''}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Option C:</label>
+                                    <input type="text" id="edit-optionC-${questionId}" value="${q.optionC || ''}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Option D:</label>
+                                    <input type="text" id="edit-optionD-${questionId}" value="${q.optionD || ''}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Option E:</label>
+                                    <input type="text" id="edit-optionE-${questionId}" value="${q.optionE || ''}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Option F:</label>
+                                    <input type="text" id="edit-optionF-${questionId}" value="${q.optionF || ''}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <div id="edit-correctAnswerSelect-${questionId}" style="display: ${q.questionType === 2 || q.questionType === 3 ? 'none' : 'block'};">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correct Answer:</label>
+                                    <select id="edit-correctAnswer-${questionId}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <option value="A" ${q.correctAnswer === 'A' ? 'selected' : ''}>A</option>
+                                        <option value="B" ${q.correctAnswer === 'B' ? 'selected' : ''}>B</option>
+                                        <option value="C" ${q.correctAnswer === 'C' ? 'selected' : ''}>C</option>
+                                        <option value="D" ${q.correctAnswer === 'D' ? 'selected' : ''}>D</option>
+                                        <option value="E" ${q.correctAnswer === 'E' ? 'selected' : ''}>E</option>
+                                        <option value="F" ${q.correctAnswer === 'F' ? 'selected' : ''}>F</option>
+                                    </select>
+                                </div>
+                                <div id="edit-correctAnswerText-${questionId}" style="display: ${q.questionType === 2 || q.questionType === 3 ? 'block' : 'none'};">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correct Answer (Text):</label>
+                                    <input type="text" id="edit-correctAnswerTextInput-${questionId}" value="${q.correctAnswer || ''}" placeholder="Enter correct answer" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                <div id="edit-correctAnswersMulti-${questionId}" style="display: ${q.questionType === 4 ? 'block' : 'none'};">
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correct Answers (Multiple):</label>
+                                    <input type="text" id="edit-correctAnswers-${questionId}" value="${q.correctAnswers || ''}" placeholder="e.g., A,B,C" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Question Type:</label>
+                                    <select id="edit-questionType-${questionId}" onchange="toggleEditFields(${questionId})" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <option value="1" ${q.questionType === 1 ? 'selected' : ''}>Choices</option>
+                                        <option value="2" ${q.questionType === 2 ? 'selected' : ''}>Blanks</option>
+                                        <option value="3" ${q.questionType === 3 ? 'selected' : ''}>Self Check</option>
+                                        <option value="4" ${q.questionType === 4 ? 'selected' : ''}>Multi-Select</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Difficulty Level:</label>
+                                    <select id="edit-difficultyLevel-${questionId}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <option value="Basic" ${q.difficultyLevel === 'Basic' ? 'selected' : ''}>Basic</option>
+                                        <option value="Intermediate" ${q.difficultyLevel === 'Intermediate' ? 'selected' : ''}>Intermediate</option>
+                                        <option value="Advanced" ${q.difficultyLevel === 'Advanced' ? 'selected' : ''}>Advanced</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; align-items: flex-end; gap: 10px;">
+                                    <button class="btn btn-success" onclick="updateQuestionInline(${questionId})" style="flex: 1;">Update</button>
+                                    <button class="btn btn-secondary" onclick="cancelEditInline(${questionId})" style="flex: 1;">Cancel</button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Notes:</label>
+                                <textarea id="edit-notes-${questionId}" style="width: 100%; min-height: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${q.notes || ''}</textarea>
+                            </div>
+                        </div>
+                    </td>
+                `;
+            } catch (error) {
+                showAlert('question-alert', 'Error loading question: ' + error.message, 'error');
+            }
+        }
+        
+        function cancelEditInline(questionId) {
+            const row = document.querySelector(`tr[data-question-id="${questionId}"]`);
+            if (row && row.dataset.originalContent) {
+                row.innerHTML = row.dataset.originalContent;
+                delete row.dataset.originalContent;
+            }
+        
+        function toggleEditFields(questionId) {
+            const questionType = parseInt(document.getElementById(`edit-questionType-${questionId}`).value);
+            const optionsGroup = document.getElementById(`edit-optionsGroup-${questionId}`);
+            const correctAnswerSelect = document.getElementById(`edit-correctAnswerSelect-${questionId}`);
+            const correctAnswerText = document.getElementById(`edit-correctAnswerText-${questionId}`);
+            const correctAnswersMulti = document.getElementById(`edit-correctAnswersMulti-${questionId}`);
+            
+            if (questionType === 4) {
+                // Multi-Select: Show options, hide single correct answer, show multiple correct answers
+                optionsGroup.style.display = 'grid';
+                correctAnswerSelect.style.display = 'none';
+                correctAnswerText.style.display = 'none';
+                correctAnswersMulti.style.display = 'block';
+            } else if (questionType === 2 || questionType === 3) {
+                // Blanks or Self Check: Hide options, show text input for correct answer
+                optionsGroup.style.display = 'none';
+                correctAnswerSelect.style.display = 'none';
+                correctAnswerText.style.display = 'block';
+                correctAnswersMulti.style.display = 'none';
+            } else {
+                // Choices: Show options and dropdown
+                optionsGroup.style.display = 'grid';
+                correctAnswerSelect.style.display = 'block';
+                correctAnswerText.style.display = 'none';
+                correctAnswersMulti.style.display = 'none';
+            }
+        }
+        }
+        
+        async function updateQuestionInline(questionId) {
+            try {
+                const currentChapterId = document.getElementById('filterChapterId').value;
+                const questionType = parseInt(document.getElementById(`edit-questionType-${questionId}`).value);
+                
+                // Determine correct answer based on question type
+                let correctAnswerValue;
+                if (questionType === 2 || questionType === 3) {
+                    // Blanks or Self Check: use text input
+                    correctAnswerValue = document.getElementById(`edit-correctAnswerTextInput-${questionId}`).value;
+                } else if (questionType === 4) {
+                    // Multi-select: use empty string
+                    correctAnswerValue = '';
+                } else {
+                    // Choices: use dropdown
+                    correctAnswerValue = document.getElementById(`edit-correctAnswer-${questionId}`).value;
+                }
+                
+                const questionData = {
+                    questionText: document.getElementById(`edit-questionText-${questionId}`).value,
+                    optionA: document.getElementById(`edit-optionA-${questionId}`).value || null,
+                    optionB: document.getElementById(`edit-optionB-${questionId}`).value || null,
+                    optionC: document.getElementById(`edit-optionC-${questionId}`).value || null,
+                    optionD: document.getElementById(`edit-optionD-${questionId}`).value || null,
+                    optionE: document.getElementById(`edit-optionE-${questionId}`).value || null,
+                    optionF: document.getElementById(`edit-optionF-${questionId}`).value || null,
+                    correctAnswer: correctAnswerValue,
+                    correctAnswers: questionType === 4 ? document.getElementById(`edit-correctAnswers-${questionId}`).value : null,
+                    questionType: questionType,
+                    difficultyLevel: document.getElementById(`edit-difficultyLevel-${questionId}`).value,
+                    explanation: document.getElementById(`edit-explanation-${questionId}`).value || null,
+                    notes: document.getElementById(`edit-notes-${questionId}`).value || null,
+                    chapter: { chapterId: currentChapterId }
+                };
+                
+                const response = await fetch(`${API_BASE}/questions/${questionId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(questionData)
+                });
+                
+                if (response.ok) {
+                    showAlert('question-alert', 'Question updated successfully!', 'success');
+                    loadQuestionsByChapter();
+                } else {
+                    showAlert('question-alert', 'Error updating question', 'error');
+                }
+            } catch (error) {
+                showAlert('question-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        function toggleCorrectAnswersField() {
+            const questionType = parseInt(document.getElementById('questionType').value);
+            const optionsGroup = document.getElementById('optionsGroup');
+            const correctAnswerGroup = document.getElementById('correctAnswerGroup');
+            const correctAnswersGroup = document.getElementById('correctAnswersGroup');
+            const correctAnswerSelect = document.getElementById('correctAnswer');
+            const correctAnswerText = document.getElementById('correctAnswerText');
+            const correctAnswersInput = document.getElementById('correctAnswers');
+            const correctAnswerHint = document.getElementById('correctAnswerHint');
+            const optionA = document.getElementById('optionA');
+            const optionB = document.getElementById('optionB');
+            
+            // Type 1: Choices (MCQ) - Show options and dropdown
+            // Type 2: Blanks - Hide options, show text input
+            // Type 3: Self Check - Hide options, show text input
+            // Type 4: Multi-Select - Show options and correctAnswers field
+            
+            if (questionType === 4) {
+                // Multi-Select: Show options, hide correctAnswer group, show correctAnswers
+                optionsGroup.style.display = 'grid';
+                correctAnswerGroup.style.display = 'none';
+                correctAnswersGroup.style.display = 'block';
+                optionA.setAttribute('required', 'required');
+                optionB.setAttribute('required', 'required');
+                correctAnswerSelect.removeAttribute('required');
+                correctAnswerText.removeAttribute('required');
+                correctAnswersInput.setAttribute('required', 'required');
+                correctAnswerSelect.value = '';
+                correctAnswerText.value = '';
+            } else if (questionType === 2 || questionType === 3) {
+                // Blanks or Self Check: Hide options, show text input for correct answer
+                optionsGroup.style.display = 'none';
+                correctAnswerGroup.style.display = 'block';
+                correctAnswersGroup.style.display = 'none';
+                correctAnswerSelect.style.display = 'none';
+                correctAnswerText.style.display = 'block';
+                optionA.removeAttribute('required');
+                optionB.removeAttribute('required');
+                correctAnswerSelect.removeAttribute('required');
+                correctAnswerText.setAttribute('required', 'required');
+                correctAnswersInput.removeAttribute('required');
+                correctAnswerHint.textContent = questionType === 3 ? 'Enter the self-check answer text' : 'Enter the correct answer text';
+                correctAnswersInput.value = '';
+            } else {
+                // Choices (1): Show options and dropdown
+                optionsGroup.style.display = 'grid';
+                correctAnswerGroup.style.display = 'block';
+                correctAnswersGroup.style.display = 'none';
+                correctAnswerSelect.style.display = 'block';
+                correctAnswerText.style.display = 'none';
+                optionA.setAttribute('required', 'required');
+                optionB.setAttribute('required', 'required');
+                correctAnswerSelect.setAttribute('required', 'required');
+                correctAnswerText.removeAttribute('required');
+                correctAnswersInput.removeAttribute('required');
+                correctAnswerHint.textContent = 'Select the correct option';
+                correctAnswersInput.value = '';
+                correctAnswerText.value = '';
+            }
+        }
+
+        function clearQuestionFields() {
+            // Clear only question-specific fields, keep subject/chapter/type/difficulty
+            document.getElementById('questionText').value = '';
+            document.getElementById('optionA').value = '';
+            document.getElementById('optionB').value = '';
+            document.getElementById('optionC').value = '';
+            document.getElementById('optionD').value = '';
+            document.getElementById('optionE').value = '';
+            document.getElementById('optionF').value = '';
+            document.getElementById('correctAnswer').value = '';
+            document.getElementById('correctAnswerText').value = '';
+            document.getElementById('correctAnswers').value = '';
+            document.getElementById('explanation').value = '';
+            document.getElementById('notes').value = '';
+            // Focus back on question text for quick entry
+            document.getElementById('questionText').focus();
+        }
+
+        function cancelQuestionEdit() {
+            document.getElementById('editQuestionId').value = '';
+            document.getElementById('questionForm').reset();
+            document.getElementById('questionFormTitle').textContent = 'Add New Question';
+            document.getElementById('questionSubmitBtn').textContent = 'Add Question';
+            document.getElementById('questionCancelBtn').style.display = 'none';
+            toggleCorrectAnswersField(); // Reset field visibility
+        }
+
+        async function deleteQuestion(questionId) {
+            if (!confirm('Are you sure you want to delete this question?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/questions/${questionId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('question-alert', 'Question deleted successfully!', 'success');
+                    loadQuestionsByChapter();
+                } else {
+                    showAlert('question-alert', 'Error deleting question', 'error');
+                }
+            } catch (error) {
+                showAlert('question-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function loadQuestionsByChapter() {
+            const chapterId = document.getElementById('filterChapterId').value;
+            if (!chapterId) {
+                document.getElementById('questionsList').innerHTML = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/questions/chapter/${chapterId}`);
+                const questions = await response.json();
+                
+                const container = document.getElementById('questionsList');
+                if (questions.length === 0) {
+                    container.innerHTML = '<p>No questions found for this chapter.</p>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Options</th>
+                                <th>Correct Answer(s)</th>
+                                <th>Type</th>
+                                <th>Difficulty</th>
+                                <th>Explanation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${questions.map((q, index) => {
+                                const questionTypeMap = {
+                                    1: 'Choices',
+                                    2: 'Blanks',
+                                    3: 'Self Check',
+                                    4: 'Multi-Select'
+                                };
+                                const questionTypeLabel = questionTypeMap[q.questionType] || 'Choices';
+                                const correctAnswerDisplay = q.correctAnswers
+                                    ? `<span class="badge badge-success">${q.correctAnswer}</span><br><small style="color: #666;">Multiple: ${q.correctAnswers}</small>`
+                                    : `<span class="badge badge-success">${q.correctAnswer}</span>`;
+                                return `
+                                <tr data-question-id="${q.questionId}">
+                                    <td>${q.questionText}</td>
+                                    <td>
+                                        A: ${q.optionA || 'N/A'}<br>
+                                        B: ${q.optionB || 'N/A'}<br>
+                                        ${q.optionC ? `C: ${q.optionC}<br>` : ''}
+                                        ${q.optionD ? `D: ${q.optionD}<br>` : ''}
+                                        ${q.optionE ? `E: ${q.optionE}<br>` : ''}
+                                        ${q.optionF ? `F: ${q.optionF}` : ''}
+                                    </td>
+                                    <td>${correctAnswerDisplay}</td>
+                                    <td><span class="badge badge-info">${questionTypeLabel}</span></td>
+                                    <td><span class="badge badge-primary">${q.difficultyLevel || 'Basic'}</span></td>
+                                    <td style="max-width: 300px; white-space: pre-wrap;">${q.explanation || 'No explanation'}</td>
+                                    <td class="action-buttons">
+                                        <button class="btn btn-warning btn-sm" onclick='editQuestion(${q.questionId})'>Edit</button>
+                                        <button class="btn btn-danger btn-sm" onclick='deleteQuestion(${q.questionId})'>Delete</button>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading questions:', error);
+            }
+        }
+
+        async function loadSubjectsForCommonNotesDropdown() {
+            try {
+                const response = await fetch(`${API_BASE}/subjects`);
+                const subjects = await response.json();
+
+                const createSelect = document.getElementById('commonNoteSubjectId');
+                if (createSelect) {
+                    createSelect.innerHTML = '<option value="">-- Select Subject --</option>' +
+                        subjects.map(s => `<option value="${s.subjectId}">${s.subjectName}</option>`).join('');
+                }
+
+                const filterSelect = document.getElementById('filterCommonNoteSubjectId');
+                if (filterSelect) {
+                    filterSelect.innerHTML = '<option value="">-- Select Subject --</option>' +
+                        subjects.map(s => `<option value="${s.subjectId}">${s.subjectName}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading subjects for common notes:', error);
+            }
+        }
+
+        function filterChaptersForCommonNotes() {
+            const subjectId = document.getElementById('commonNoteSubjectId').value;
+            const chapterSelect = document.getElementById('commonNoteChapterId');
+
+            if (!subjectId) {
+                chapterSelect.innerHTML = '<option value="">-- Select Subject First --</option>';
+                return;
+            }
+
+            const filteredChapters = allChapters.filter(ch =>
+                ch.subject && ch.subject.subjectId === subjectId
+            );
+
+            chapterSelect.innerHTML = '<option value="">-- Select Chapter --</option>' +
+                filteredChapters.map(ch => `<option value="${ch.chapterId}">${ch.chapterName}</option>`).join('');
+        }
+
+        function filterChaptersForCommonNotesFilter() {
+            const subjectId = document.getElementById('filterCommonNoteSubjectId').value;
+            const chapterSelect = document.getElementById('filterCommonNoteChapterId');
+
+            if (!subjectId) {
+                chapterSelect.innerHTML = '<option value="">-- Select Subject First --</option>';
+                document.getElementById('commonNotesList').innerHTML = '';
+                return;
+            }
+
+            const filteredChapters = allChapters.filter(ch =>
+                ch.subject && ch.subject.subjectId === subjectId
+            );
+
+            chapterSelect.innerHTML = '<option value="">-- Select Chapter --</option>' +
+                filteredChapters.map(ch => `<option value="${ch.chapterId}">${ch.chapterName}</option>`).join('');
+        }
+
+        document.getElementById('commonNoteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const editId = document.getElementById('editCommonNoteId').value;
+            const commonNoteData = {
+                chapterId: document.getElementById('commonNoteChapterId').value,
+                category: document.getElementById('commonNoteCategory').value,
+                title: document.getElementById('commonNoteTitle').value,
+                content: document.getElementById('commonNoteContent').value || null,
+                imageUrl: document.getElementById('commonNoteImageUrl').value || null,
+                color: document.getElementById('commonNoteColor').value || '#BBDEFB',
+                icon: document.getElementById('commonNoteIcon').value || '📚',
+                displayOrder: document.getElementById('commonNoteDisplayOrder').value
+                    ? parseInt(document.getElementById('commonNoteDisplayOrder').value)
+                    : 0,
+                isActive: true,
+                createdBy: document.getElementById('commonNoteCreatedBy').value
+                    ? parseInt(document.getElementById('commonNoteCreatedBy').value)
+                    : null
+            };
+
+            try {
+                const url = editId ? `${API_BASE}/common-notes/${editId}` : `${API_BASE}/common-notes`;
+                const method = editId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(commonNoteData)
+                });
+
+                if (response.ok) {
+                    showAlert('common-note-alert', `Common note ${editId ? 'updated' : 'added'} successfully!`, 'success');
+                    cancelCommonNoteEdit();
+                    loadAllCommonNotes();
+                    loadCommonNotesByChapter();
+                } else {
+                    const errorText = await response.text();
+                    showAlert('common-note-alert', `Error ${editId ? 'updating' : 'adding'} common note: ` + errorText, 'error');
+                }
+            } catch (error) {
+                showAlert('common-note-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        async function editCommonNote(noteId) {
+            try {
+                const response = await fetch(`${API_BASE}/common-notes/${noteId}`);
+                const note = await response.json();
+
+                const chapter = allChapters.find(ch => ch.chapterId === note.chapterId);
+                const subjectId = chapter && chapter.subject ? chapter.subject.subjectId : '';
+
+                document.getElementById('editCommonNoteId').value = note.id;
+                document.getElementById('commonNoteSubjectId').value = subjectId;
+                filterChaptersForCommonNotes();
+                document.getElementById('commonNoteChapterId').value = note.chapterId || '';
+                document.getElementById('commonNoteCategory').value = note.category || '';
+                document.getElementById('commonNoteTitle').value = note.title || '';
+                document.getElementById('commonNoteContent').value = note.content || '';
+                document.getElementById('commonNoteImageUrl').value = note.imageUrl || '';
+                document.getElementById('commonNoteColor').value = note.color || '#BBDEFB';
+                document.getElementById('commonNoteIcon').value = note.icon || '📚';
+                document.getElementById('commonNoteDisplayOrder').value = note.displayOrder ?? 0;
+                document.getElementById('commonNoteCreatedBy').value = note.createdBy || '';
+
+                document.getElementById('commonNoteFormTitle').textContent = 'Edit Common Note';
+                document.getElementById('commonNoteSubmitBtn').textContent = 'Update Common Note';
+                document.getElementById('commonNoteCancelBtn').style.display = 'inline-block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                showAlert('common-note-alert', 'Error loading common note: ' + error.message, 'error');
+            }
+        }
+
+        function cancelCommonNoteEdit() {
+            document.getElementById('editCommonNoteId').value = '';
+            document.getElementById('commonNoteForm').reset();
+            document.getElementById('commonNoteFormTitle').textContent = 'Add Common Note';
+            document.getElementById('commonNoteSubmitBtn').textContent = 'Add Common Note';
+            document.getElementById('commonNoteCancelBtn').style.display = 'none';
+            document.getElementById('commonNoteColor').value = '#BBDEFB';
+            document.getElementById('commonNoteIcon').value = '📚';
+            document.getElementById('commonNoteDisplayOrder').value = '0';
+            document.getElementById('commonNoteChapterId').innerHTML = '<option value="">-- Select Subject First --</option>';
+        }
+
+        async function loadAllCommonNotes() {
+            try {
+                const response = await fetch(`${API_BASE}/common-notes`);
+                const notes = await response.json();
+
+                if (!document.getElementById('filterCommonNoteChapterId').value) {
+                    renderCommonNotes(notes);
+                }
+            } catch (error) {
+                console.error('Error loading all common notes:', error);
+            }
+        }
+
+        async function loadCommonNotesByChapter() {
+            const chapterId = document.getElementById('filterCommonNoteChapterId').value;
+
+            if (!chapterId) {
+                loadAllCommonNotes();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/common-notes/chapter/${chapterId}`);
+                const result = await response.json();
+                const notes = result.data || [];
+                renderCommonNotes(notes);
+            } catch (error) {
+                console.error('Error loading common notes by chapter:', error);
+            }
+        }
+
+        function renderCommonNotes(notes) {
+            const container = document.getElementById('commonNotesList');
+
+            if (!notes || notes.length === 0) {
+                container.innerHTML = '<p>No common notes found.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Chapter</th>
+                            <th>Category</th>
+                            <th>Title</th>
+                            <th>Content</th>
+                            <th>Image URL</th>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${notes.map(note => `
+                            <tr>
+                                <td>${note.id}</td>
+                                <td>${note.chapterId}</td>
+                                <td>${note.category || '-'}</td>
+                                <td>${note.title || '-'}</td>
+                                <td style="max-width: 300px; white-space: pre-wrap;">${note.content || '-'}</td>
+                                <td style="max-width: 320px; word-break: break-all;">
+                                    ${note.imageUrl ? `<a href="${note.imageUrl}" target="_blank">${note.imageUrl}</a>` : '-'}
+                                </td>
+                                <td>${note.displayOrder ?? 0}</td>
+                                <td><span class="badge ${note.isActive ? 'badge-success' : 'badge-primary'}">${note.isActive ? 'Active' : 'Inactive'}</span></td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-warning btn-sm" onclick='editCommonNote(${note.id})'>Edit</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Load initial data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadClasses();
+        });
+    </script>
+</body>
+</html>

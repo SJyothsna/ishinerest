@@ -1,0 +1,10 @@
+### HomeController + AdminController
+@baseUrl = http://localhost:8080
+
+### Home page
+GET {{baseUrl}}/
+
+###
+
+### Admin page
+GET {{baseUrl}}/admin

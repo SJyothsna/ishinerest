@@ -1,0 +1,158 @@
+### QuestionController
+@baseUrl = http://localhost:8080
+@studentId = 1
+@subjectId = LC5H01
+@chapterId = LC5H0102
+@questionId = 1
+
+### Get all questions
+GET {{baseUrl}}/questions
+Accept: application/json
+
+###
+
+### Get question by id
+GET {{baseUrl}}/questions/{{questionId}}
+Accept: application/json
+
+###
+
+### Get questions by chapter
+GET {{baseUrl}}/questions/chapter/{{chapterId}}
+Accept: application/json
+
+###
+
+### Get questions by subject
+GET {{baseUrl}}/questions/subject/{{subjectId}}
+Accept: application/json
+
+###
+
+### Get unpracticed questions by subject
+GET {{baseUrl}}/questions/unpracticed/subject?studentId={{studentId}}&subjectId={{subjectId}}&limit=10
+Accept: application/json
+
+###
+
+### Get unpracticed questions by chapter
+GET {{baseUrl}}/questions/unpracticed/chapter?studentId={{studentId}}&chapterId={{chapterId}}&limit=10&level=Easy
+Accept: application/json
+
+###
+
+### ========================================
+### NEW ENDPOINTS WITH FLAG STATUS
+### ========================================
+
+### Get unpracticed questions by chapter WITH FLAGS
+GET {{baseUrl}}/questions/unpracticed/chapter/with-flags?studentId={{studentId}}&chapterId={{chapterId}}&limit=10&level=Basic
+Accept: application/json
+
+###
+
+### Get unpracticed questions by subject WITH FLAGS
+GET {{baseUrl}}/questions/unpracticed/subject/with-flags?studentId={{studentId}}&subjectId={{subjectId}}&limit=10
+Accept: application/json
+
+###
+
+### Get questions by chapter WITH FLAGS
+GET {{baseUrl}}/questions/chapter/{{chapterId}}/with-flags?studentId={{studentId}}
+Accept: application/json
+
+###
+
+### Get questions by subject WITH FLAGS
+GET {{baseUrl}}/questions/subject/{{subjectId}}/with-flags?studentId={{studentId}}
+Accept: application/json
+
+###
+
+### ========================================
+### WRONG-UNPRACTICED QUESTIONS (Review Mistakes)
+### ========================================
+
+### Get wrong-unpracticed questions by chapter
+# Returns questions that were answered incorrectly and haven't been correctly answered yet
+GET {{baseUrl}}/questions/wrong-unpracticed/chapter?studentId={{studentId}}&chapterId={{chapterId}}
+Accept: application/json
+
+###
+
+### Get wrong-unpracticed questions by subject
+# Returns questions that were answered incorrectly and haven't been correctly answered yet
+GET {{baseUrl}}/questions/wrong-unpracticed/subject?studentId={{studentId}}&subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Create questions
+POST {{baseUrl}}/questions
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionText": "What is 2 + 2?",
+    "optionA": "3",
+    "optionB": "4",
+    "optionC": "5",
+    "optionD": "6",
+    "correctAnswer": "B",
+    "correctAnswers": null,
+    "questionType": 1,
+    "difficultyLevel": "Easy",
+    "explanation": "2 + 2 = 4",
+    "notes": "Sample question",
+    "chapter": {
+      "chapterId": "{{chapterId}}"
+    }
+  },
+  {
+    "questionText": "Which of these are prime numbers?",
+    "optionA": "2",
+    "optionB": "4",
+    "optionC": "5",
+    "optionD": "8",
+    "correctAnswer": "",
+    "correctAnswers": "A,C",
+    "questionType": 4,
+    "difficultyLevel": "Intermediate",
+    "explanation": "2 and 5 are prime numbers.",
+    "notes": "Multiple choice sample",
+    "chapter": {
+      "chapterId": "{{chapterId}}"
+    }
+  }
+]
+
+###
+
+### Update question
+PUT {{baseUrl}}/questions/{{questionId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "questionText": "Updated: Which of these are even numbers?",
+  "optionA": "2",
+  "optionB": "3",
+  "optionC": "4",
+  "optionD": "5",
+  "correctAnswer": "",
+  "correctAnswers": "A,C",
+  "questionType": 4,
+  "difficultyLevel": "Easy",
+  "explanation": "2 and 4 are even numbers.",
+  "notes": "Updated multiple choice sample",
+  "chapter": {
+    "chapterId": "{{chapterId}}"
+  }
+}
+
+###
+
+### Delete question
+DELETE {{baseUrl}}/questions/{{questionId}}
+Accept: application/json

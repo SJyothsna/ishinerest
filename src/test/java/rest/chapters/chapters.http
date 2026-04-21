@@ -1,0 +1,88 @@
+### ChapterController + ChapterImageController
+@baseUrl = http://localhost:8080
+@subjectId = LC5H01
+@chapterId = LC5H0102
+
+### Get all chapters
+GET {{baseUrl}}/chapters
+Accept: application/json
+
+###
+
+### Get chapters by subject
+GET {{baseUrl}}/chapters?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### Create chapter
+POST {{baseUrl}}/chapters
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "chapterName": "Algebra Basics",
+  "sectionId": "SEC1",
+  "sectionName": "Numbers",
+  "subject": {
+    "subjectId": "{{subjectId}}"
+  }
+}
+
+###
+
+### Create chapters for a subject
+POST {{baseUrl}}/chapters/subject/{{subjectId}}
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "chapterId": "LC5H0102",
+    "chapterName": "Algebra Basics",
+    "sectionId": "SEC1",
+    "sectionName": "Numbers"
+  },
+  {
+    "chapterId": "LC5H0103",
+    "chapterName": "Quadratics",
+    "sectionId": "SEC1",
+    "sectionName": "Numbers"
+  }
+]
+
+###
+
+### Update chapter
+PUT {{baseUrl}}/chapters/{{chapterId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "chapterName": "Algebra Basics Updated",
+  "sectionId": "SEC1",
+  "sectionName": "Numbers",
+  "subject": {
+    "subjectId": "{{subjectId}}"
+  }
+}
+
+###
+
+### Delete chapter by id
+DELETE {{baseUrl}}/chapters/{{chapterId}}
+Accept: application/json
+
+###
+
+### Delete chapters by subject
+DELETE {{baseUrl}}/chapters?subjectId={{subjectId}}
+Accept: application/json
+
+###
+
+### List chapter images
+GET {{baseUrl}}/chapters/{{chapterId}}/images
+Accept: application/json

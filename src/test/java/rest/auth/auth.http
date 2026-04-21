@@ -1,0 +1,25 @@
+### AuthController
+@baseUrl = http://localhost:8080
+
+### Signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test Student",
+  "email": "teststudent@example.com",
+  "password": "Password123"
+}
+
+###
+
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "teststudent@example.com",
+  "password": "Password123"
+}

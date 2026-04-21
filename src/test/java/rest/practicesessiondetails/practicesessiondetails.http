@@ -1,0 +1,39 @@
+### PracticeSessionDetailController
+@baseUrl = http://localhost:8080
+@studentId = 1
+@chapterId = LC5H0102
+
+### Get all practice session details
+GET {{baseUrl}}/practice-session-details
+Accept: application/json
+
+###
+
+### Get practice session details by student id
+GET {{baseUrl}}/practice-session-details/{{studentId}}
+Accept: application/json
+
+###
+
+### Create practice session details for student
+POST {{baseUrl}}/practice-session-details/{{studentId}}
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "chapterId": "{{chapterId}}"
+  }
+]
+
+###
+
+### Delete practice session detail by id
+DELETE {{baseUrl}}/practice-session-details/1
+Accept: application/json
+
+###
+
+### Reset chapter progress for student
+DELETE {{baseUrl}}/practice-session-details/reset/student/{{studentId}}/chapter/{{chapterId}}
+Accept: application/json
