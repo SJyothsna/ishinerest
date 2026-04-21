@@ -40,6 +40,26 @@ public interface PracticeSessionDetailRepository extends JpaRepository<PracticeS
             """)
     List<Long> findCorrectlyAnsweredQuestionIdsByChapter(Long studentId, String chapterId);
 
+    // Get incorrectly answered question IDs by student and chapter
+    @Query("""
+                SELECT psd.questionId
+                FROM PracticeSessionDetail psd
+                WHERE psd.studentId = :studentId
+                AND psd.question.chapter.chapterId = :chapterId
+                AND psd.isCorrect = false
+            """)
+    List<Long> findIncorrectlyAnsweredQuestionIdsByChapter(Long studentId, String chapterId);
+
+    // Get incorrectly answered question IDs by student and subject
+    @Query("""
+                SELECT psd.questionId
+                FROM PracticeSessionDetail psd
+                WHERE psd.studentId = :studentId
+                AND psd.question.chapter.subject.subjectId = :subjectId
+                AND psd.isCorrect = false
+            """)
+    List<Long> findIncorrectlyAnsweredQuestionIdsBySubject(Long studentId, String subjectId);
+
     Optional<PracticeSessionDetail> findByStudentIdAndQuestionId(Long studentId, Long questionId);
 
     // Delete practice session details by student and chapter

@@ -5711,3 +5711,254 @@ org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-22
 org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
 2026-04-14 20:58:18.815988+01:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 13:54:11.565531+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 13:56:28.346601+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'As zero is a real number, this means that any real number can be written as a... (257)"; SQL statement:
+insert into questions (chapter_id,correct_answer,created_by,difficulty_level,explanation,notes,optiona,optionb,optionc,optiond,question_text,question_type,section_id,tags,question_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,default) [22001-224]
+2026-04-15 14:12:04.642006+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 14:45:17.405401+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:01:06.509107+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:01:47.792657+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:02:18.927280+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:02:47.196156+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:03:10.157017+01:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:38:46.433114+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:40:35.044731+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:41:32.534325+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:42:31.548439+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:43:37.829659+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 15:44:55.389406+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.456369+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.517381+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.521913+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.527913+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.530914+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.533913+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.538915+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.544918+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.548916+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.552922+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.558924+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.562917+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 18:37:11.565916+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 19:06:22.368583+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 21:04:48.802804+01:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 21:04:48.810802+01:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 21:04:48.819809+01:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 21:04:48.834801+01:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-15 21:23:37.161931+01:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'Numbers which cannot be written as a fraction of integers. \\000a(e.g.  \\+01d7... (345)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 21:23:46.121251+01:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'Numbers which cannot be written as a fraction of integers. \\000a(e.g.  \\+01d7... (345)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 21:23:47.648531+01:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'Numbers which cannot be written as a fraction of integers. \\000a(e.g.  \\+01d7... (345)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:07:35.254811+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (331)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:07:39.914552+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (331)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:07:45.549492+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (331)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:07:57.555769+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (331)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:07:58.652977+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (331)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:09:34.651846+01:00 jdbc[53]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd a -1 = \\221a2 -1 , 1 minus from i... (331)"; SQL statement:
+UPDATE "PUBLIC"."QUESTIONS" SET "QUESTION_ID"=? ,"CORRECT_ANSWER"=? ,"DIFFICULTY_LEVEL"=? ,"EXPLANATION"=? ,"OPTIONA"=? ,"OPTIONB"=? ,"OPTIONC"=? ,"OPTIOND"=? ,"QUESTION_TEXT"=? ,"QUESTION_TYPE"=? ,"CHAPTER_ID"=? ,"NOTES"=? ,"CREATED_BY"=? ,"TAGS"=? ,"SECTION_ID"=? ,"CORRECT_ANSWERS"=? ,"OPTIONE"=? ,"OPTIONF"=?  WHERE "QUESTION_ID"=? [22001-224]
+2026-04-15 22:09:34.651846+01:00 jdbc[53]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd a -1 = \\221a2 -1 , 1 minus from i... (331)"; SQL statement:
+UPDATE "PUBLIC"."QUESTIONS" SET "QUESTION_ID"=? ,"CORRECT_ANSWER"=? ,"DIFFICULTY_LEVEL"=? ,"EXPLANATION"=? ,"OPTIONA"=? ,"OPTIONB"=? ,"OPTIONC"=? ,"OPTIOND"=? ,"QUESTION_TEXT"=? ,"QUESTION_TYPE"=? ,"CHAPTER_ID"=? ,"NOTES"=? ,"CREATED_BY"=? ,"TAGS"=? ,"SECTION_ID"=? ,"CORRECT_ANSWERS"=? ,"OPTIONE"=? ,"OPTIONF"=?  WHERE "QUESTION_ID"=? [22001-224]
+2026-04-15 22:10:07.491147+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (302)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:10:09.234306+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (302)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:10:26.924387+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (278)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-15 22:10:28.143676+01:00 jdbc[43]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'a = \\221a2 - irrational numbers as its surd\\000aa -1 = \\221a2 -1 , 1 minus fr... (278)"; SQL statement:
+update questions set chapter_id=?,correct_answer=?,correct_answers=?,created_by=?,difficulty_level=?,explanation=?,notes=?,optiona=?,optionb=?,optionc=?,optiond=?,optione=?,optionf=?,question_text=?,question_type=?,section_id=?,tags=? where question_id=? [22001-224]
+2026-04-16 13:49:32.753847+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 13:51:38.202999+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 13:54:09.479950+01:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 13:55:46.493344+01:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:19:34.280584+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'To multiply polynomials, we must multiply each term in the first bracket by e... (296)"; SQL statement:
+insert into questions (chapter_id,correct_answer,correct_answers,created_by,difficulty_level,explanation,notes,optiona,optionb,optionc,optiond,optione,optionf,question_text,question_type,section_id,tags,question_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,default) [22001-224]
+2026-04-16 16:20:09.560369+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:28:51.516333+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:29:50.081129+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:30:38.405162+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:33:08.286479+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:34:13.425787+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:35:10.654575+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:36:03.198634+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:37:34.370785+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:38:37.330048+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:41:01.479787+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:43:32.444191+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:44:40.451816+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:45:44.239406+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:46:58.454759+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:48:19.346065+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:49:12.980452+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 16:49:54.782410+01:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:11:26.398033+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:11:46.556737+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:12:06.718637+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:12:24.839116+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:12:44.721630+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:13:19.055399+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:13:36.672131+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:13:52.080497+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:14:12.117113+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:16:40.860503+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:17:36.337705+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:17:58.370108+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:19:11.516375+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 17:35:06.980515+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 21:13:30.135289+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-16 21:13:30.168852+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-17 15:08:36.000726+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-17 19:24:56.768223+01:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-17 19:25:22.582032+01:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-17 19:25:44.610575+01:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'Group the terms:\\000a(3ax\\00b2 \\2212 3ay\\00b2) \\2212 (4bx\\00b2 \\2212 4by\\00b2... (286)"; SQL statement:
+insert into questions (chapter_id,correct_answer,correct_answers,created_by,difficulty_level,explanation,notes,optiona,optionb,optionc,optiond,optione,optionf,question_text,question_type,section_id,tags,question_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,default) [22001-224]
+2026-04-17 19:25:47.092174+01:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'Group the terms:\\000a(3ax\\00b2 \\2212 3ay\\00b2) \\2212 (4bx\\00b2 \\2212 4by\\00b2... (286)"; SQL statement:
+insert into questions (chapter_id,correct_answer,correct_answers,created_by,difficulty_level,explanation,notes,optiona,optionb,optionc,optiond,optione,optionf,question_text,question_type,section_id,tags,question_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,default) [22001-224]
+2026-04-17 19:25:47.850280+01:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "EXPLANATION CHARACTER VARYING(255)": "U&'Group the terms:\\000a(3ax\\00b2 \\2212 3ay\\00b2) \\2212 (4bx\\00b2 \\2212 4by\\00b2... (286)"; SQL statement:
+insert into questions (chapter_id,correct_answer,correct_answers,created_by,difficulty_level,explanation,notes,optiona,optionb,optionc,optiond,optione,optionf,question_text,question_type,section_id,tags,question_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,default) [22001-224]
+2026-04-17 19:26:21.443673+01:00 jdbc[44]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-20 22:17:12.230633+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-20 22:17:29.546249+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-20 22:18:59.055099+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-20 22:19:25.257293+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-20 22:19:28.428201+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 09:41:42.195443+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 09:41:54.731504+01:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 09:41:54.748574+01:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 12:35:00.433382+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 12:35:10.530881+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 12:35:10.540496+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:05:56.923335+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:13:24.204250+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:20:48.659109+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:23:30.964517+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:28:08.161147+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:32:44.016916+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:35:45.695107+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:40:03.148704+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:47:18.162058+01:00 jdbc[15]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:53:20.624950+01:00 jdbc[16]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 21:53:23.405409+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2026-04-21 22:43:12.920117+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]

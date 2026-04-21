@@ -3,6 +3,8 @@ package com.ishine.ishinerest.service;
 import com.ishine.ishinerest.entity.PracticeSessionDetail;
 import com.ishine.ishinerest.entity.Question;
 import com.ishine.ishinerest.entity.Student;
+import com.ishine.ishinerest.pojo.QuestionWithFlagDTO;
+import com.ishine.ishinerest.repository.FlaggedQuestionRepository;
 import com.ishine.ishinerest.repository.PracticeSessionDetailRepository;
 import com.ishine.ishinerest.repository.QuestionRepository;
 import com.ishine.ishinerest.repository.StudentRepository;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PracticeSessionDetailService {
@@ -24,6 +28,9 @@ public class PracticeSessionDetailService {
 
     @Autowired
     private StudentRepository studentRepository;
+
+    @Autowired
+    private FlaggedQuestionRepository flaggedQuestionRepository;
 
     public List<PracticeSessionDetail> getAllSessionDetails() {
         return repository.findAll();
@@ -76,5 +83,33 @@ public class PracticeSessionDetailService {
 
     public void resetChapterProgress(Long studentId, String chapterId) {
         repository.deleteByStudentIdAndChapterId(studentId, chapterId);
+    }
+
+    /**
+     * Get wrong answers (incorrectly answered questions) for a student in a chapter
+     * with flag status
+     */
+    public List<QuestionWithFlagDTO> getWrongAnswersByChapterWithFlags(Long studentId, String chapterId) {
+        // Get incorrectly answered question IDs
+        List<Long> wrongQuestionIds = repository.findIncorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
+
+        if (wrongQuestionIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Get the questions
+        List<Question> wrongQuestions = questionRepository.findAllById(wrongQuestionIds);
+
+        // Get flagged question IDs for this student
+        Set<Long> flaggedQuestionIds = flaggedQuestionRepository
+                .findByStudent_StudentId(studentId)
+                .stream()
+                .map(fq -> fq.getQuestion().getQuestionId())
+                .collect(Collectors.toSet());
+
+        // Convert to DTOs with flag status
+        return wrongQuestions.stream()
+                .map(q -> new QuestionWithFlagDTO(q, flaggedQuestionIds.contains(q.getQuestionId())))
+                .collect(Collectors.toList());
     }
 }

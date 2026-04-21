@@ -1,6 +1,7 @@
 package com.ishine.ishinerest.controller;
 
 import com.ishine.ishinerest.entity.PracticeSessionDetail;
+import com.ishine.ishinerest.pojo.QuestionWithFlagDTO;
 import com.ishine.ishinerest.service.PracticeSessionDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,20 @@ public class PracticeSessionDetailController {
             @PathVariable String chapterId) {
         service.resetChapterProgress(studentId, chapterId);
         return ResponseEntity.ok("Progress reset successfully for student " + studentId + " in chapter " + chapterId);
+    }
+
+    /**
+     * Get wrong answers (incorrectly answered questions) for a student in a chapter
+     * WITH isFlagged
+     * GET
+     * /practice-session-details/wrong-answers/student/{studentId}/chapter/{chapterId}
+     */
+    @GetMapping("/wrong-answers/student/{studentId}/chapter/{chapterId}")
+    public ResponseEntity<List<QuestionWithFlagDTO>> getWrongAnswersByChapter(
+            @PathVariable Long studentId,
+            @PathVariable String chapterId) {
+        List<QuestionWithFlagDTO> wrongAnswers = service.getWrongAnswersByChapterWithFlags(studentId, chapterId);
+        return ResponseEntity.ok(wrongAnswers);
     }
 
 }

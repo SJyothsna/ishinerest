@@ -1,6 +1,5 @@
 package com.ishine.ishinerest.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,8 +32,17 @@ public class Question {
     @Column
     private String optionD;
 
+    @Column
+    private String optionE;
+
+    @Column
+    private String optionF;
+
     @Column(nullable = false)
     private String correctAnswer;
+
+    @Column
+    private String correctAnswers;
 
     @Column
     private int questionType;
@@ -50,7 +58,7 @@ public class Question {
     private String createdBy;
     @Column
     private String tags;
-    //section number in chapter
+    // section number in chapter
     @Column
     private String sectionId;
 

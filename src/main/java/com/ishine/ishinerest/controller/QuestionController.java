@@ -1,6 +1,7 @@
 package com.ishine.ishinerest.controller;
 
 import com.ishine.ishinerest.entity.Question;
+import com.ishine.ishinerest.pojo.QuestionWithFlagDTO;
 import com.ishine.ishinerest.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,10 @@ public class QuestionController {
             question.setOptionB(questionDetails.getOptionB());
             question.setOptionC(questionDetails.getOptionC());
             question.setOptionD(questionDetails.getOptionD());
+            question.setOptionE(questionDetails.getOptionE());
+            question.setOptionF(questionDetails.getOptionF());
             question.setCorrectAnswer(questionDetails.getCorrectAnswer());
+            question.setCorrectAnswers(questionDetails.getCorrectAnswers());
             question.setQuestionType(questionDetails.getQuestionType());
             question.setDifficultyLevel(questionDetails.getDifficultyLevel());
             question.setExplanation(questionDetails.getExplanation());
@@ -72,22 +76,85 @@ public class QuestionController {
         questionService.deleteQuestion(id);
     }
 
-    // Endpoint for unpracticed questions by subject
+    // Endpoint for unpracticed questions by subject (NOW WITH isFlagged)
     @GetMapping("/unpracticed/subject")
-    public List<Question> getUnpracticedQuestionsBySubject(
+    public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubject(
             @RequestParam Long studentId,
             @RequestParam String subjectId,
             @RequestParam(defaultValue = "10") int limit) {
-        return questionService.getUnpracticedQuestionsBySubject(studentId, subjectId, limit);
+        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit);
     }
 
-    // Endpoint for unpracticed questions by chapter
+    // Endpoint for unpracticed questions by chapter (NOW WITH isFlagged)
     @GetMapping("/unpracticed/chapter")
-    public List<Question> getUnpracticedQuestionsByChapter(
+    public List<QuestionWithFlagDTO> getUnpracticedQuestionsByChapter(
             @RequestParam Long studentId,
             @RequestParam String chapterId,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(name = "level", required = false) String level) {
-        return questionService.getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level);
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level);
+    }
+
+    // NEW ENDPOINTS WITH FLAG STATUS
+
+    // Endpoint for unpracticed questions by chapter with flag status
+    @GetMapping("/unpracticed/chapter/with-flags")
+    public List<QuestionWithFlagDTO> getUnpracticedQuestionsByChapterWithFlags(
+            @RequestParam Long studentId,
+            @RequestParam String chapterId,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(name = "level", required = false) String level) {
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level);
+    }
+
+    // Endpoint for unpracticed questions by subject with flag status
+    @GetMapping("/unpracticed/subject/with-flags")
+    public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubjectWithFlags(
+            @RequestParam Long studentId,
+            @RequestParam String subjectId,
+            @RequestParam(defaultValue = "10") int limit) {
+        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit);
+    }
+
+    // Endpoint for questions by chapter with flag status
+    @GetMapping("/chapter/{chapterId}/with-flags")
+    public List<QuestionWithFlagDTO> getQuestionsByChapterWithFlags(
+            @PathVariable String chapterId,
+            @RequestParam Long studentId) {
+        return questionService.getQuestionsByChapterWithFlags(chapterId, studentId);
+    }
+
+    // Endpoint for questions by subject with flag status
+    @GetMapping("/subject/{subjectId}/with-flags")
+    public List<QuestionWithFlagDTO> getQuestionsBySubjectWithFlags(
+            @PathVariable String subjectId,
+            @RequestParam Long studentId) {
+        return questionService.getQuestionsBySubjectWithFlags(subjectId, studentId);
+    }
+
+    /**
+     * Get questions that were answered incorrectly and haven't been correctly
+     * answered yet (by chapter)
+     * These are questions the student got wrong and still need to practice
+     * GET /questions/wrong-unpracticed/chapter?studentId=X&chapterId=Y
+     */
+    @GetMapping("/wrong-unpracticed/chapter")
+    public List<QuestionWithFlagDTO> getWrongUnpracticedQuestionsByChapter(
+            @RequestParam Long studentId,
+            @RequestParam String chapterId) {
+        return questionService.getWrongUnpracticedQuestionsByChapter(studentId, chapterId);
+    }
+
+    /**
+     * Get questions that were answered incorrectly and haven't been correctly
+     * answered yet (by subject)
+     * These are questions the student got wrong and still need to practice
+     * GET /questions/wrong-unpracticed/subject?studentId=X&subjectId=Y
+     */
+    @GetMapping("/wrong-unpracticed/subject")
+    public List<QuestionWithFlagDTO> getWrongUnpracticedQuestionsBySubject(
+            @RequestParam Long studentId,
+            @RequestParam String subjectId) {
+        return questionService.getWrongUnpracticedQuestionsBySubject(studentId, subjectId);
     }
 }
