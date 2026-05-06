@@ -18,8 +18,12 @@ public class QuestionController {
     private QuestionService questionService;
 
     @GetMapping
-    public List<Question> getAllQuestions() {
-        return questionService.getAllQuestions();
+    public List<Question> getAllQuestions(
+            @RequestParam(name = "createdBy", required = false) Long createdBy) {
+        if (createdBy != null) {
+            return questionService.getQuestionsByCreatorOrDefault(createdBy);
+        }
+        return questionService.getQuestionsByCreatorOrDefault(null);
     }
 
     @GetMapping("/{id}")
@@ -65,6 +69,9 @@ public class QuestionController {
             question.setDifficultyLevel(questionDetails.getDifficultyLevel());
             question.setExplanation(questionDetails.getExplanation());
             question.setNotes(questionDetails.getNotes());
+            question.setHint(questionDetails.getHint());
+            question.setUsageType(questionDetails.getUsageType());
+            question.setQuestionImageUrl(questionDetails.getQuestionImageUrl());
 
             return questionService.saveQuestion(question);
         }
@@ -81,8 +88,9 @@ public class QuestionController {
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubject(
             @RequestParam Long studentId,
             @RequestParam String subjectId,
-            @RequestParam(defaultValue = "10") int limit) {
-        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(name = "usageType", required = false) String usageType) {
+        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit, usageType);
     }
 
     // Endpoint for unpracticed questions by chapter (NOW WITH isFlagged)
@@ -91,8 +99,9 @@ public class QuestionController {
             @RequestParam Long studentId,
             @RequestParam String chapterId,
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(name = "level", required = false) String level) {
-        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level);
+            @RequestParam(name = "level", required = false) String level,
+            @RequestParam(name = "usageType", required = false) String usageType) {
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType);
     }
 
     // NEW ENDPOINTS WITH FLAG STATUS
@@ -103,8 +112,9 @@ public class QuestionController {
             @RequestParam Long studentId,
             @RequestParam String chapterId,
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(name = "level", required = false) String level) {
-        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level);
+            @RequestParam(name = "level", required = false) String level,
+            @RequestParam(name = "usageType", required = false) String usageType) {
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType);
     }
 
     // Endpoint for unpracticed questions by subject with flag status
@@ -112,8 +122,9 @@ public class QuestionController {
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubjectWithFlags(
             @RequestParam Long studentId,
             @RequestParam String subjectId,
-            @RequestParam(defaultValue = "10") int limit) {
-        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(name = "usageType", required = false) String usageType) {
+        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit, usageType);
     }
 
     // Endpoint for questions by chapter with flag status
@@ -156,5 +167,81 @@ public class QuestionController {
             @RequestParam Long studentId,
             @RequestParam String subjectId) {
         return questionService.getWrongUnpracticedQuestionsBySubject(studentId, subjectId);
+    }
+    
+    // ========================================================================
+    // CUSTOM QUESTION ENDPOINTS (for parents/teachers)
+    // ========================================================================
+    
+    /**
+     * Create a custom question
+     * POST /questions/custom?creatorUserId=X
+     */
+    @PostMapping("/custom")
+    public Question createCustomQuestion(
+            @RequestParam Long creatorUserId,
+            @RequestBody Question question) {
+        return questionService.createCustomQuestion(question, creatorUserId);
+    }
+    
+    /**
+     * Get all custom questions by creator
+     * GET /questions/custom/creator/{creatorUserId}
+     */
+    @GetMapping("/custom/creator/{creatorUserId}")
+    public List<Question> getCustomQuestionsByCreator(@PathVariable Long creatorUserId) {
+        return questionService.getCustomQuestionsByCreator(creatorUserId);
+    }
+    
+    /**
+     * Get custom questions by creator and chapter
+     * GET /questions/custom/creator/{creatorUserId}/chapter/{chapterId}
+     */
+    @GetMapping("/custom/creator/{creatorUserId}/chapter/{chapterId}")
+    public List<Question> getCustomQuestionsByCreatorAndChapter(
+            @PathVariable Long creatorUserId,
+            @PathVariable String chapterId) {
+        return questionService.getCustomQuestionsByCreatorAndChapter(creatorUserId, chapterId);
+    }
+    
+    /**
+     * Update question visibility
+     * PUT /questions/{questionId}/visibility?creatorUserId=X
+     */
+    @PutMapping("/{questionId}/visibility")
+    public Question updateQuestionVisibility(
+            @PathVariable Long questionId,
+            @RequestParam Long creatorUserId,
+            @RequestParam String visibility) {
+        return questionService.updateQuestionVisibility(questionId, creatorUserId, visibility);
+    }
+    
+    /**
+     * Delete a custom question
+     * DELETE /questions/custom/{questionId}?creatorUserId=X
+     */
+    @DeleteMapping("/custom/{questionId}")
+    public void deleteCustomQuestion(
+            @PathVariable Long questionId,
+            @RequestParam Long creatorUserId) {
+        questionService.deleteCustomQuestion(questionId, creatorUserId);
+    }
+    
+    /**
+     * Get all system questions
+     * GET /questions/system
+     */
+    @GetMapping("/system")
+    public List<Question> getSystemQuestions() {
+        return questionService.getSystemQuestions();
+    }
+    
+    /**
+     * Get all custom questions (admin only)
+     * GET /questions/custom
+     */
+    @GetMapping("/all-custom")
+    public List<Question> getAllCustomQuestions() {
+        return questionService.getAllCustomQuestions();
     }
 }

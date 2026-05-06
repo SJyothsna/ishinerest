@@ -20,12 +20,11 @@ public class AuthController {
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     public SignupResponse signup(@Valid @RequestBody SignupRequest req) {
-        var s = authService.signup(req);
-        return new SignupResponse(s.getStudentId(), s.getName(), s.getEmail());
+        return authService.signup(req);
     }
+    
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest req) {
-        var s = authService.login(req);
-        return new LoginResponse(s.getStudentId(), s.getName(), s.getEmail());
+        return authService.login(req);
     }
 }

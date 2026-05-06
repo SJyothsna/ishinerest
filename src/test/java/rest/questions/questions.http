@@ -105,6 +105,7 @@ Accept: application/json
     "difficultyLevel": "Easy",
     "explanation": "2 + 2 = 4",
     "notes": "Sample question",
+    "hint": "Think about adding two pairs together before choosing the correct option.",
     "chapter": {
       "chapterId": "{{chapterId}}"
     }
@@ -121,11 +122,92 @@ Accept: application/json
     "difficultyLevel": "Intermediate",
     "explanation": "2 and 5 are prime numbers.",
     "notes": "Multiple choice sample",
+    "hint": "Prime numbers have exactly two factors: 1 and themselves.",
     "chapter": {
       "chapterId": "{{chapterId}}"
     }
   }
 ]
+
+### Create question with image only (no text) - VALID
+POST {{baseUrl}}/questions
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionText": null,
+    "optionA": "Option A",
+    "optionB": "Option B",
+    "optionC": "Option C",
+    "optionD": "Option D",
+    "correctAnswer": "A",
+    "correctAnswers": null,
+    "questionType": 1,
+    "difficultyLevel": "Easy",
+    "explanation": "This question uses only an image",
+    "notes": "Image-only question",
+    "questionImageUrl": "http://localhost:8080/uploads/chapters/LC5H0102/questions/q_123.png",
+    "chapter": {
+      "chapterId": "{{chapterId}}"
+    }
+  }
+]
+
+###
+
+### Create question with both text and image - VALID
+POST {{baseUrl}}/questions
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionText": "What is shown in the image?",
+    "optionA": "Option A",
+    "optionB": "Option B",
+    "optionC": "Option C",
+    "optionD": "Option D",
+    "correctAnswer": "B",
+    "correctAnswers": null,
+    "questionType": 1,
+    "difficultyLevel": "Intermediate",
+    "explanation": "This question has both text and image",
+    "notes": "Combined text and image question",
+    "questionImageUrl": "http://localhost:8080/uploads/chapters/LC5H0102/questions/q_124.png",
+    "chapter": {
+      "chapterId": "{{chapterId}}"
+    }
+  }
+]
+
+###
+
+### Create question with neither text nor image - INVALID (should fail)
+POST {{baseUrl}}/questions
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionText": null,
+    "optionA": "Option A",
+    "optionB": "Option B",
+    "optionC": "Option C",
+    "optionD": "Option D",
+    "correctAnswer": "A",
+    "correctAnswers": null,
+    "questionType": 1,
+    "difficultyLevel": "Easy",
+    "explanation": "This should fail validation",
+    "notes": "Invalid question - no text or image",
+    "questionImageUrl": null,
+    "chapter": {
+      "chapterId": "{{chapterId}}"
+    }
+  }
+]
+
 
 ###
 
@@ -146,6 +228,7 @@ Accept: application/json
   "difficultyLevel": "Easy",
   "explanation": "2 and 4 are even numbers.",
   "notes": "Updated multiple choice sample",
+  "hint": "An even number is divisible by 2 without remainder.",
   "chapter": {
     "chapterId": "{{chapterId}}"
   }

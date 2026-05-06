@@ -327,96 +327,131 @@
             <button class="tab" onclick="showTab('chapters')">Chapters</button>
             <button class="tab" onclick="showTab('questions')">Questions</button>
             <button class="tab" onclick="showTab('common-notes')">Common Notes</button>
+            <button class="tab" onclick="showTab('users')">Users</button>
+            <button class="tab" onclick="showTab('parent-student-links')">Parent-Student Links</button>
+            <button class="tab" onclick="showTab('teacher-student-links')">Teacher-Student Links</button>
         </div>
 
         <!-- Classes Tab -->
         <div id="classes" class="tab-content active">
-            <div class="form-section">
-                <h3 id="classFormTitle">Create New Class</h3>
-                <div id="class-alert"></div>
-                <form id="classForm">
-                    <input type="hidden" id="editClassId">
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Class ID *</label>
-                            <input type="number" id="classId" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Class Name *</label>
-                            <input type="text" id="className" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Exam</label>
-                            <input type="text" id="exam" placeholder="e.g., Junior Cert, Leaving Cert">
-                        </div>
-                        <div class="form-group">
-                            <label>Exam ID</label>
-                            <input type="number" id="examId">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="classSubmitBtn">Create Class</button>
-                    <button type="button" class="btn btn-secondary" id="classCancelBtn" onclick="cancelClassEdit()" style="display:none;">Cancel</button>
-                </form>
-            </div>
-
             <div class="list-section">
-                <h3>Existing Classes</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Class ID</th>
-                            <th>Class Name</th>
-                            <th>Exam</th>
-                            <th>Exam ID</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="classesList"></tbody>
-                </table>
+                <h3>Filter Classes</h3>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Exam:</label>
+                        <select id="filterClassExam">
+                            <option value="">-- All Exams --</option>
+                            <option value="Junior Cert">Junior Cert</option>
+                            <option value="Leaving Cert">Leaving Cert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="loadClasses()">List Classes</button>
+                    <button type="button" class="btn btn-success" onclick="showAddClassForm()">+ Add Class</button>
+                </div>
+
+                <div class="form-section" id="classFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3 id="classFormTitle">Create New Class</h3>
+                    <div id="class-alert"></div>
+                    <form id="classForm">
+                        <input type="hidden" id="editClassId">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Class ID *</label>
+                                <input type="number" id="classId" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Class Name *</label>
+                                <input type="text" id="className" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Exam</label>
+                                <input type="text" id="exam" placeholder="e.g., Junior Cert, Leaving Cert">
+                            </div>
+                            <div class="form-group">
+                                <label>Exam ID</label>
+                                <input type="number" id="examId">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="classSubmitBtn">Create Class</button>
+                        <button type="button" class="btn btn-secondary" id="classCancelBtn" onclick="cancelClassEdit()" style="display:none;">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddClassForm()">Close</button>
+                    </form>
+                </div>
+
+                <div id="classesTableSection" class="list-section">
+                    <h3>Existing Classes</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Class ID</th>
+                                <th>Class Name</th>
+                                <th>Exam</th>
+                                <th>Exam ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="classesList"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- Subjects Tab -->
         <div id="subjects" class="tab-content">
-            <div class="form-section">
-                <h3 id="subjectFormTitle">Create New Subject</h3>
-                <div id="subject-alert"></div>
-                <form id="subjectForm">
-                    <input type="hidden" id="editSubjectId">
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Subject ID *</label>
-                            <input type="text" id="subjectId" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Subject Name *</label>
-                            <input type="text" id="subjectName" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="subjectSubmitBtn">Create Subject</button>
-                    <button type="button" class="btn btn-secondary" id="subjectCancelBtn" onclick="cancelSubjectEdit()" style="display:none;">Cancel</button>
-                </form>
-            </div>
-
             <div class="list-section">
-                <h3>Existing Subjects</h3>
-                <div class="filter-section">
-                    <label>Filter by Class:</label>
-                    <select id="filterSubjectByClass" onchange="filterSubjectsByClass()">
-                        <option value="">-- All Subjects --</option>
-                    </select>
+                <h3>Filter Subjects</h3>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Class:</label>
+                        <select id="filterSubjectByClass">
+                            <option value="">-- All Subjects --</option>
+                        </select>
+                    </div>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Subject ID</th>
-                            <th>Subject Name</th>
-                            <th>Linked Classes</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="subjectsList"></tbody>
-                </table>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="filterSubjectsByClass()">List Subjects</button>
+                    <button type="button" class="btn btn-success" onclick="showAddSubjectForm()">+ Add Subject</button>
+                </div>
+
+                <div class="form-section" id="subjectFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3 id="subjectFormTitle">Create New Subject</h3>
+                    <div id="subject-alert"></div>
+                    <form id="subjectForm">
+                        <input type="hidden" id="editSubjectId">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Subject ID *</label>
+                                <input type="text" id="subjectId" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Subject Name *</label>
+                                <input type="text" id="subjectName" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="subjectSubmitBtn">Create Subject</button>
+                        <button type="button" class="btn btn-secondary" id="subjectCancelBtn" onclick="cancelSubjectEdit()" style="display:none;">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddSubjectForm()">Close</button>
+                    </form>
+                </div>
+
+                <div class="list-section">
+                    <h3>Existing Subjects</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Subject ID</th>
+                                <th>Subject Name</th>
+                                <th>Linked Classes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectsList"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -448,155 +483,72 @@
 
         <!-- Chapters Tab -->
         <div id="chapters" class="tab-content">
-            <div class="form-section">
-                <h3 id="chapterFormTitle">Create New Chapter</h3>
-                <div id="chapter-alert"></div>
-                <form id="chapterForm">
-                    <input type="hidden" id="editChapterId">
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Chapter ID *</label>
-                            <input type="text" id="chapterId" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Chapter Name *</label>
-                            <input type="text" id="chapterName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Select Subject *</label>
-                            <select id="chapterSubjectId" required>
-                                <option value="">-- Select Subject --</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="chapterSubmitBtn">Create Chapter</button>
-                    <button type="button" class="btn btn-secondary" id="chapterCancelBtn" onclick="cancelChapterEdit()" style="display:none;">Cancel</button>
-                </form>
-            </div>
-
             <div class="list-section">
-                <h3>Existing Chapters</h3>
-                <div class="filter-section">
-                    <label>Filter by Subject:</label>
-                    <select id="filterChapterBySubject" onchange="filterChaptersBySubject()">
-                        <option value="">-- All Chapters --</option>
-                    </select>
+                <h3>Filter Chapters</h3>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Subject:</label>
+                        <select id="filterChapterBySubject">
+                            <option value="">-- All Chapters --</option>
+                        </select>
+                    </div>
                 </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Chapter ID</th>
-                            <th>Chapter Name</th>
-                            <th>Subject</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="chaptersList"></tbody>
-                </table>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="filterChaptersBySubject()">List Chapters</button>
+                    <button type="button" class="btn btn-success" onclick="showAddChapterForm()">+ Add Chapter</button>
+                </div>
+
+                <div class="form-section" id="chapterFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3 id="chapterFormTitle">Create New Chapter</h3>
+                    <div id="chapter-alert"></div>
+                    <form id="chapterForm">
+                        <input type="hidden" id="editChapterId">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Chapter ID *</label>
+                                <input type="text" id="chapterId" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Chapter Name *</label>
+                                <input type="text" id="chapterName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Subject *</label>
+                                <select id="chapterSubjectId" required>
+                                    <option value="">-- Select Subject --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="chapterSubmitBtn">Create Chapter</button>
+                        <button type="button" class="btn btn-secondary" id="chapterCancelBtn" onclick="cancelChapterEdit()" style="display:none;">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddChapterForm()">Close</button>
+                    </form>
+                </div>
+
+                <div class="list-section">
+                    <h3>Existing Chapters</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Chapter ID</th>
+                                <th>Chapter Name</th>
+                                <th>Subject</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chaptersList"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
         <!-- Questions Tab -->
         <div id="questions" class="tab-content">
-            <div class="form-section">
-                <h3 id="questionFormTitle">Add New Question</h3>
-                <div id="question-alert"></div>
-                <form id="questionForm">
-                    <input type="hidden" id="editQuestionId">
-                    <div class="form-group">
-                        <label>Select Subject *</label>
-                        <select id="questionSubjectId" required onchange="filterChaptersForQuestion()">
-                            <option value="">-- Select Subject --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Select Chapter *</label>
-                        <select id="questionChapterId" required>
-                            <option value="">-- Select Subject First --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Question Text *</label>
-                        <textarea id="questionText" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Question Type</label>
-                        <select id="questionType" onchange="toggleCorrectAnswersField()">
-                            <option value="1" selected>Choices</option>
-                            <option value="2">Blanks</option>
-                            <option value="3">Self Check</option>
-                            <option value="4">Multi-Select</option>
-                        </select>
-                    </div>
-                    <div class="grid-2" id="optionsGroup">
-                        <div class="form-group">
-                            <label>Option A <span id="optionARequired">*</span></label>
-                            <input type="text" id="optionA" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Option B <span id="optionBRequired">*</span></label>
-                            <input type="text" id="optionB" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Option C</label>
-                            <input type="text" id="optionC">
-                        </div>
-                        <div class="form-group">
-                            <label>Option D</label>
-                            <input type="text" id="optionD">
-                        </div>
-                        <div class="form-group">
-                            <label>Option E</label>
-                            <input type="text" id="optionE">
-                        </div>
-                        <div class="form-group">
-                            <label>Option F</label>
-                            <input type="text" id="optionF">
-                        </div>
-                    </div>
-                    <div class="form-group" id="correctAnswerGroup">
-                        <label>Correct Answer <span id="correctAnswerRequired">*</span></label>
-                        <select id="correctAnswer" style="display: block;">
-                            <option value="">-- Select Correct Answer --</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
-                            <option value="E">E</option>
-                            <option value="F">F</option>
-                        </select>
-                        <input type="text" id="correctAnswerText" placeholder="Enter the correct answer" style="display: none; width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                        <small id="correctAnswerHint" style="color: #666; display: block; margin-top: 5px;">For single answer questions only</small>
-                    </div>
-                    <div class="form-group" id="correctAnswersGroup" style="display: none;">
-                        <label>Correct Answers (Multiple) *</label>
-                        <input type="text" id="correctAnswers" placeholder="e.g., A,B,C,D,E,F for multiple answers">
-                        <small style="color: #666; display: block; margin-top: 5px;">For multi-select questions, enter comma-separated values (e.g., A,B,C,D,E,F)</small>
-                    </div>
-                    <div class="form-group">
-                        <label>Difficulty Level</label>
-                        <select id="difficultyLevel">
-                            <option value="Basic" selected>Basic</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Explanation</label>
-                        <textarea id="explanation" rows="3" placeholder="Explain the correct answer..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Notes</label>
-                        <textarea id="notes" rows="2" placeholder="Additional notes or hints..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="questionSubmitBtn">Add Question</button>
-                    <button type="button" class="btn btn-secondary" id="questionCancelBtn" onclick="cancelQuestionEdit()" style="display:none;">Cancel</button>
-                </form>
-            </div>
-
+            <!-- Filter Section with Buttons -->
             <div class="list-section">
                 <h3>Filter Questions</h3>
-                <div class="grid-2">
+                <div class="grid-2" style="margin-bottom: 15px;">
                     <div class="form-group">
                         <label>Filter by Subject:</label>
                         <select id="filterQuestionSubjectId" onchange="filterChaptersForQuestionFilter()">
@@ -605,93 +557,445 @@
                     </div>
                     <div class="form-group">
                         <label>Filter by Chapter:</label>
-                        <select id="filterChapterId" onchange="loadQuestionsByChapter()">
+                        <select id="filterChapterId">
                             <option value="">-- Select Subject First --</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>Filter by Usage Type:</label>
+                        <select id="filterUsageType">
+                            <option value="">All</option>
+                            <option value="Practice">Practice</option>
+                            <option value="Test">Test</option>
+                            <option value="Both">Both</option>
+                        </select>
+                    </div>
                 </div>
+                
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="loadQuestionsByChapter()">List Questions</button>
+                    <button type="button" class="btn btn-success" onclick="showAddQuestionForm()">+ Add Question</button>
+                </div>
+
+                <!-- Add/Edit Question Form (Initially Hidden) -->
+                <div class="form-section" id="questionFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3 id="questionFormTitle">Add New Question</h3>
+                    <div id="question-alert"></div>
+                    <form id="questionForm">
+                        <input type="hidden" id="editQuestionId">
+                        <div class="form-group">
+                            <label>Select Subject *</label>
+                            <select id="questionSubjectId" required onchange="filterChaptersForQuestion()">
+                                <option value="">-- Select Subject --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Select Chapter *</label>
+                            <select id="questionChapterId" required>
+                                <option value="">-- Select Subject First --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Question Text <span id="questionTextRequired">*</span></label>
+                            <textarea id="questionText"></textarea>
+                            <small style="color: #666; display: block; margin-top: 5px;">Required unless a question image is provided</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Question Image (Optional)</label>
+                            <input type="file" id="questionImage" accept="image/*" onchange="previewQuestionImage(event)">
+                            <input type="hidden" id="questionImageUrl">
+                            <div id="questionImagePreview" style="margin-top: 10px; display: none;">
+                                <img id="questionImagePreviewImg" style="max-width: 300px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px;">
+                                <button type="button" class="btn btn-secondary" onclick="removeQuestionImage()" style="display: block; margin-top: 5px;">Remove Image</button>
+                            </div>
+                            <small style="color: #666; display: block; margin-top: 5px;">Upload an image for this question (PNG, JPG, GIF)</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Question Type</label>
+                            <select id="questionType" onchange="toggleCorrectAnswersField()">
+                                <option value="1" selected>Choices</option>
+                                <option value="2">Blanks</option>
+                                <option value="3">Self Check</option>
+                                <option value="4">Multi-Select</option>
+                            </select>
+                        </div>
+                        <div class="grid-2" id="optionsGroup">
+                            <div class="form-group">
+                                <label>Option A <span id="optionARequired">*</span></label>
+                                <input type="text" id="optionA" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Option B <span id="optionBRequired">*</span></label>
+                                <input type="text" id="optionB" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Option C</label>
+                                <input type="text" id="optionC">
+                            </div>
+                            <div class="form-group">
+                                <label>Option D</label>
+                                <input type="text" id="optionD">
+                            </div>
+                            <div class="form-group">
+                                <label>Option E</label>
+                                <input type="text" id="optionE">
+                            </div>
+                            <div class="form-group">
+                                <label>Option F</label>
+                                <input type="text" id="optionF">
+                            </div>
+                        </div>
+                        <div class="form-group" id="correctAnswerGroup">
+                            <label>Correct Answer <span id="correctAnswerRequired">*</span></label>
+                            <select id="correctAnswer" style="display: block;">
+                                <option value="">-- Select Correct Answer --</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                            </select>
+                            <input type="text" id="correctAnswerText" placeholder="Enter the correct answer" style="display: none; width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <small id="correctAnswerHint" style="color: #666; display: block; margin-top: 5px;">For single answer questions only</small>
+                        </div>
+                        <div class="form-group" id="correctAnswersGroup" style="display: none;">
+                            <label>Correct Answers (Multiple) *</label>
+                            <input type="text" id="correctAnswers" placeholder="e.g., A,B,C,D,E,F for multiple answers">
+                            <small style="color: #666; display: block; margin-top: 5px;">For multi-select questions, enter comma-separated values (e.g., A,B,C,D,E,F)</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Difficulty Level</label>
+                            <select id="difficultyLevel">
+                                <option value="Basic" selected>Basic</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Explanation</label>
+                            <textarea id="explanation" rows="3" placeholder="Explain the correct answer..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <textarea id="notes" rows="2" placeholder="Additional notes..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Hint</label>
+                            <textarea id="hint" rows="3" placeholder="Optional hint for the question"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Usage Type</label>
+                            <select id="usageType">
+                                <option value="Both" selected>Both</option>
+                                <option value="Practice">Practice</option>
+                                <option value="Test">Test</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="questionSubmitBtn">Add Question</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddQuestionForm()">Cancel</button>
+                    </form>
+                </div>
+
+                <!-- Questions List (Initially Empty) -->
                 <div id="questionsList"></div>
             </div>
         </div>
 
         <!-- Common Notes Tab -->
         <div id="common-notes" class="tab-content">
-            <div class="form-section">
-                <h3 id="commonNoteFormTitle">Add Common Note</h3>
-                <div id="common-note-alert"></div>
-                <form id="commonNoteForm">
-                    <input type="hidden" id="editCommonNoteId">
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Select Subject</label>
-                            <select id="commonNoteSubjectId" onchange="filterChaptersForCommonNotes()">
-                                <option value="">-- Select Subject --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Select Chapter *</label>
-                            <select id="commonNoteChapterId" required>
-                                <option value="">-- Select Subject First --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Category *</label>
-                            <input type="text" id="commonNoteCategory" required placeholder="e.g. Formula, Definition, Tip">
-                        </div>
-                        <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" id="commonNoteTitle" required placeholder="Enter note title">
-                        </div>
-                        <div class="form-group">
-                            <label>Color</label>
-                            <input type="text" id="commonNoteColor" value="#BBDEFB" placeholder="#BBDEFB">
-                        </div>
-                        <div class="form-group">
-                            <label>Icon</label>
-                            <input type="text" id="commonNoteIcon" value="📚" placeholder="📚">
-                        </div>
-                        <div class="form-group">
-                            <label>Display Order</label>
-                            <input type="number" id="commonNoteDisplayOrder" value="0" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Created By</label>
-                            <input type="number" id="commonNoteCreatedBy" placeholder="e.g. 1">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Content</label>
-                        <textarea id="commonNoteContent" rows="4" placeholder="Leave empty if using only imageUrl"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Image URL</label>
-                        <input type="text" id="commonNoteImageUrl" placeholder="/uploads/chapters/LC5H0102/notes/common/note_img_123.png">
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="commonNoteSubmitBtn">Add Common Note</button>
-                    <button type="button" class="btn btn-secondary" id="commonNoteCancelBtn" onclick="cancelCommonNoteEdit()" style="display:none;">Cancel</button>
-                </form>
-            </div>
-
             <div class="list-section">
-                <h3>View Common Notes</h3>
-                <div class="filter-section">
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Filter by Subject:</label>
-                            <select id="filterCommonNoteSubjectId" onchange="filterChaptersForCommonNotesFilter()">
-                                <option value="">-- Select Subject --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Filter by Chapter:</label>
-                            <select id="filterCommonNoteChapterId" onchange="loadCommonNotesByChapter()">
-                                <option value="">-- Select Subject First --</option>
-                            </select>
-                        </div>
+                <h3>Filter Common Notes</h3>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Subject:</label>
+                        <select id="filterCommonNoteSubjectId" onchange="filterChaptersForCommonNotesFilter()">
+                            <option value="">-- Select Subject --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Filter by Chapter:</label>
+                        <select id="filterCommonNoteChapterId">
+                            <option value="">-- Select Subject First --</option>
+                        </select>
                     </div>
                 </div>
-                <div id="commonNotesList"></div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="loadCommonNotesByChapter()">List Common Notes</button>
+                    <button type="button" class="btn btn-success" onclick="showAddCommonNoteForm()">+ Add Common Note</button>
+                </div>
+
+                <div class="form-section" id="commonNoteFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3 id="commonNoteFormTitle">Add Common Note</h3>
+                    <div id="common-note-alert"></div>
+                    <form id="commonNoteForm">
+                        <input type="hidden" id="editCommonNoteId">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Select Subject</label>
+                                <select id="commonNoteSubjectId" onchange="filterChaptersForCommonNotes()">
+                                    <option value="">-- Select Subject --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Chapter *</label>
+                                <select id="commonNoteChapterId" required>
+                                    <option value="">-- Select Subject First --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Category *</label>
+                                <input type="text" id="commonNoteCategory" required placeholder="e.g. Formula, Definition, Tip">
+                            </div>
+                            <div class="form-group">
+                                <label>Title *</label>
+                                <input type="text" id="commonNoteTitle" required placeholder="Enter note title">
+                            </div>
+                            <div class="form-group">
+                                <label>Color</label>
+                                <input type="text" id="commonNoteColor" value="#BBDEFB" placeholder="#BBDEFB">
+                            </div>
+                            <div class="form-group">
+                                <label>Icon</label>
+                                <input type="text" id="commonNoteIcon" value="📚" placeholder="📚">
+                            </div>
+                            <div class="form-group">
+                                <label>Display Order</label>
+                                <input type="number" id="commonNoteDisplayOrder" value="0" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Created By</label>
+                                <input type="number" id="commonNoteCreatedBy" placeholder="e.g. 1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Content</label>
+                            <textarea id="commonNoteContent" rows="4" placeholder="Leave empty if using only imageUrl"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Image URL</label>
+                            <input type="text" id="commonNoteImageUrl" placeholder="/uploads/chapters/LC5H0102/notes/common/note_img_123.png">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="commonNoteSubmitBtn">Add Common Note</button>
+                        <button type="button" class="btn btn-secondary" id="commonNoteCancelBtn" onclick="cancelCommonNoteEdit()" style="display:none;">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddCommonNoteForm()">Close</button>
+                    </form>
+                </div>
+
+                <div class="list-section">
+                    <h3>View Common Notes</h3>
+                    <div id="commonNotesList"></div>
+                </div>
             </div>
+        </div>
+
+        <!-- Users Management Tab -->
+        <div id="users" class="tab-content">
+            <div class="list-section">
+                <h3>Filter Users</h3>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Role:</label>
+                        <select id="filterUserRole">
+                            <option value="">-- All Roles --</option>
+                            <option value="STUDENT">Student</option>
+                            <option value="PARENT">Parent</option>
+                            <option value="TEACHER">Teacher</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Filter by Status:</label>
+                        <select id="filterUserStatus">
+                            <option value="">-- All Status --</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="loadUsers()">List Users</button>
+                    <button type="button" class="btn btn-success" onclick="showAddUserForm()">+ Add User</button>
+                </div>
+
+                <div class="form-section" id="userFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3 id="userFormTitle">Create New User</h3>
+                    <div id="user-alert"></div>
+                    <form id="userForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Name *</label>
+                                <input type="text" id="userName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" id="userEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Password *</label>
+                                <input type="password" id="userPassword" required>
+                                <small style="color: #666;">Minimum 6 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Role *</label>
+                                <select id="userRole" required>
+                                    <option value="">-- Select Role --</option>
+                                    <option value="STUDENT">Student</option>
+                                    <option value="PARENT">Parent</option>
+                                    <option value="TEACHER">Teacher</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="userSubmitBtn">Create User</button>
+                        <button type="button" class="btn btn-secondary" id="userCancelBtn" onclick="cancelUserEdit()" style="display:none;">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddUserForm()">Close</button>
+                    </form>
+                </div>
+
+                <div id="usersTableSection" class="list-section">
+                    <h3>Existing Users</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent-Student Links Tab -->
+        <div id="parent-student-links" class="tab-content">
+            <div class="list-section">
+                <h3>Filter Parent-Student Links</h3>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Parent ID:</label>
+                        <input type="number" id="filterParentId" placeholder="Enter parent user ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Filter by Student ID:</label>
+                        <input type="number" id="filterStudentIdForParent" placeholder="Enter student user ID">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="loadParentStudentLinks()">List Links</button>
+                    <button type="button" class="btn btn-success" onclick="showAddParentStudentLinkForm()">+ Add Link</button>
+                </div>
+
+                <div class="form-section" id="parentStudentLinkFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3>Link Parent to Student</h3>
+                    <div id="parent-student-link-alert"></div>
+                    <form id="parentStudentLinkForm">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Parent User ID *</label>
+                                <input type="number" id="linkParentUserId" required>
+                                <small style="color: #666;">User ID of the parent</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Student User ID *</label>
+                                <input type="number" id="linkStudentUserId" required>
+                                <small style="color: #666;">User ID of the student</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Link Parent to Student</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddParentStudentLinkForm()">Close</button>
+                    </form>
+                </div>
+
+                <div id="parentStudentLinksTableSection" class="list-section">
+                    <h3>Existing Parent-Student Links</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Parent ID</th>
+                                <th>Parent Name</th>
+                                <th>Parent Email</th>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Student Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parentStudentLinksList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher-Student Links Tab -->
+        <div id="teacher-student-links" class="tab-content">
+            <div class="list-section">
+                <h3>Filter Teacher-Student Links</h3>
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filter by Teacher ID:</label>
+                        <input type="number" id="filterTeacherId" placeholder="Enter teacher user ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Filter by Student ID:</label>
+                        <input type="number" id="filterStudentIdForTeacher" placeholder="Enter student user ID">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="loadTeacherStudentLinks()">List Links</button>
+                    <button type="button" class="btn btn-success" onclick="showAddTeacherStudentLinkForm()">+ Add Link</button>
+                </div>
+
+                <div class="form-section" id="teacherStudentLinkFormSection" style="display: none; margin-bottom: 30px;">
+                    <h3>Link Teacher to Student</h3>
+                    <div id="teacher-student-link-alert"></div>
+                    <form id="teacherStudentLinkForm">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Teacher User ID *</label>
+                                <input type="number" id="linkTeacherUserId" required>
+                                <small style="color: #666;">User ID of the teacher</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Student User ID *</label>
+                                <input type="number" id="linkStudentUserIdForTeacher" required>
+                                <small style="color: #666;">User ID of the student</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Link Teacher to Student</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideAddTeacherStudentLinkForm()">Close</button>
+                    </form>
+                </div>
+
+                <div id="teacherStudentLinksTableSection" class="list-section">
+                    <h3>Existing Teacher-Student Links</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Teacher ID</th>
+                                <th>Teacher Name</th>
+                                <th>Teacher Email</th>
+                                <th>Student ID</th>
+                                <th>Student Name</th>
+                                <th>Student Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherStudentLinksList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -737,6 +1041,25 @@
                 loadChaptersForDropdown();
                 loadAllCommonNotes();
             }
+            if (tabName === 'users') {
+                loadUsers();
+            }
+            if (tabName === 'parent-student-links') {
+                loadParentStudentLinks();
+            }
+            if (tabName === 'teacher-student-links') {
+                loadTeacherStudentLinks();
+            }
+        }
+
+        function showAddChapterForm() {
+            document.getElementById('chapterFormSection').style.display = 'block';
+            cancelChapterEdit();
+        }
+
+        function hideAddChapterForm() {
+            document.getElementById('chapterFormSection').style.display = 'none';
+            cancelChapterEdit();
         }
 
         // Show alert message
@@ -789,6 +1112,7 @@
             document.getElementById('classFormTitle').textContent = 'Edit Class';
             document.getElementById('classSubmitBtn').textContent = 'Update Class';
             document.getElementById('classCancelBtn').style.display = 'inline-block';
+            document.getElementById('classFormSection').style.display = 'block';
             window.scrollTo(0, 0);
         }
 
@@ -799,6 +1123,16 @@
             document.getElementById('classFormTitle').textContent = 'Create New Class';
             document.getElementById('classSubmitBtn').textContent = 'Create Class';
             document.getElementById('classCancelBtn').style.display = 'none';
+        }
+
+        function showAddClassForm() {
+            document.getElementById('classFormSection').style.display = 'block';
+            cancelClassEdit();
+        }
+
+        function hideAddClassForm() {
+            document.getElementById('classFormSection').style.display = 'none';
+            cancelClassEdit();
         }
 
         async function deleteClass(classId, className) {
@@ -825,9 +1159,14 @@
                 const response = await fetch(`${API_BASE}/classes`);
                 const classes = await response.json();
                 allClasses = classes;
+
+                const selectedExam = document.getElementById('filterClassExam')?.value;
+                const filteredClasses = selectedExam
+                    ? classes.filter(c => (c.exam || '') === selectedExam)
+                    : classes;
                 
                 const tbody = document.getElementById('classesList');
-                tbody.innerHTML = classes.map(c => `
+                tbody.innerHTML = filteredClasses.map(c => `
                     <tr>
                         <td>${c.classId}</td>
                         <td>${c.className}</td>
@@ -902,6 +1241,7 @@
             document.getElementById('subjectFormTitle').textContent = 'Edit Subject';
             document.getElementById('subjectSubmitBtn').textContent = 'Update Subject';
             document.getElementById('subjectCancelBtn').style.display = 'inline-block';
+            document.getElementById('subjectFormSection').style.display = 'block';
             window.scrollTo(0, 0);
         }
 
@@ -912,6 +1252,16 @@
             document.getElementById('subjectFormTitle').textContent = 'Create New Subject';
             document.getElementById('subjectSubmitBtn').textContent = 'Create Subject';
             document.getElementById('subjectCancelBtn').style.display = 'none';
+        }
+
+        function showAddSubjectForm() {
+            document.getElementById('subjectFormSection').style.display = 'block';
+            cancelSubjectEdit();
+        }
+
+        function hideAddSubjectForm() {
+            document.getElementById('subjectFormSection').style.display = 'none';
+            cancelSubjectEdit();
         }
 
         async function deleteSubject(subjectId, subjectName) {
@@ -1173,6 +1523,16 @@
             } catch (error) {
                 console.error('Error loading relationships:', error);
             }
+    
+            function showAddChapterForm() {
+                document.getElementById('chapterFormSection').style.display = 'block';
+                cancelChapterEdit();
+            }
+    
+            function hideAddChapterForm() {
+                document.getElementById('chapterFormSection').style.display = 'none';
+                cancelChapterEdit();
+            }
         }
 
         // Chapters Management
@@ -1389,6 +1749,16 @@
             const editId = document.getElementById('editQuestionId').value;
             const chapterId = document.getElementById('questionChapterId').value;
             
+            // Validate that either questionText or image file is provided
+            const questionText = document.getElementById('questionText').value.trim();
+            const imageFile = document.getElementById('questionImage').files[0];
+            const existingImageUrl = document.getElementById('questionImageUrl').value;
+            
+            if (!questionText && !imageFile && !existingImageUrl) {
+                showAlert('question-alert', 'Please provide either question text or upload a question image', 'error');
+                return;
+            }
+            
             const questionType = parseInt(document.getElementById('questionType').value);
             const correctAnswersValue = document.getElementById('correctAnswers').value;
             const correctAnswerSelectValue = document.getElementById('correctAnswer').value;
@@ -1408,7 +1778,7 @@
             }
             
             const questionData = {
-                questionText: document.getElementById('questionText').value,
+                questionText: document.getElementById('questionText').value.trim() || null,
                 optionA: document.getElementById('optionA').value,
                 optionB: document.getElementById('optionB').value,
                 optionC: document.getElementById('optionC').value || null,
@@ -1421,12 +1791,16 @@
                 difficultyLevel: document.getElementById('difficultyLevel').value,
                 explanation: document.getElementById('explanation').value || null,
                 notes: document.getElementById('notes').value || null,
+                hint: document.getElementById('hint').value || null,
+                usageType: document.getElementById('usageType').value,
+                questionImageUrl: null, // Will be updated after upload if image exists
                 chapter: {
                     chapterId: chapterId
                 }
             };
 
             try {
+                // Step 1: Save the question first to get the question ID
                 const url = editId ? `${API_BASE}/questions/${editId}` : `${API_BASE}/questions`;
                 const method = editId ? 'PUT' : 'POST';
                 
@@ -1439,18 +1813,71 @@
                     body: body
                 });
 
-                if (response.ok) {
-                    showAlert('question-alert', `Question ${editId ? 'updated' : 'added'} successfully!`, 'success');
-                    if (editId) {
-                        cancelQuestionEdit();
-                    } else {
-                        // For new questions, only clear question-specific fields, keep subject/chapter/type/difficulty
-                        clearQuestionFields();
-                    }
-                    loadQuestionsByChapter();
-                } else {
+                if (!response.ok) {
                     showAlert('question-alert', `Error ${editId ? 'updating' : 'adding'} question`, 'error');
+                    return;
                 }
+                
+                // Get the saved question (with ID)
+                const savedQuestions = await response.json();
+                const savedQuestion = method === 'POST' ? savedQuestions[0] : savedQuestions;
+                const questionId = savedQuestion.questionId;
+                
+                // Step 2: Upload image if file is selected
+                const imageFile = document.getElementById('questionImage').files[0];
+                if (imageFile) {
+                    // Validate chapter ID
+                    if (!chapterId) {
+                        showAlert('question-alert', 'Please select a chapter before uploading an image', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', imageFile);
+                        formData.append('chapterId', chapterId);
+                        formData.append('questionId', questionId);
+                        
+                        const uploadResponse = await fetch(`${API_BASE}/api/question-images/upload`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (uploadResponse.ok) {
+                            const uploadResult = await uploadResponse.json();
+                            const questionImageUrl = uploadResult.questionImageUrl;
+                            
+                            // Step 3: Update question with image URL
+                            savedQuestion.questionImageUrl = questionImageUrl;
+                            
+                            const updateResponse = await fetch(`${API_BASE}/questions/${questionId}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(savedQuestion)
+                            });
+                            
+                            if (!updateResponse.ok) {
+                                showAlert('question-alert', 'Question saved but failed to update with image URL', 'warning');
+                            }
+                        } else {
+                            const errorData = await uploadResponse.json().catch(() => ({}));
+                            const errorMessage = errorData.error || 'Failed to upload image';
+                            showAlert('question-alert', `Question saved but image upload failed: ${errorMessage}`, 'warning');
+                        }
+                    } catch (error) {
+                        showAlert('question-alert', `Question saved but error uploading image: ${error.message}`, 'warning');
+                    }
+                }
+                
+                showAlert('question-alert', `Question ${editId ? 'updated' : 'added'} successfully!`, 'success');
+                if (editId) {
+                    cancelQuestionEdit();
+                } else {
+                    // For new questions, only clear question-specific fields, keep subject/chapter/type/difficulty
+                    clearQuestionFields();
+                }
+                loadQuestionsByChapter();
+                
             } catch (error) {
                 showAlert('question-alert', 'Error: ' + error.message, 'error');
             }
@@ -1478,7 +1905,7 @@
                 
                 // Create inline edit form
                 row.innerHTML = `
-                    <td colspan="7" style="padding: 20px;">
+                    <td colspan="10" style="padding: 20px;">
                         <div style="display: grid; gap: 15px;">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div>
@@ -1489,6 +1916,19 @@
                                     <label style="display: block; margin-bottom: 5px; font-weight: bold;">Explanation:</label>
                                     <textarea id="edit-explanation-${questionId}" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${q.explanation || ''}</textarea>
                                 </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Question Image:</label>
+                                ${q.questionImageUrl ? `
+                                    <div id="edit-currentImage-${questionId}" style="margin-bottom: 10px;">
+                                        <img src="${q.questionImageUrl}" alt="Question Image" style="max-width: 300px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px; display: block; margin-bottom: 5px;">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="removeEditQuestionImage(${questionId})" style="padding: 5px 10px; font-size: 12px;">Remove Image</button>
+                                    </div>
+                                ` : ''}
+                                <input type="file" id="edit-questionImage-${questionId}" accept="image/*" onchange="previewEditQuestionImage(${questionId})" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <input type="hidden" id="edit-questionImageUrl-${questionId}" value="${q.questionImageUrl || ''}">
+                                <div id="edit-imagePreview-${questionId}" style="margin-top: 10px;"></div>
                             </div>
                             
                             <div id="edit-optionsGroup-${questionId}" style="display: ${q.questionType === 2 || q.questionType === 3 ? 'none' : 'grid'}; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
@@ -1558,6 +1998,14 @@
                                         <option value="Advanced" ${q.difficultyLevel === 'Advanced' ? 'selected' : ''}>Advanced</option>
                                     </select>
                                 </div>
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Usage Type:</label>
+                                    <select id="edit-usageType-${questionId}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <option value="Both" ${(q.usageType === 'Both' || !q.usageType) ? 'selected' : ''}>Both</option>
+                                        <option value="Practice" ${q.usageType === 'Practice' ? 'selected' : ''}>Practice</option>
+                                        <option value="Test" ${q.usageType === 'Test' ? 'selected' : ''}>Test</option>
+                                    </select>
+                                </div>
                                 <div style="display: flex; align-items: flex-end; gap: 10px;">
                                     <button class="btn btn-success" onclick="updateQuestionInline(${questionId})" style="flex: 1;">Update</button>
                                     <button class="btn btn-secondary" onclick="cancelEditInline(${questionId})" style="flex: 1;">Cancel</button>
@@ -1567,6 +2015,10 @@
                             <div>
                                 <label style="display: block; margin-bottom: 5px; font-weight: bold;">Notes:</label>
                                 <textarea id="edit-notes-${questionId}" style="width: 100%; min-height: 60px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${q.notes || ''}</textarea>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Hint:</label>
+                                <textarea id="edit-hint-${questionId}" style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${q.hint || ''}</textarea>
                             </div>
                         </div>
                     </td>
@@ -1582,6 +2034,7 @@
                 row.innerHTML = row.dataset.originalContent;
                 delete row.dataset.originalContent;
             }
+        }
         
         function toggleEditFields(questionId) {
             const questionType = parseInt(document.getElementById(`edit-questionType-${questionId}`).value);
@@ -1610,8 +2063,6 @@
                 correctAnswersMulti.style.display = 'none';
             }
         }
-        }
-        
         async function updateQuestionInline(questionId) {
             try {
                 const currentChapterId = document.getElementById('filterChapterId').value;
@@ -1630,6 +2081,38 @@
                     correctAnswerValue = document.getElementById(`edit-correctAnswer-${questionId}`).value;
                 }
                 
+                // Get existing image URL or check if it was removed
+                let questionImageUrl = document.getElementById(`edit-questionImageUrl-${questionId}`).value;
+                const imageFile = document.getElementById(`edit-questionImage-${questionId}`).files[0];
+                
+                // Handle new image upload
+                if (imageFile) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', imageFile);
+                        formData.append('chapterId', currentChapterId);
+                        formData.append('questionId', questionId);
+                        
+                        const uploadResponse = await fetch(`${API_BASE}/api/question-images/upload`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (uploadResponse.ok) {
+                            const uploadResult = await uploadResponse.json();
+                            questionImageUrl = uploadResult.questionImageUrl;
+                        } else {
+                            const errorData = await uploadResponse.json().catch(() => ({}));
+                            const errorMessage = errorData.error || 'Failed to upload image';
+                            showAlert('question-alert', errorMessage, 'error');
+                            return;
+                        }
+                    } catch (error) {
+                        showAlert('question-alert', 'Error uploading image: ' + error.message, 'error');
+                        return;
+                    }
+                }
+                
                 const questionData = {
                     questionText: document.getElementById(`edit-questionText-${questionId}`).value,
                     optionA: document.getElementById(`edit-optionA-${questionId}`).value || null,
@@ -1644,6 +2127,9 @@
                     difficultyLevel: document.getElementById(`edit-difficultyLevel-${questionId}`).value,
                     explanation: document.getElementById(`edit-explanation-${questionId}`).value || null,
                     notes: document.getElementById(`edit-notes-${questionId}`).value || null,
+                    hint: document.getElementById(`edit-hint-${questionId}`).value || null,
+                    usageType: document.getElementById(`edit-usageType-${questionId}`).value,
+                    questionImageUrl: questionImageUrl || null,
                     chapter: { chapterId: currentChapterId }
                 };
                 
@@ -1703,9 +2189,15 @@
                 optionA.removeAttribute('required');
                 optionB.removeAttribute('required');
                 correctAnswerSelect.removeAttribute('required');
-                correctAnswerText.setAttribute('required', 'required');
+                // For Self Check (type 3), correct answer is optional; for Blanks (type 2), it's required
+                if (questionType === 3) {
+                    correctAnswerText.removeAttribute('required');
+                    correctAnswerHint.textContent = 'Enter the self-check answer text (optional)';
+                } else {
+                    correctAnswerText.setAttribute('required', 'required');
+                    correctAnswerHint.textContent = 'Enter the correct answer text';
+                }
                 correctAnswersInput.removeAttribute('required');
-                correctAnswerHint.textContent = questionType === 3 ? 'Enter the self-check answer text' : 'Enter the correct answer text';
                 correctAnswersInput.value = '';
             } else {
                 // Choices (1): Show options and dropdown
@@ -1726,7 +2218,7 @@
         }
 
         function clearQuestionFields() {
-            // Clear only question-specific fields, keep subject/chapter/type/difficulty
+            // Clear only question-specific fields, keep subject/chapter/type/difficulty/usageType
             document.getElementById('questionText').value = '';
             document.getElementById('optionA').value = '';
             document.getElementById('optionB').value = '';
@@ -1739,8 +2231,100 @@
             document.getElementById('correctAnswers').value = '';
             document.getElementById('explanation').value = '';
             document.getElementById('notes').value = '';
+            document.getElementById('hint').value = '';
+            document.getElementById('questionImage').value = '';
+            document.getElementById('questionImageUrl').value = '';
+            document.getElementById('questionImagePreview').style.display = 'none';
             // Focus back on question text for quick entry
             document.getElementById('questionText').focus();
+        }
+
+        function previewQuestionImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('questionImagePreviewImg').src = e.target.result;
+                    document.getElementById('questionImagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeQuestionImage() {
+            document.getElementById('questionImage').value = '';
+            document.getElementById('questionImageUrl').value = '';
+            document.getElementById('questionImagePreview').style.display = 'none';
+        }
+        
+        // Edit question image functions
+        function previewEditQuestionImage(questionId) {
+            const file = document.getElementById(`edit-questionImage-${questionId}`).files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewDiv = document.getElementById(`edit-imagePreview-${questionId}`);
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" style="max-width: 300px; max-height: 200px; border: 1px solid #ddd; border-radius: 4px; display: block; margin-top: 5px;">
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeEditQuestionImage(questionId) {
+            // Hide current image
+            const currentImageDiv = document.getElementById(`edit-currentImage-${questionId}`);
+            if (currentImageDiv) {
+                currentImageDiv.style.display = 'none';
+            }
+            // Clear the hidden URL field
+            document.getElementById(`edit-questionImageUrl-${questionId}`).value = '';
+            // Clear file input
+            document.getElementById(`edit-questionImage-${questionId}`).value = '';
+            // Clear preview
+            document.getElementById(`edit-imagePreview-${questionId}`).innerHTML = '';
+        }
+
+        function showAddQuestionForm() {
+            // Show the form section
+            document.getElementById('questionFormSection').style.display = 'block';
+            
+            // Pre-fill subject and chapter from filters
+            const filterSubjectId = document.getElementById('filterQuestionSubjectId').value;
+            const filterChapterId = document.getElementById('filterChapterId').value;
+            
+            if (filterSubjectId) {
+                document.getElementById('questionSubjectId').value = filterSubjectId;
+                // Trigger the chapter filter update
+                filterChaptersForQuestion();
+                
+                // Set chapter after a brief delay to ensure chapters are loaded
+                if (filterChapterId) {
+                    setTimeout(() => {
+                        document.getElementById('questionChapterId').value = filterChapterId;
+                    }, 100);
+                }
+            }
+            
+            // Focus on question text
+            setTimeout(() => {
+                document.getElementById('questionText').focus();
+            }, 200);
+        }
+
+        function hideAddQuestionForm() {
+            // Clear the form
+            document.getElementById('questionForm').reset();
+            document.getElementById('editQuestionId').value = '';
+            document.getElementById('questionFormTitle').textContent = 'Add New Question';
+            document.getElementById('questionSubmitBtn').textContent = 'Add Question';
+            
+            // Hide the form section
+            document.getElementById('questionFormSection').style.display = 'none';
+            
+            // Reset field visibility
+            toggleCorrectAnswersField();
         }
 
         function cancelQuestionEdit() {
@@ -1750,6 +2334,9 @@
             document.getElementById('questionSubmitBtn').textContent = 'Add Question';
             document.getElementById('questionCancelBtn').style.display = 'none';
             toggleCorrectAnswersField(); // Reset field visibility
+            
+            // Hide the form section
+            document.getElementById('questionFormSection').style.display = 'none';
         }
 
         async function deleteQuestion(questionId) {
@@ -1780,11 +2367,20 @@
 
             try {
                 const response = await fetch(`${API_BASE}/questions/chapter/${chapterId}`);
-                const questions = await response.json();
+                let questions = await response.json();
+                
+                // Filter by usage type if selected
+                const filterUsageType = document.getElementById('filterUsageType').value;
+                if (filterUsageType) {
+                    questions = questions.filter(q => {
+                        const qUsageType = q.usageType || 'Both';
+                        return qUsageType === filterUsageType || qUsageType === 'Both';
+                    });
+                }
                 
                 const container = document.getElementById('questionsList');
                 if (questions.length === 0) {
-                    container.innerHTML = '<p>No questions found for this chapter.</p>';
+                    container.innerHTML = '<p>No questions found for this chapter with the selected filters.</p>';
                     return;
                 }
 
@@ -1792,11 +2388,14 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>Question</th>
                                 <th>Options</th>
                                 <th>Correct Answer(s)</th>
                                 <th>Type</th>
                                 <th>Difficulty</th>
+                                <th>Usage Type</th>
+                                <th>Hint</th>
                                 <th>Explanation</th>
                                 <th>Actions</th>
                             </tr>
@@ -1813,8 +2412,11 @@
                                 const correctAnswerDisplay = q.correctAnswers
                                     ? `<span class="badge badge-success">${q.correctAnswer}</span><br><small style="color: #666;">Multiple: ${q.correctAnswers}</small>`
                                     : `<span class="badge badge-success">${q.correctAnswer}</span>`;
+                                const usageTypeDisplay = q.usageType || 'Both';
+                                const usageTypeBadgeClass = usageTypeDisplay === 'Practice' ? 'badge-warning' : (usageTypeDisplay === 'Test' ? 'badge-danger' : 'badge-secondary');
                                 return `
                                 <tr data-question-id="${q.questionId}">
+                                    <td><span class="badge badge-secondary">${q.questionId}</span></td>
                                     <td>${q.questionText}</td>
                                     <td>
                                         A: ${q.optionA || 'N/A'}<br>
@@ -1827,6 +2429,8 @@
                                     <td>${correctAnswerDisplay}</td>
                                     <td><span class="badge badge-info">${questionTypeLabel}</span></td>
                                     <td><span class="badge badge-primary">${q.difficultyLevel || 'Basic'}</span></td>
+                                    <td><span class="badge ${usageTypeBadgeClass}">${usageTypeDisplay}</span></td>
+                                    <td style="max-width: 300px; white-space: pre-wrap;">${q.hint || 'No hint'}</td>
                                     <td style="max-width: 300px; white-space: pre-wrap;">${q.explanation || 'No explanation'}</td>
                                     <td class="action-buttons">
                                         <button class="btn btn-warning btn-sm" onclick='editQuestion(${q.questionId})'>Edit</button>
@@ -1938,10 +2542,26 @@
                     const errorText = await response.text();
                     showAlert('common-note-alert', `Error ${editId ? 'updating' : 'adding'} common note: ` + errorText, 'error');
                 }
+        
+                function showAddCommonNoteForm() {
+                    document.getElementById('commonNoteFormSection').style.display = 'block';
+                    cancelCommonNoteEdit();
+                }
+        
             } catch (error) {
                 showAlert('common-note-alert', 'Error: ' + error.message, 'error');
             }
         });
+
+        function showAddCommonNoteForm() {
+            document.getElementById('commonNoteFormSection').style.display = 'block';
+            cancelCommonNoteEdit();
+        }
+
+        function hideAddCommonNoteForm() {
+            document.getElementById('commonNoteFormSection').style.display = 'none';
+            cancelCommonNoteEdit();
+        }
 
         async function editCommonNote(noteId) {
             try {
@@ -1967,9 +2587,20 @@
                 document.getElementById('commonNoteFormTitle').textContent = 'Edit Common Note';
                 document.getElementById('commonNoteSubmitBtn').textContent = 'Update Common Note';
                 document.getElementById('commonNoteCancelBtn').style.display = 'inline-block';
+                document.getElementById('commonNoteFormSection').style.display = 'block';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
                 showAlert('common-note-alert', 'Error loading common note: ' + error.message, 'error');
+            }
+    
+            function showAddCommonNoteForm() {
+                document.getElementById('commonNoteFormSection').style.display = 'block';
+                cancelCommonNoteEdit();
+            }
+    
+            function hideAddCommonNoteForm() {
+                document.getElementById('commonNoteFormSection').style.display = 'none';
+                cancelCommonNoteEdit();
             }
         }
 
@@ -2053,13 +2684,369 @@
                                 <td>${note.displayOrder ?? 0}</td>
                                 <td><span class="badge ${note.isActive ? 'badge-success' : 'badge-primary'}">${note.isActive ? 'Active' : 'Inactive'}</span></td>
                                 <td class="action-buttons">
-                                    <button class="btn btn-warning btn-sm" onclick='editCommonNote(${note.id})'>Edit</button>
+                                    <button class="btn btn-primary btn-sm" onclick="editCommonNote(${note.id})">Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteCommonNote(${note.id})">Delete</button>
                                 </td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
             `;
+        }
+
+        // ==================== USERS MANAGEMENT ====================
+        
+        function showAddUserForm() {
+            document.getElementById('userFormSection').style.display = 'block';
+            cancelUserEdit();
+        }
+
+        function hideAddUserForm() {
+            document.getElementById('userFormSection').style.display = 'none';
+            cancelUserEdit();
+        }
+
+        function cancelUserEdit() {
+            document.getElementById('userForm').reset();
+            document.getElementById('editUserId').value = '';
+            document.getElementById('userFormTitle').textContent = 'Create New User';
+            document.getElementById('userSubmitBtn').textContent = 'Create User';
+            document.getElementById('userCancelBtn').style.display = 'none';
+            document.getElementById('userPassword').required = true;
+        }
+
+        async function loadUsers() {
+            try {
+                const role = document.getElementById('filterUserRole').value;
+                const status = document.getElementById('filterUserStatus').value;
+                
+                let url = `${API_BASE}/api/users`;
+                const params = [];
+                if (role) params.push(`role=${role}`);
+                if (status) params.push(`active=${status === 'active'}`);
+                if (params.length > 0) url += '?' + params.join('&');
+
+                const response = await fetch(url);
+                const users = await response.json();
+                
+                const tbody = document.getElementById('usersList');
+                tbody.innerHTML = users.map(user => `
+                    <tr data-user-id="${user.userId}">
+                        <td>${user.userId}</td>
+                        <td contenteditable="true" data-field="name">${user.name}</td>
+                        <td contenteditable="true" data-field="email">${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>
+                            <span class="badge ${user.isActive ? 'badge-success' : 'badge-secondary'}">${user.isActive ? 'Active' : 'Inactive'}</span>
+                        </td>
+                        <td class="action-buttons">
+                            <button class="btn btn-success btn-sm" onclick="updateUserInline(${user.userId})">Update</button>
+                            <button class="btn btn-secondary btn-sm" onclick="toggleUserStatus(${user.userId}, ${user.isActive})">
+                                ${user.isActive ? 'Deactivate' : 'Activate'}
+                            </button>
+                            ${!user.isActive ? `<button class="btn btn-danger btn-sm" onclick="hardDeleteUser(${user.userId})">Hard Delete</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                showAlert('user-alert', 'Error loading users: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userData = {
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                password: document.getElementById('userPassword').value,
+                role: document.getElementById('userRole').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    showAlert('user-alert', 'User created successfully!', 'success');
+                    hideAddUserForm();
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showAlert('user-alert', error.message || 'Failed to create user', 'error');
+                }
+            } catch (error) {
+                showAlert('user-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        async function updateUserInline(userId) {
+            const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+            const name = row.querySelector('[data-field="name"]').textContent.trim();
+            const email = row.querySelector('[data-field="email"]').textContent.trim();
+
+            try {
+                const response = await fetch(`${API_BASE}/api/users/${userId}/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+
+                if (response.ok) {
+                    showAlert('user-alert', 'User updated successfully!', 'success');
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showAlert('user-alert', error.message || 'Failed to update user', 'error');
+                }
+            } catch (error) {
+                showAlert('user-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function toggleUserStatus(userId, currentStatus) {
+            const action = currentStatus ? 'deactivate' : 'activate';
+            if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+            try {
+                const url = currentStatus 
+                    ? `${API_BASE}/api/users/${userId}/deactivate`
+                    : `${API_BASE}/api/users/${userId}/activate`;
+                    
+                const response = await fetch(url, { method: 'PUT' });
+
+                if (response.ok) {
+                    showAlert('user-alert', `User ${action}d successfully!`, 'success');
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showAlert('user-alert', error.message || `Failed to ${action} user`, 'error');
+                }
+            } catch (error) {
+                showAlert('user-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        async function hardDeleteUser(userId) {
+            if (!confirm('⚠️ WARNING: This will PERMANENTLY delete the user from the database.\n\nThis action CANNOT be undone!\n\nAre you absolutely sure you want to proceed?')) return;
+            
+            // Double confirmation for safety
+            if (!confirm('Final confirmation: Delete this user permanently?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/users/${userId}/hard-delete`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('user-alert', 'User permanently deleted successfully!', 'success');
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showAlert('user-alert', error.message || 'Failed to delete user', 'error');
+                }
+            } catch (error) {
+                showAlert('user-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        // ==================== PARENT-STUDENT LINKS ====================
+        
+        function showAddParentStudentLinkForm() {
+            document.getElementById('parentStudentLinkFormSection').style.display = 'block';
+            document.getElementById('parentStudentLinkForm').reset();
+        }
+
+        function hideAddParentStudentLinkForm() {
+            document.getElementById('parentStudentLinkFormSection').style.display = 'none';
+            document.getElementById('parentStudentLinkForm').reset();
+        }
+
+        async function loadParentStudentLinks() {
+            try {
+                const parentId = document.getElementById('filterParentId').value;
+                const studentId = document.getElementById('filterStudentIdForParent').value;
+                
+                let url = `${API_BASE}/api/parents/links`;
+                const params = [];
+                if (parentId) params.push(`parentUserId=${parentId}`);
+                if (studentId) params.push(`studentUserId=${studentId}`);
+                if (params.length > 0) url += '?' + params.join('&');
+
+                const response = await fetch(url);
+                const links = await response.json();
+                
+                const tbody = document.getElementById('parentStudentLinksList');
+                if (links.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No parent-student links found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = links.map(link => `
+                    <tr>
+                        <td>${link.parentUserId}</td>
+                        <td>${link.parentName}</td>
+                        <td>${link.parentEmail}</td>
+                        <td>${link.studentUserId}</td>
+                        <td>${link.studentName}</td>
+                        <td>${link.studentEmail}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-danger btn-sm" onclick="unlinkParentStudent(${link.parentUserId}, ${link.studentUserId})">Unlink</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                showAlert('parent-student-link-alert', 'Error loading links: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('parentStudentLinkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const linkData = {
+                studentUserId: parseInt(document.getElementById('linkStudentUserId').value)
+            };
+            const parentUserId = document.getElementById('linkParentUserId').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/parents/${parentUserId}/students`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(linkData)
+                });
+
+                if (response.ok) {
+                    showAlert('parent-student-link-alert', 'Parent linked to student successfully!', 'success');
+                    hideAddParentStudentLinkForm();
+                    loadParentStudentLinks();
+                } else {
+                    const error = await response.json();
+                    showAlert('parent-student-link-alert', error.message || 'Failed to link parent to student', 'error');
+                }
+            } catch (error) {
+                showAlert('parent-student-link-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        async function unlinkParentStudent(parentUserId, studentUserId) {
+            if (!confirm('Are you sure you want to unlink this parent from the student?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/parents/${parentUserId}/students/${studentUserId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('parent-student-link-alert', 'Parent unlinked from student successfully!', 'success');
+                    loadParentStudentLinks();
+                } else {
+                    const error = await response.json();
+                    showAlert('parent-student-link-alert', error.message || 'Failed to unlink', 'error');
+                }
+            } catch (error) {
+                showAlert('parent-student-link-alert', 'Error: ' + error.message, 'error');
+            }
+        }
+
+        // ==================== TEACHER-STUDENT LINKS ====================
+        
+        function showAddTeacherStudentLinkForm() {
+            document.getElementById('teacherStudentLinkFormSection').style.display = 'block';
+            document.getElementById('teacherStudentLinkForm').reset();
+        }
+
+        function hideAddTeacherStudentLinkForm() {
+            document.getElementById('teacherStudentLinkFormSection').style.display = 'none';
+            document.getElementById('teacherStudentLinkForm').reset();
+        }
+
+        async function loadTeacherStudentLinks() {
+            try {
+                const teacherId = document.getElementById('filterTeacherId').value;
+                const studentId = document.getElementById('filterStudentIdForTeacher').value;
+                
+                let url = `${API_BASE}/api/teachers/links`;
+                const params = [];
+                if (teacherId) params.push(`teacherUserId=${teacherId}`);
+                if (studentId) params.push(`studentUserId=${studentId}`);
+                if (params.length > 0) url += '?' + params.join('&');
+
+                const response = await fetch(url);
+                const links = await response.json();
+                
+                const tbody = document.getElementById('teacherStudentLinksList');
+                if (links.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No teacher-student links found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = links.map(link => `
+                    <tr>
+                        <td>${link.teacherUserId}</td>
+                        <td>${link.teacherName}</td>
+                        <td>${link.teacherEmail}</td>
+                        <td>${link.studentUserId}</td>
+                        <td>${link.studentName}</td>
+                        <td>${link.studentEmail}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-danger btn-sm" onclick="unlinkTeacherStudent(${link.teacherUserId}, ${link.studentUserId})">Unlink</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                showAlert('teacher-student-link-alert', 'Error loading links: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('teacherStudentLinkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const linkData = {
+                studentUserId: parseInt(document.getElementById('linkStudentUserIdForTeacher').value)
+            };
+            const teacherUserId = document.getElementById('linkTeacherUserId').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/teachers/${teacherUserId}/students`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(linkData)
+                });
+
+                if (response.ok) {
+                    showAlert('teacher-student-link-alert', 'Teacher linked to student successfully!', 'success');
+                    hideAddTeacherStudentLinkForm();
+                    loadTeacherStudentLinks();
+                } else {
+                    const error = await response.json();
+                    showAlert('teacher-student-link-alert', error.message || 'Failed to link teacher to student', 'error');
+                }
+            } catch (error) {
+                showAlert('teacher-student-link-alert', 'Error: ' + error.message, 'error');
+            }
+        });
+
+        async function unlinkTeacherStudent(teacherUserId, studentUserId) {
+            if (!confirm('Are you sure you want to unlink this teacher from the student?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/teachers/${teacherUserId}/students/${studentUserId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('teacher-student-link-alert', 'Teacher unlinked from student successfully!', 'success');
+                    loadTeacherStudentLinks();
+                } else {
+                    const error = await response.json();
+                    showAlert('teacher-student-link-alert', error.message || 'Failed to unlink', 'error');
+                }
+            } catch (error) {
+                showAlert('teacher-student-link-alert', 'Error: ' + error.message, 'error');
+            }
         }
 
         // Load initial data on page load

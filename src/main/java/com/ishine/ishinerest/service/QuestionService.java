@@ -2,11 +2,15 @@ package com.ishine.ishinerest.service;
 
 import com.ishine.ishinerest.entity.Chapter;
 import com.ishine.ishinerest.entity.Question;
+import com.ishine.ishinerest.entity.User;
+import com.ishine.ishinerest.entity.UserRole;
 import com.ishine.ishinerest.pojo.QuestionWithFlagDTO;
 import com.ishine.ishinerest.repository.ChapterRepository;
 import com.ishine.ishinerest.repository.FlaggedQuestionRepository;
 import com.ishine.ishinerest.repository.QuestionRepository;
 import com.ishine.ishinerest.repository.PracticeSessionDetailRepository;
+import com.ishine.ishinerest.repository.TeacherSubjectRepository;
+import com.ishine.ishinerest.repository.UserRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,8 +38,33 @@ public class QuestionService {
     @Autowired
     private FlaggedQuestionRepository flaggedQuestionRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TeacherSubjectRepository teacherSubjectRepository;
+
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
+    }
+
+    public List<Question> getQuestionsByCreatorOrDefault(Long createdByUserId) {
+        if (createdByUserId != null) {
+            var creator = userRepository.findById(createdByUserId)
+                    .orElseThrow(() -> new RuntimeException("Creator not found"));
+            return questionRepository.findByCreatedBy(creator);
+        }
+
+        User adminUser = userRepository.findByRole(UserRole.ADMIN)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (adminUser != null) {
+            return questionRepository.findByCreatedBy(adminUser);
+        }
+
+        return questionRepository.findByCreatedByIsNull();
     }
 
     public Optional<Question> getQuestionById(Long id) {
@@ -51,11 +80,15 @@ public class QuestionService {
     }
 
     public Question saveQuestion(Question question) {
+        applyCreatedByRule(question);
+        validateQuestion(question);
         normalizeCorrectAnswers(question);
         return questionRepository.save(question);
     }
 
     public List<Question> saveQuestions(List<Question> questions) {
+        questions.forEach(this::applyCreatedByRule);
+        questions.forEach(this::validateQuestion);
         questions.forEach(this::normalizeCorrectAnswers);
         return questionRepository.saveAll(questions);
     }
@@ -100,12 +133,19 @@ public class QuestionService {
 
                 question.setCorrectAnswers(getCellValue(row.getCell(12)));
                 question.setNotes(getCellValue(row.getCell(13)));
+                
+                // Handle UsageType - default to "Both" if empty
+                String usageType = getCellValue(row.getCell(14));
+                question.setUsageType(usageType != null && !usageType.trim().isEmpty()
+                        ? usageType.trim()
+                        : "Both");
 
                 Chapter chapter = chapterRepository.findById(chapterId)
                         .orElseThrow(() -> new RuntimeException("Chapter not found for ID: " + chapterId));
 
                 question.setChapter(chapter);
 
+                applyCreatedByRule(question);
                 questions.add(question);
             }
         } catch (IOException e) {
@@ -139,51 +179,98 @@ public class QuestionService {
     }
 
     public void deleteQuestion(Long id) {
+        // Get the question first to check if it has an image
+        Optional<Question> questionOpt = questionRepository.findById(id);
+        
+        if (questionOpt.isPresent()) {
+            Question question = questionOpt.get();
+            String imageUrl = question.getQuestionImageUrl();
+            
+            // Delete the image file if it exists
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                deleteImageFile(imageUrl);
+            }
+        }
+        
+        // Delete the question from database
         questionRepository.deleteById(id);
+    }
+    
+    private void deleteImageFile(String imageUrl) {
+        try {
+            // Extract path from URL
+            // Example: http://localhost:8080/uploads/chapters/LC5H0102/questions/q_123.png
+            // Extract: public/uploads/chapters/LC5H0102/questions/q_123.png
+            String baseUrl = "http://localhost:8080/uploads/chapters";
+            String baseDir = "public/uploads/chapters";
+            
+            if (imageUrl.startsWith(baseUrl)) {
+                String relativePath = imageUrl.replace(baseUrl, baseDir);
+                java.io.File file = new java.io.File(relativePath);
+                
+                if (file.exists()) {
+                    boolean deleted = file.delete();
+                    if (deleted) {
+                        System.out.println("Deleted image file: " + relativePath);
+                    } else {
+                        System.err.println("Failed to delete image file: " + relativePath);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting image file: " + e.getMessage());
+            // Don't throw exception - we still want to delete the question even if image deletion fails
+        }
     }
 
     // Unpracticed questions by subject
-    public List<Question> getUnpracticedQuestionsBySubject(Long studentId, String subjectId, int limit) {
+    public List<Question> getUnpracticedQuestionsBySubject(Long studentId, String subjectId, int limit, String usageType) {
+        // Normalize usageType parameter - treat "all" as null to get all usage types
+        String normalizedUsageType = (usageType != null && usageType.equalsIgnoreCase("all")) ? null : usageType;
+        
         // Get practiced question IDs for the student
         List<Long> practicedQuestionIds = practiceSessionDetailRepository.findAnsweredQuestionIds(studentId);
 
         // If no questions have been practiced, return questions with limit
         if (practicedQuestionIds == null || practicedQuestionIds.isEmpty()) {
-            return questionRepository.findBySubjectIdWithLimit(subjectId, limit);
+            return questionRepository.findBySubjectIdWithLimit(subjectId, limit, normalizedUsageType);
         }
 
         // Get unpracticed questions for the subject
-        return questionRepository.findUnpracticedQuestionsBySubject(subjectId, practicedQuestionIds, limit);
+        return questionRepository.findUnpracticedQuestionsBySubject(subjectId, practicedQuestionIds, limit, normalizedUsageType);
     }
 
     // Unpracticed questions by chapter
-    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level) {
+    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level, String usageType) {
         // Normalize level parameter - treat "all" as null to get all difficulty levels
         String normalizedLevel = (level != null && level.equalsIgnoreCase("all")) ? null : level;
+        
+        // Normalize usageType parameter - treat "all" as null to get all usage types
+        String normalizedUsageType = (usageType != null && usageType.equalsIgnoreCase("all")) ? null : usageType;
 
         // Get answered question IDs for the student and chapter
         List<Long> practicedQuestionIds = practiceSessionDetailRepository
                 .findCorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
 
         if (practicedQuestionIds == null || practicedQuestionIds.isEmpty()) {
-            return questionRepository.findByChapterIdWithLimit(chapterId, limit);
+            return questionRepository.findByChapterIdWithLimit(chapterId, limit, normalizedUsageType);
         }
         // Get unpracticed questions for the chapter
         return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit,
-                normalizedLevel);
+                normalizedLevel, normalizedUsageType);
     }
 
     // Get unpracticed questions by chapter with flag status
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsByChapterWithFlags(
-            Long studentId, String chapterId, int limit, String level) {
-        List<Question> questions = getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level);
+            Long studentId, String chapterId, int limit, String level, String usageType) {
+        List<Question> questions = getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level, usageType);
         return addFlagStatusToQuestions(questions, studentId);
     }
 
     // Get unpracticed questions by subject with flag status
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubjectWithFlags(
-            Long studentId, String subjectId, int limit) {
-        List<Question> questions = getUnpracticedQuestionsBySubject(studentId, subjectId, limit);
+            Long studentId, String subjectId, int limit, String usageType) {
+        List<Question> questions = getUnpracticedQuestionsBySubject(studentId, subjectId, limit, usageType);
         return addFlagStatusToQuestions(questions, studentId);
     }
 
@@ -323,7 +410,182 @@ public class QuestionService {
         }
     }
 
+    /**
+     * Validates that a question has either questionText or questionImageUrl
+     * At least one must be provided
+     * Note: This validation allows null/empty questionText during initial save
+     * because the image upload happens after question creation
+     */
+    private void validateQuestion(Question question) {
+        String questionText = question.getQuestionText();
+        String questionImageUrl = question.getQuestionImageUrl();
+        
+        boolean hasText = questionText != null && !questionText.trim().isEmpty();
+        boolean hasImage = questionImageUrl != null && !questionImageUrl.trim().isEmpty();
+        
+        // Allow questions without text if they will have an image uploaded later
+        // The frontend ensures at least one is provided before submission
+        // For updates, we validate that at least one exists
+        if (question.getQuestionId() != null && !hasText && !hasImage) {
+            // This is an update operation - both text and image are missing
+            throw new IllegalArgumentException("Question must have either question text or question image");
+        }
+        // For new questions (questionId is null), we allow empty text as image will be uploaded next
+    }
+
     // public List<Question> getQuestionsByChapter(Long chapterId) {
     // return questionRepository.findQuestionsByChapterExcludingPractice(chapterId);
     // }
+    
+    // ========================================================================
+    // CREATOR TRACKING METHODS (for custom questions by parents/teachers)
+    // ========================================================================
+    
+    /**
+     * Create a custom question by a parent or teacher
+     * @param question The question to create
+     * @param creatorUserId The user ID of the creator (parent or teacher)
+     * @return The saved question
+     */
+    public Question createCustomQuestion(Question question, Long creatorUserId) {
+        // Verify creator exists and has appropriate role
+        var creator = userRepository.findById(creatorUserId)
+                .orElseThrow(() -> new RuntimeException("Creator not found"));
+        
+        if (creator.getRole() != com.ishine.ishinerest.entity.UserRole.PARENT &&
+            creator.getRole() != com.ishine.ishinerest.entity.UserRole.TEACHER) {
+            throw new RuntimeException("Only parents and teachers can create custom questions");
+        }
+
+        if (creator.getRole() == com.ishine.ishinerest.entity.UserRole.TEACHER) {
+            if (question.getChapter() == null || question.getChapter().getChapterId() == null) {
+                throw new RuntimeException("Chapter is required for teacher custom questions");
+            }
+
+            var chapter = chapterRepository.findById(question.getChapter().getChapterId())
+                    .orElseThrow(() -> new RuntimeException("Chapter not found"));
+
+            String subjectId = chapter.getSubject().getSubjectId();
+            boolean teacherHasSubject = teacherSubjectRepository
+                    .existsByTeacherUserIdAndSubjectId(creatorUserId, subjectId);
+
+            if (!teacherHasSubject) {
+                throw new RuntimeException("Teacher is not allowed to create questions for subject: " + subjectId);
+            }
+
+            question.setChapter(chapter);
+        }
+        
+        // Set creator and custom flags
+        question.setCreatedBy(creator);
+        question.setIsCustom(true);
+        question.setVisibility("PRIVATE"); // Default to private
+        
+        // Validate and save
+        validateQuestion(question);
+        normalizeCorrectAnswers(question);
+        return questionRepository.save(question);
+    }
+    
+    /**
+     * Get all custom questions created by a user
+     */
+    public List<Question> getCustomQuestionsByCreator(Long creatorUserId) {
+        return getQuestionsByCreatorOrDefault(creatorUserId);
+    }
+    
+    /**
+     * Get all custom questions for a specific chapter created by a user
+     */
+    public List<Question> getCustomQuestionsByCreatorAndChapter(Long creatorUserId, String chapterId) {
+        if (creatorUserId != null) {
+            var creator = userRepository.findById(creatorUserId)
+                    .orElseThrow(() -> new RuntimeException("Creator not found"));
+            return questionRepository.findByCreatedByAndChapter_ChapterId(creator, chapterId);
+        }
+
+        User adminUser = userRepository.findByRole(UserRole.ADMIN)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (adminUser != null) {
+            return questionRepository.findByCreatedByAndChapter_ChapterId(adminUser, chapterId);
+        }
+
+        return questionRepository.findByCreatedByIsNullAndChapter_ChapterId(chapterId);
+    }
+    
+    /**
+     * Update visibility of a custom question
+     */
+    public Question updateQuestionVisibility(Long questionId, Long creatorUserId, String visibility) {
+        var question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        
+        // Verify the user is the creator
+        if (question.getCreatedBy() == null || 
+            !question.getCreatedBy().getUserId().equals(creatorUserId)) {
+            throw new RuntimeException("Only the creator can update question visibility");
+        }
+        
+        // Validate visibility value
+        if (!visibility.equals("PUBLIC") && !visibility.equals("PRIVATE") && !visibility.equals("SHARED")) {
+            throw new RuntimeException("Invalid visibility value. Must be PUBLIC, PRIVATE, or SHARED");
+        }
+        
+        question.setVisibility(visibility);
+        return questionRepository.save(question);
+    }
+    
+    /**
+     * Delete a custom question (only by creator)
+     */
+    public void deleteCustomQuestion(Long questionId, Long creatorUserId) {
+        var question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        
+        // Verify the user is the creator
+        if (question.getCreatedBy() == null || 
+            !question.getCreatedBy().getUserId().equals(creatorUserId)) {
+            throw new RuntimeException("Only the creator can delete their custom questions");
+        }
+        
+        // Verify it's a custom question
+        if (!question.getIsCustom()) {
+            throw new RuntimeException("Cannot delete system questions");
+        }
+        
+        deleteQuestion(questionId);
+    }
+    
+    /**
+     * Get all system questions (not custom)
+     */
+    public List<Question> getSystemQuestions() {
+        return questionRepository.findByIsCustom(false);
+    }
+    
+    /**
+     * Get all custom questions
+     */
+    public List<Question> getAllCustomQuestions() {
+        return questionRepository.findByIsCustom(true);
+    }
+
+    private void applyCreatedByRule(Question question) {
+        if (question.getCreatedBy() != null && question.getCreatedBy().getUserId() != null) {
+            User providedCreator = userRepository.findById(question.getCreatedBy().getUserId())
+                    .orElseThrow(() -> new RuntimeException("CreatedBy user not found: " + question.getCreatedBy().getUserId()));
+            question.setCreatedBy(providedCreator);
+            return;
+        }
+
+        User adminUser = userRepository.findByRole(UserRole.ADMIN)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        question.setCreatedBy(adminUser);
+    }
 }

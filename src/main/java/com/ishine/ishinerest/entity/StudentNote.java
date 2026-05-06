@@ -47,7 +47,7 @@ public class StudentNote {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", referencedColumnName = "studentId", insertable = false, updatable = false)
+    @JoinColumn(name = "student_id", insertable = false, updatable = false)
     private Student student;
 
     @JsonIgnore

@@ -17,7 +17,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long questionId;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String questionText;
 
     @Column
@@ -38,7 +38,7 @@ public class Question {
     @Column
     private String optionF;
 
-    @Column(nullable = false)
+    @Column
     private String correctAnswer;
 
     @Column
@@ -47,20 +47,40 @@ public class Question {
     @Column
     private int questionType;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String explanation;
 
     @Column
     private String difficultyLevel;
-    @Column
+    
+    @Column(columnDefinition = "TEXT")
     private String notes;
-    @Column
-    private String createdBy;
+
+    @Column(columnDefinition = "TEXT")
+    private String hint;
+
     @Column
     private String tags;
     // section number in chapter
     @Column
     private String sectionId;
+
+    @Column
+    private String usageType; // Possible values: "Practice", "Test", "Both"
+
+    @Column
+    private String questionImageUrl; // URL to the question image
+
+    // NEW: Creator tracking
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_user_id")
+    private User createdBy;
+
+    @Column(nullable = false)
+    private Boolean isCustom = false;
+
+    @Column(length = 50)
+    private String visibility = "PUBLIC";  // PUBLIC, PRIVATE, SHARED
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chapter_id", nullable = false)

@@ -20,12 +20,15 @@ public class QuestionWithFlagDTO {
     private String correctAnswer;
     private String correctAnswers;
     private int questionType;
+    private String questionTypeName;
     private String explanation;
     private String difficultyLevel;
     private String notes;
+    private String hint;
     private String createdBy;
     private String tags;
     private String sectionId;
+    private String questionImageUrl;
     private boolean isFlagged;
 
     // Constructor from Question entity
@@ -41,13 +44,28 @@ public class QuestionWithFlagDTO {
         this.correctAnswer = question.getCorrectAnswer();
         this.correctAnswers = question.getCorrectAnswers();
         this.questionType = question.getQuestionType();
+        this.questionTypeName = mapQuestionTypeName(question.getQuestionType());
         this.explanation = question.getExplanation();
         this.difficultyLevel = question.getDifficultyLevel();
         this.notes = question.getNotes();
-        this.createdBy = question.getCreatedBy();
+        this.hint = question.getHint();
+        // Handle User object - extract name or email
+        this.createdBy = question.getCreatedBy() != null ? question.getCreatedBy().getName() : null;
         this.tags = question.getTags();
         this.sectionId = question.getSectionId();
+        this.questionImageUrl = question.getQuestionImageUrl();
         this.isFlagged = isFlagged;
+    }
+
+    private String mapQuestionTypeName(int questionType) {
+        return switch (questionType) {
+            case 1 -> "SINGLE_CHOICE";
+            case 2 -> "MULTIPLE_CHOICE";
+            case 3 -> "TRUE_FALSE";
+            case 4 -> "FILL_IN_THE_BLANK";
+            case 5 -> "SHORT_ANSWER";
+            default -> "UNKNOWN";
+        };
     }
 }
 
