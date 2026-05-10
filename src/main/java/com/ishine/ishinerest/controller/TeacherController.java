@@ -28,7 +28,7 @@ public class TeacherController {
     
     /**
      * Link a teacher to a student
-     * POST /api/teachers/{teacherUserId}/students
+     * POST /teachers/{teacherUserId}/students
      */
     @PostMapping("/{teacherUserId}/students")
     @ResponseStatus(HttpStatus.CREATED)
@@ -42,7 +42,7 @@ public class TeacherController {
      * Add a student by name and email.
      * If the email already belongs to a student, link that student.
      * Otherwise create a guest student account and link it.
-     * POST /api/teachers/{teacherUserId}/students/add-or-link
+     * POST /teachers/{teacherUserId}/students/add-or-link
      */
     @PostMapping("/{teacherUserId}/students/add-or-link")
     @ResponseStatus(HttpStatus.CREATED)
@@ -54,7 +54,7 @@ public class TeacherController {
     
     /**
      * Unlink a teacher from a student
-     * DELETE /api/teachers/{teacherUserId}/students/{studentUserId}
+     * DELETE /teachers/{teacherUserId}/students/{studentUserId}
      */
     @DeleteMapping("/{teacherUserId}/students/{studentUserId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -66,7 +66,7 @@ public class TeacherController {
     
     /**
      * Get all students for a teacher
-     * GET /api/teachers/{teacherUserId}/students
+     * GET /teachers/{teacherUserId}/students
      */
     @GetMapping("/{teacherUserId}/students")
     public List<UserDTO> getStudentsForTeacher(@PathVariable Long teacherUserId) {
@@ -77,7 +77,7 @@ public class TeacherController {
     
     /**
      * Get all teachers for a student
-     * GET /api/students/{studentUserId}/teachers
+     * GET /students/{studentUserId}/teachers
      */
     @GetMapping("/students/{studentUserId}/teachers")
     public List<UserDTO> getTeachersForStudent(@PathVariable Long studentUserId) {
@@ -88,7 +88,7 @@ public class TeacherController {
     
     /**
      * Check if a teacher is linked to a student
-     * GET /api/teachers/{teacherUserId}/students/{studentUserId}/linked
+     * GET /teachers/{teacherUserId}/students/{studentUserId}/linked
      */
     @GetMapping("/{teacherUserId}/students/{studentUserId}/linked")
     public boolean isTeacherLinkedToStudent(

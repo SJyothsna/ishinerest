@@ -5,7 +5,7 @@
 @studentUserId = 4
 
 ### Link parent to student
-POST {{baseUrl}}/api/parents/{{parentUserId}}/students
+POST {{baseUrl}}/parents/{{parentUserId}}/students
 Content-Type: application/json
 
 {
@@ -13,15 +13,15 @@ Content-Type: application/json
 }
 
 ### Get all students for a parent
-GET {{baseUrl}}/api/parents/{{parentUserId}}/students
+GET {{baseUrl}}/parents/{{parentUserId}}/students
 
 ### Get all parents for a student
-GET {{baseUrl}}/api/parents/students/{{studentUserId}}/parents
+GET {{baseUrl}}/parents/students/{{studentUserId}}/parents
 
 ### Check if parent is linked to student
-GET {{baseUrl}}/api/parents/{{parentUserId}}/students/{{studentUserId}}/linked
+GET {{baseUrl}}/parents/{{parentUserId}}/students/{{studentUserId}}/linked
 
 ### Unlink parent from student
-DELETE {{baseUrl}}/api/parents/{{parentUserId}}/students/{{studentUserId}}
+DELETE {{baseUrl}}/parents/{{parentUserId}}/students/{{studentUserId}}
 
 # Made with Bob

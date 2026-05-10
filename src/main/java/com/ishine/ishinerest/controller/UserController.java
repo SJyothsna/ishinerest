@@ -26,7 +26,7 @@ public class UserController {
     
     /**
      * Get user by ID
-     * GET /api/users/{userId}
+     * GET /users/{userId}
      */
     @GetMapping("/{userId}")
     public UserDTO getUserById(@PathVariable Long userId) {
@@ -35,7 +35,7 @@ public class UserController {
     
     /**
      * Get user by email
-     * GET /api/users/email/{email}
+     * GET /users/email/{email}
      */
     @GetMapping("/email/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
@@ -44,7 +44,7 @@ public class UserController {
     
     /**
      * Get all active users
-     * GET /api/users/active
+     * GET /users/active
      */
     @GetMapping("/active")
     public List<UserDTO> getAllActiveUsers() {
@@ -55,7 +55,7 @@ public class UserController {
     
     /**
      * Get users by role
-     * GET /api/users/role/{role}
+     * GET /users/role/{role}
      */
     @GetMapping("/role/{role}")
     public List<UserDTO> getUsersByRole(@PathVariable UserRole role) {
@@ -66,7 +66,7 @@ public class UserController {
     
     /**
      * Get active users by role
-     * GET /api/users/role/{role}/active
+     * GET /users/role/{role}/active
      */
     @GetMapping("/role/{role}/active")
     public List<UserDTO> getActiveUsersByRole(@PathVariable UserRole role) {
@@ -77,7 +77,7 @@ public class UserController {
     
     /**
      * Update user profile
-     * PUT /api/users/{userId}/profile
+     * PUT /users/{userId}/profile
      */
     @PutMapping("/{userId}/profile")
     public UserDTO updateUserProfile(
@@ -89,7 +89,7 @@ public class UserController {
     
     /**
      * Change user password
-     * PUT /api/users/{userId}/password
+     * PUT /users/{userId}/password
      */
     @PutMapping("/{userId}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -101,7 +101,7 @@ public class UserController {
     
     /**
      * Deactivate user account
-     * DELETE /api/users/{userId}
+     * DELETE /users/{userId}
      */
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -111,7 +111,7 @@ public class UserController {
     
     /**
      * Deactivate user account (alternative endpoint for admin UI)
-     * PUT /api/users/{userId}/deactivate
+     * PUT /users/{userId}/deactivate
      */
     @PutMapping("/{userId}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -121,7 +121,7 @@ public class UserController {
     
     /**
      * Reactivate user account
-     * POST /api/users/{userId}/reactivate
+     * POST /users/{userId}/reactivate
      */
     @PostMapping("/{userId}/reactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -131,7 +131,7 @@ public class UserController {
     
     /**
      * Activate user account (alternative endpoint for admin UI)
-     * PUT /api/users/{userId}/activate
+     * PUT /users/{userId}/activate
      */
     @PutMapping("/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -141,7 +141,7 @@ public class UserController {
     
     /**
      * Hard delete user (permanently remove from database)
-     * DELETE /api/users/{userId}/hard-delete
+     * DELETE /users/{userId}/hard-delete
      * Only works for inactive users
      */
     @DeleteMapping("/{userId}/hard-delete")
@@ -152,7 +152,7 @@ public class UserController {
     
     /**
      * Get all users (admin only)
-     * GET /api/users
+     * GET /users
      */
     @GetMapping
     public List<UserDTO> getAllUsers() {

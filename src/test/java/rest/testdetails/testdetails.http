@@ -1,0 +1,76 @@
+### TestDetailController
+@baseUrl = http://localhost:8080
+@studentId = 14
+@assignmentId = 1
+@questionId = 271
+
+### Get all test details
+GET {{baseUrl}}/test-details
+Accept: application/json
+
+###
+
+### Get all test details by student id
+GET {{baseUrl}}/test-details/{{studentId}}
+Accept: application/json
+
+###
+
+### Get test details by student and assignment id
+GET {{baseUrl}}/test-details/student/{{studentId}}/assignment/{{assignmentId}}
+Accept: application/json
+
+###
+
+### Create/update test details for student without assignment
+POST {{baseUrl}}/test-details/{{studentId}}
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "questionId": {{questionId}},
+    "studentAnswer": "7",
+    "isCorrect": false
+  }
+]
+
+###
+
+### Create/update test details for student with assignment
+POST {{baseUrl}}/test-details/{{studentId}}
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "assignmentId": {{assignmentId}},
+    "questionId": {{questionId}},
+    "studentAnswer": "7",
+    "isCorrect": false
+  }
+]
+
+###
+
+### Get wrong answers for student in assignment
+GET {{baseUrl}}/test-details/wrong-answers/student/{{studentId}}/assignment/{{assignmentId}}
+Accept: application/json
+
+###
+
+### Delete test detail by id
+DELETE {{baseUrl}}/test-details/1
+Accept: application/json
+
+###
+
+### Reset all test details for student
+DELETE {{baseUrl}}/test-details/reset/student/{{studentId}}
+Accept: application/json
+
+###
+
+### Reset assignment progress
+DELETE {{baseUrl}}/test-details/reset/student/{{studentId}}/assignment/{{assignmentId}}
+Accept: application/json

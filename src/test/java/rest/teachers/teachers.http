@@ -5,7 +5,7 @@
 @studentUserId = 4
 
 ### Link teacher to student
-POST {{baseUrl}}/api/teachers/{{teacherUserId}}/students
+POST {{baseUrl}}/teachers/{{teacherUserId}}/students
 Content-Type: application/json
 
 {
@@ -13,15 +13,15 @@ Content-Type: application/json
 }
 
 ### Get all students for a teacher
-GET {{baseUrl}}/api/teachers/{{teacherUserId}}/students
+GET {{baseUrl}}/teachers/{{teacherUserId}}/students
 
 ### Get all teachers for a student
-GET {{baseUrl}}/api/teachers/students/{{studentUserId}}/teachers
+GET {{baseUrl}}/teachers/students/{{studentUserId}}/teachers
 
 ### Check if teacher is linked to student
-GET {{baseUrl}}/api/teachers/{{teacherUserId}}/students/{{studentUserId}}/linked
+GET {{baseUrl}}/teachers/{{teacherUserId}}/students/{{studentUserId}}/linked
 
 ### Unlink teacher from student
-DELETE {{baseUrl}}/api/teachers/{{teacherUserId}}/students/{{studentUserId}}
+DELETE {{baseUrl}}/teachers/{{teacherUserId}}/students/{{studentUserId}}
 
 # Made with Bob

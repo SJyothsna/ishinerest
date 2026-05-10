@@ -27,7 +27,7 @@ public class ParentController {
     
     /**
      * Link a parent to a student by email (creates pending request)
-     * POST /api/parents/{parentUserId}/link-student
+     * POST /parents/{parentUserId}/link-student
      */
     @PostMapping("/{parentUserId}/link-student")
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,7 +44,7 @@ public class ParentController {
     
     /**
      * Link a parent to a student by ID (backward compatibility)
-     * POST /api/parents/{parentUserId}/students
+     * POST /parents/{parentUserId}/students
      */
     @PostMapping("/{parentUserId}/students")
     @ResponseStatus(HttpStatus.CREATED)
@@ -56,7 +56,7 @@ public class ParentController {
     
     /**
      * Unlink a parent from a student (revoke access)
-     * DELETE /api/parents/{parentUserId}/students/{studentUserId}
+     * DELETE /parents/{parentUserId}/students/{studentUserId}
      */
     @DeleteMapping("/{parentUserId}/students/{studentUserId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -68,7 +68,7 @@ public class ParentController {
     
     /**
      * Get all students for a parent (active links only)
-     * GET /api/parents/{parentUserId}/students
+     * GET /parents/{parentUserId}/students
      */
     @GetMapping("/{parentUserId}/students")
     public List<UserDTO> getStudentsForParent(@PathVariable Long parentUserId) {
@@ -79,7 +79,7 @@ public class ParentController {
     
     /**
      * Get all parent-student links with optional status filter
-     * GET /api/parents/{parentUserId}/links?status=ACTIVE
+     * GET /parents/{parentUserId}/links?status=ACTIVE
      */
     @GetMapping("/{parentUserId}/links")
     public List<ParentStudentLinkDTO> getLinksForParent(
@@ -92,7 +92,7 @@ public class ParentController {
     
     /**
      * Get all parents for a student
-     * GET /api/students/{studentUserId}/parents
+     * GET /students/{studentUserId}/parents
      */
     @GetMapping("/students/{studentUserId}/parents")
     public List<UserDTO> getParentsForStudent(@PathVariable Long studentUserId) {
@@ -103,7 +103,7 @@ public class ParentController {
     
     /**
      * Check if a parent is actively linked to a student
-     * GET /api/parents/{parentUserId}/students/{studentUserId}/linked
+     * GET /parents/{parentUserId}/students/{studentUserId}/linked
      */
     @GetMapping("/{parentUserId}/students/{studentUserId}/linked")
     public boolean isParentLinkedToStudent(

@@ -5,31 +5,31 @@
 @email = admin@ishine.com
 
 ### Get user by ID
-GET {{baseUrl}}/api/users/{{userId}}
+GET {{baseUrl}}/users/{{userId}}
 
 ### Get user by email
-GET {{baseUrl}}/api/users/email/{{email}}
+GET {{baseUrl}}/users/email/{{email}}
 
 ### Get all active users
-GET {{baseUrl}}/api/users/active
+GET {{baseUrl}}/users/active
 
 ### Get users by role (STUDENT)
-GET {{baseUrl}}/api/users/role/STUDENT
+GET {{baseUrl}}/users/role/STUDENT
 
 ### Get users by role (PARENT)
-GET {{baseUrl}}/api/users/role/PARENT
+GET {{baseUrl}}/users/role/PARENT
 
 ### Get users by role (TEACHER)
-GET {{baseUrl}}/api/users/role/TEACHER
+GET {{baseUrl}}/users/role/TEACHER
 
 ### Get users by role (ADMIN)
-GET {{baseUrl}}/api/users/role/ADMIN
+GET {{baseUrl}}/users/role/ADMIN
 
 ### Get active users by role (STUDENT)
-GET {{baseUrl}}/api/users/role/STUDENT/active
+GET {{baseUrl}}/users/role/STUDENT/active
 
 ### Update user profile
-PUT {{baseUrl}}/api/users/{{userId}}/profile
+PUT {{baseUrl}}/users/{{userId}}/profile
 Content-Type: application/json
 
 {
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ### Change password
-PUT {{baseUrl}}/api/users/{{userId}}/password
+PUT {{baseUrl}}/users/{{userId}}/password
 Content-Type: application/json
 
 {
@@ -47,12 +47,12 @@ Content-Type: application/json
 }
 
 ### Deactivate user
-DELETE {{baseUrl}}/api/users/{{userId}}
+DELETE {{baseUrl}}/users/{{userId}}
 
 ### Reactivate user
-POST {{baseUrl}}/api/users/{{userId}}/reactivate
+POST {{baseUrl}}/users/{{userId}}/reactivate
 
 ### Get all users (admin only)
-GET {{baseUrl}}/api/users
+GET {{baseUrl}}/users
 
 # Made with Bob

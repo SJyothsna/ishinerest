@@ -24,7 +24,7 @@ public class StudentLinkController {
     
     /**
      * Get pending parent link requests for a student
-     * GET /api/students/{studentUserId}/link-requests
+     * GET /students/{studentUserId}/link-requests
      */
     @GetMapping("/{studentUserId}/link-requests")
     public List<ParentStudentLinkDTO> getPendingLinkRequests(@PathVariable Long studentUserId) {
@@ -35,7 +35,7 @@ public class StudentLinkController {
     
     /**
      * Approve a parent link request
-     * POST /api/students/link-requests/{parentUserId}/approve
+     * POST /students/link-requests/{parentUserId}/approve
      */
     @PostMapping("/link-requests/{parentUserId}/approve")
     @ResponseStatus(HttpStatus.OK)
@@ -48,7 +48,7 @@ public class StudentLinkController {
     
     /**
      * Reject a parent link request
-     * POST /api/students/link-requests/{parentUserId}/reject
+     * POST /students/link-requests/{parentUserId}/reject
      */
     @PostMapping("/link-requests/{parentUserId}/reject")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -75,23 +75,32 @@ public interface PracticeSessionDetailRepository extends JpaRepository<PracticeS
     @Query(value = """
             SELECT
                 (SELECT COUNT(*)
-                 FROM questions
-                 WHERE chapter_id = :chapterId),
+                 FROM questions q
+                 WHERE q.chapter_id = :chapterId
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
 
                 (SELECT COUNT(DISTINCT psd.question_id)
                  FROM practice_session_details psd
                  JOIN questions q ON psd.question_id = q.question_id
-                 WHERE psd.student_id = :studentId AND q.chapter_id = :chapterId),
+                 WHERE psd.student_id = :studentId
+                   AND q.chapter_id = :chapterId
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
 
                 (SELECT COUNT(*)
                  FROM practice_session_details psd
                  JOIN questions q ON psd.question_id = q.question_id
-                 WHERE psd.student_id = :studentId AND q.chapter_id = :chapterId AND psd.is_correct = true),
+                 WHERE psd.student_id = :studentId
+                   AND q.chapter_id = :chapterId
+                   AND psd.is_correct = true
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
 
                 (SELECT COUNT(*)
                  FROM practice_session_details psd
                  JOIN questions q ON psd.question_id = q.question_id
-                 WHERE psd.student_id = :studentId AND q.chapter_id = :chapterId AND psd.is_correct = false)
+                 WHERE psd.student_id = :studentId
+                   AND q.chapter_id = :chapterId
+                   AND psd.is_correct = false
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both'))
             """, nativeQuery = true)
     List<Object[]> getChapterProgress(@Param("studentId") Long studentId, @Param("chapterId") String chapterId);
 
@@ -100,25 +109,34 @@ public interface PracticeSessionDetailRepository extends JpaRepository<PracticeS
                 (SELECT COUNT(*)
                  FROM questions q
                  JOIN chapters c ON q.chapter_id = c.chapter_id
-                 WHERE c.subject_id = :subjectId),
+                 WHERE c.subject_id = :subjectId
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
 
                 (SELECT COUNT(DISTINCT psd.question_id)
                  FROM practice_session_details psd
                  JOIN questions q ON psd.question_id = q.question_id
                  JOIN chapters c ON q.chapter_id = c.chapter_id
-                 WHERE psd.student_id = :studentId AND c.subject_id = :subjectId),
+                 WHERE psd.student_id = :studentId
+                   AND c.subject_id = :subjectId
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
 
                 (SELECT COUNT(*)
                  FROM practice_session_details psd
                  JOIN questions q ON psd.question_id = q.question_id
                  JOIN chapters c ON q.chapter_id = c.chapter_id
-                 WHERE psd.student_id = :studentId AND psd.is_correct = true AND c.subject_id = :subjectId),
+                 WHERE psd.student_id = :studentId
+                   AND psd.is_correct = true
+                   AND c.subject_id = :subjectId
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
 
                 (SELECT COUNT(*)
                  FROM practice_session_details psd
                  JOIN questions q ON psd.question_id = q.question_id
                  JOIN chapters c ON q.chapter_id = c.chapter_id
-                 WHERE psd.student_id = :studentId AND psd.is_correct = false AND c.subject_id = :subjectId)
+                 WHERE psd.student_id = :studentId
+                   AND psd.is_correct = false
+                   AND c.subject_id = :subjectId
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both'))
             """, nativeQuery = true)
     List<Object[]> getSubjectProgress(@Param("studentId") Long studentId, @Param("subjectId") String subjectId);
 

@@ -83,6 +83,20 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getPracticeProgressBySubject(studentId, subjectId));
     }
 
+    @GetMapping("/{studentId}/testProgress/chapter")
+    public ResponseEntity<StudentPracticeProgressDTO> getChapterTestProgress(
+            @PathVariable Long studentId,
+            @RequestParam String chapterId) {
+        return ResponseEntity.ok(studentService.getTestProgressByChapter(studentId, chapterId));
+    }
+
+    @GetMapping("/{studentId}/testProgress/subject")
+    public ResponseEntity<StudentPracticeProgressDTO> getSubjectTestProgress(
+            @PathVariable Long studentId,
+            @RequestParam String subjectId) {
+        return ResponseEntity.ok(studentService.getTestProgressBySubject(studentId, subjectId));
+    }
+
     @GetMapping("/{studentId}/subjects")
     public ResponseEntity<List<StudentSelectedSubjectDTO>> getStudentSubjects(@PathVariable Long studentId) {
         List<StudentSelectedSubjectDTO> selections = studentService.getSubjectsSelectedByStudent(studentId);

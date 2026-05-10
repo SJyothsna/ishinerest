@@ -1838,7 +1838,7 @@
                         formData.append('chapterId', chapterId);
                         formData.append('questionId', questionId);
                         
-                        const uploadResponse = await fetch(`${API_BASE}/api/question-images/upload`, {
+                        const uploadResponse = await fetch(`${API_BASE}/question-images/upload`, {
                             method: 'POST',
                             body: formData
                         });
@@ -2093,7 +2093,7 @@
                         formData.append('chapterId', currentChapterId);
                         formData.append('questionId', questionId);
                         
-                        const uploadResponse = await fetch(`${API_BASE}/api/question-images/upload`, {
+                        const uploadResponse = await fetch(`${API_BASE}/question-images/upload`, {
                             method: 'POST',
                             body: formData
                         });
@@ -2720,7 +2720,7 @@
                 const role = document.getElementById('filterUserRole').value;
                 const status = document.getElementById('filterUserStatus').value;
                 
-                let url = `${API_BASE}/api/users`;
+                let url = `${API_BASE}/users`;
                 const params = [];
                 if (role) params.push(`role=${role}`);
                 if (status) params.push(`active=${status === 'active'}`);
@@ -2764,7 +2764,7 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE}/api/users`, {
+                const response = await fetch(`${API_BASE}/users`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)
@@ -2789,7 +2789,7 @@
             const email = row.querySelector('[data-field="email"]').textContent.trim();
 
             try {
-                const response = await fetch(`${API_BASE}/api/users/${userId}/profile`, {
+                const response = await fetch(`${API_BASE}/users/${userId}/profile`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email })
@@ -2813,8 +2813,8 @@
 
             try {
                 const url = currentStatus 
-                    ? `${API_BASE}/api/users/${userId}/deactivate`
-                    : `${API_BASE}/api/users/${userId}/activate`;
+                    ? `${API_BASE}/users/${userId}/deactivate`
+                    : `${API_BASE}/users/${userId}/activate`;
                     
                 const response = await fetch(url, { method: 'PUT' });
 
@@ -2837,7 +2837,7 @@
             if (!confirm('Final confirmation: Delete this user permanently?')) return;
 
             try {
-                const response = await fetch(`${API_BASE}/api/users/${userId}/hard-delete`, {
+                const response = await fetch(`${API_BASE}/users/${userId}/hard-delete`, {
                     method: 'DELETE'
                 });
 
@@ -2870,7 +2870,7 @@
                 const parentId = document.getElementById('filterParentId').value;
                 const studentId = document.getElementById('filterStudentIdForParent').value;
                 
-                let url = `${API_BASE}/api/parents/links`;
+                let url = `${API_BASE}/parents/links`;
                 const params = [];
                 if (parentId) params.push(`parentUserId=${parentId}`);
                 if (studentId) params.push(`studentUserId=${studentId}`);
@@ -2912,7 +2912,7 @@
             const parentUserId = document.getElementById('linkParentUserId').value;
 
             try {
-                const response = await fetch(`${API_BASE}/api/parents/${parentUserId}/students`, {
+                const response = await fetch(`${API_BASE}/parents/${parentUserId}/students`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(linkData)
@@ -2935,7 +2935,7 @@
             if (!confirm('Are you sure you want to unlink this parent from the student?')) return;
 
             try {
-                const response = await fetch(`${API_BASE}/api/parents/${parentUserId}/students/${studentUserId}`, {
+                const response = await fetch(`${API_BASE}/parents/${parentUserId}/students/${studentUserId}`, {
                     method: 'DELETE'
                 });
 
@@ -2968,7 +2968,7 @@
                 const teacherId = document.getElementById('filterTeacherId').value;
                 const studentId = document.getElementById('filterStudentIdForTeacher').value;
                 
-                let url = `${API_BASE}/api/teachers/links`;
+                let url = `${API_BASE}/teachers/links`;
                 const params = [];
                 if (teacherId) params.push(`teacherUserId=${teacherId}`);
                 if (studentId) params.push(`studentUserId=${studentId}`);
@@ -3010,7 +3010,7 @@
             const teacherUserId = document.getElementById('linkTeacherUserId').value;
 
             try {
-                const response = await fetch(`${API_BASE}/api/teachers/${teacherUserId}/students`, {
+                const response = await fetch(`${API_BASE}/teachers/${teacherUserId}/students`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(linkData)
@@ -3033,7 +3033,7 @@
             if (!confirm('Are you sure you want to unlink this teacher from the student?')) return;
 
             try {
-                const response = await fetch(`${API_BASE}/api/teachers/${teacherUserId}/students/${studentUserId}`, {
+                const response = await fetch(`${API_BASE}/teachers/${teacherUserId}/students/${studentUserId}`, {
                     method: 'DELETE'
                 });
 

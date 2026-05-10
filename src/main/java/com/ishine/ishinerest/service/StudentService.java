@@ -7,6 +7,7 @@ import com.ishine.ishinerest.pojo.StudentPracticeProgressDTO;
 import com.ishine.ishinerest.pojo.StudentSelectedSubjectDTO;
 import com.ishine.ishinerest.repository.PracticeSessionDetailRepository;
 import com.ishine.ishinerest.repository.StudentRepository;
+import com.ishine.ishinerest.repository.TestDetailRepository;
 import com.ishine.ishinerest.repository.StudentSubjectRepository;
 import com.ishine.ishinerest.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ public class StudentService {
     private PracticeSessionDetailRepository practiceSessionDetailRepository;
     @Autowired
     private ClassRepository classRepository;
+    @Autowired
+    private TestDetailRepository testDetailRepository;
 
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
@@ -82,6 +85,36 @@ public class StudentService {
         }
 
         Object[] row = resultList.get(0); // ✅ Extract first row from the result
+        return mapToProgressDTO(row);
+    }
+
+    public StudentPracticeProgressDTO getTestProgressByChapter(Long studentId, String chapterId) {
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Student not found with ID: " + studentId));
+
+        List<Object[]> results = testDetailRepository.getChapterProgress(studentId, chapterId);
+
+        if (results == null || results.isEmpty()) {
+            return new StudentPracticeProgressDTO(0L, 0L, 0L, 0L, 0L);
+        }
+
+        Object[] row = results.get(0);
+        return mapToProgressDTO(row);
+    }
+
+    public StudentPracticeProgressDTO getTestProgressBySubject(Long studentId, String subjectId) {
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Student not found with ID: " + studentId));
+
+        List<Object[]> resultList = testDetailRepository.getSubjectProgress(studentId, subjectId);
+
+        if (resultList == null || resultList.isEmpty()) {
+            return new StudentPracticeProgressDTO(0L, 0L, 0L, 0L, 0L);
+        }
+
+        Object[] row = resultList.get(0);
         return mapToProgressDTO(row);
     }
 
