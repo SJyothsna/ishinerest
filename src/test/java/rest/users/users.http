@@ -1,0 +1,58 @@
+### User Management API Tests
+
+@baseUrl = http://localhost:8080
+@userId = 1
+@email = admin@ishine.com
+
+### Get user by ID
+GET {{baseUrl}}/api/users/{{userId}}
+
+### Get user by email
+GET {{baseUrl}}/api/users/email/{{email}}
+
+### Get all active users
+GET {{baseUrl}}/api/users/active
+
+### Get users by role (STUDENT)
+GET {{baseUrl}}/api/users/role/STUDENT
+
+### Get users by role (PARENT)
+GET {{baseUrl}}/api/users/role/PARENT
+
+### Get users by role (TEACHER)
+GET {{baseUrl}}/api/users/role/TEACHER
+
+### Get users by role (ADMIN)
+GET {{baseUrl}}/api/users/role/ADMIN
+
+### Get active users by role (STUDENT)
+GET {{baseUrl}}/api/users/role/STUDENT/active
+
+### Update user profile
+PUT {{baseUrl}}/api/users/{{userId}}/profile
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "email": "updated@example.com"
+}
+
+### Change password
+PUT {{baseUrl}}/api/users/{{userId}}/password
+Content-Type: application/json
+
+{
+  "currentPassword": "admin123",
+  "newPassword": "newpassword123"
+}
+
+### Deactivate user
+DELETE {{baseUrl}}/api/users/{{userId}}
+
+### Reactivate user
+POST {{baseUrl}}/api/users/{{userId}}/reactivate
+
+### Get all users (admin only)
+GET {{baseUrl}}/api/users
+
+# Made with Bob

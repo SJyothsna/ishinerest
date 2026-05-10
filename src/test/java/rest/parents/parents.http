@@ -1,0 +1,27 @@
+### Parent-Student Relationship API Tests
+
+@baseUrl = http://localhost:8080
+@parentUserId = 5
+@studentUserId = 4
+
+### Link parent to student
+POST {{baseUrl}}/api/parents/{{parentUserId}}/students
+Content-Type: application/json
+
+{
+  "studentUserId": {{studentUserId}}
+}
+
+### Get all students for a parent
+GET {{baseUrl}}/api/parents/{{parentUserId}}/students
+
+### Get all parents for a student
+GET {{baseUrl}}/api/parents/students/{{studentUserId}}/parents
+
+### Check if parent is linked to student
+GET {{baseUrl}}/api/parents/{{parentUserId}}/students/{{studentUserId}}/linked
+
+### Unlink parent from student
+DELETE {{baseUrl}}/api/parents/{{parentUserId}}/students/{{studentUserId}}
+
+# Made with Bob

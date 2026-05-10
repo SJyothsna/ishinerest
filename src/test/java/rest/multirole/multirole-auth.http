@@ -1,0 +1,85 @@
+### Multi-Role Authentication API Tests
+
+@baseUrl = http://localhost:8080
+
+### Signup as STUDENT
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "John Student",
+  "email": "john.student@example.com",
+  "password": "password123",
+  "role": "STUDENT"
+}
+
+### Signup as PARENT
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Jane Parent",
+  "email": "jane.parent@example.com",
+  "password": "password123",
+  "role": "PARENT"
+}
+
+### Signup as TEACHER
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Bob Teacher",
+  "email": "bob.teacher@example.com",
+  "password": "password123",
+  "role": "TEACHER"
+}
+
+### Try to signup as ADMIN (should fail)
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin.user@example.com",
+  "password": "password123",
+  "role": "ADMIN"
+}
+
+### Login as STUDENT
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.student@example.com",
+  "password": "password123"
+}
+
+### Login as PARENT
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane.parent@example.com",
+  "password": "password123"
+}
+
+### Login as TEACHER
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "bob.teacher@example.com",
+  "password": "password123"
+}
+
+### Login as ADMIN
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ishine.com",
+  "password": "admin123"
+}
+
+# Made with Bob

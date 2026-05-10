@@ -1,0 +1,27 @@
+### Teacher-Student Relationship API Tests
+
+@baseUrl = http://localhost:8080
+@teacherUserId = 6
+@studentUserId = 4
+
+### Link teacher to student
+POST {{baseUrl}}/api/teachers/{{teacherUserId}}/students
+Content-Type: application/json
+
+{
+  "studentUserId": {{studentUserId}}
+}
+
+### Get all students for a teacher
+GET {{baseUrl}}/api/teachers/{{teacherUserId}}/students
+
+### Get all teachers for a student
+GET {{baseUrl}}/api/teachers/students/{{studentUserId}}/teachers
+
+### Check if teacher is linked to student
+GET {{baseUrl}}/api/teachers/{{teacherUserId}}/students/{{studentUserId}}/linked
+
+### Unlink teacher from student
+DELETE {{baseUrl}}/api/teachers/{{teacherUserId}}/students/{{studentUserId}}
+
+# Made with Bob

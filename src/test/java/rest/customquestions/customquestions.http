@@ -1,0 +1,50 @@
+### Custom Questions API Tests
+
+@baseUrl = http://localhost:8080
+@creatorUserId = 5
+@questionId = 1
+@chapterId = LC5H0102
+
+### Create a custom question
+POST {{baseUrl}}/questions/custom?creatorUserId={{creatorUserId}}
+Content-Type: application/json
+
+{
+  "chapterId": "{{chapterId}}",
+  "questionText": "What is 2 + 2?",
+  "optionA": "3",
+  "optionB": "4",
+  "optionC": "5",
+  "optionD": "6",
+  "correctAnswer": "B",
+  "questionType": 1,
+  "difficultyLevel": "Easy",
+  "explanation": "Basic addition",
+  "usageType": "Practice"
+}
+
+### Get all custom questions by creator
+GET {{baseUrl}}/questions/custom/creator/{{creatorUserId}}
+
+### Get custom questions by creator and chapter
+GET {{baseUrl}}/questions/custom/creator/{{creatorUserId}}/chapter/{{chapterId}}
+
+### Update question visibility to PUBLIC
+PUT {{baseUrl}}/questions/{{questionId}}/visibility?creatorUserId={{creatorUserId}}&visibility=PUBLIC
+
+### Update question visibility to PRIVATE
+PUT {{baseUrl}}/questions/{{questionId}}/visibility?creatorUserId={{creatorUserId}}&visibility=PRIVATE
+
+### Update question visibility to SHARED
+PUT {{baseUrl}}/questions/{{questionId}}/visibility?creatorUserId={{creatorUserId}}&visibility=SHARED
+
+### Delete a custom question
+DELETE {{baseUrl}}/questions/custom/{{questionId}}?creatorUserId={{creatorUserId}}
+
+### Get all system questions
+GET {{baseUrl}}/questions/system
+
+### Get all custom questions (admin only)
+GET {{baseUrl}}/questions/all-custom
+
+# Made with Bob
