@@ -72,7 +72,16 @@ public class QuestionService {
     }
 
     public List<Question> getQuestionsByChapter(String chapterId) {
-        return questionRepository.findByChapter_ChapterId(chapterId);
+        User adminUser = userRepository.findByRole(UserRole.ADMIN)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        if (adminUser != null) {
+            return questionRepository.findByCreatedByAndChapter_ChapterId(adminUser, chapterId);
+        }
+
+        return questionRepository.findByCreatedByIsNullAndChapter_ChapterId(chapterId);
     }
 
     public List<Question> getQuestionsBySubject(String subjectId) {
@@ -80,14 +89,14 @@ public class QuestionService {
     }
 
     public Question saveQuestion(Question question) {
-        applyCreatedByRule(question);
+        applyAdminCreatedByRule(question);
         validateQuestion(question);
         normalizeCorrectAnswers(question);
         return questionRepository.save(question);
     }
 
     public List<Question> saveQuestions(List<Question> questions) {
-        questions.forEach(this::applyCreatedByRule);
+        questions.forEach(this::applyAdminCreatedByRule);
         questions.forEach(this::validateQuestion);
         questions.forEach(this::normalizeCorrectAnswers);
         return questionRepository.saveAll(questions);
@@ -145,7 +154,7 @@ public class QuestionService {
 
                 question.setChapter(chapter);
 
-                applyCreatedByRule(question);
+                applyAdminCreatedByRule(question);
                 questions.add(question);
             }
         } catch (IOException e) {
@@ -241,29 +250,32 @@ public class QuestionService {
     }
 
     // Unpracticed questions by chapter
-    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level, String usageType) {
+    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level, String usageType, String sectionId) {
         // Normalize level parameter - treat "all" as null to get all difficulty levels
         String normalizedLevel = (level != null && level.equalsIgnoreCase("all")) ? null : level;
         
         // Normalize usageType parameter - treat "all" as null to get all usage types
         String normalizedUsageType = (usageType != null && usageType.equalsIgnoreCase("all")) ? null : usageType;
 
+        // Normalize sectionId parameter - treat blank as null
+        String normalizedSectionId = (sectionId != null && sectionId.isBlank()) ? null : sectionId;
+
         // Get answered question IDs for the student and chapter
         List<Long> practicedQuestionIds = practiceSessionDetailRepository
                 .findCorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
 
         if (practicedQuestionIds == null || practicedQuestionIds.isEmpty()) {
-            return questionRepository.findByChapterIdWithLimit(chapterId, limit, normalizedUsageType);
+            return questionRepository.findByChapterIdWithLimit(chapterId, limit, normalizedUsageType, normalizedSectionId);
         }
         // Get unpracticed questions for the chapter
         return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit,
-                normalizedLevel, normalizedUsageType);
+                normalizedLevel, normalizedUsageType, normalizedSectionId);
     }
 
     // Get unpracticed questions by chapter with flag status
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsByChapterWithFlags(
-            Long studentId, String chapterId, int limit, String level, String usageType) {
-        List<Question> questions = getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level, usageType);
+            Long studentId, String chapterId, int limit, String level, String usageType, String sectionId) {
+        List<Question> questions = getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level, usageType, sectionId);
         return addFlagStatusToQuestions(questions, studentId);
     }
 
@@ -587,5 +599,18 @@ public class QuestionService {
                 .orElse(null);
 
         question.setCreatedBy(adminUser);
+    }
+
+    private void applyAdminCreatedByRule(Question question) {
+        User adminUser = userRepository.findByRole(UserRole.ADMIN)
+                .stream()
+                .findFirst()
+                .orElse(null);
+
+        question.setCreatedBy(adminUser);
+        question.setIsCustom(false);
+        if (question.getVisibility() == null || question.getVisibility().isBlank()) {
+            question.setVisibility("PUBLIC");
+        }
     }
 }

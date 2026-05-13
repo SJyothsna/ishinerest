@@ -3,6 +3,7 @@ package com.ishine.ishinerest.service;
 import com.ishine.ishinerest.entity.Chapter;
 import com.ishine.ishinerest.entity.SubjectEntity;
 import com.ishine.ishinerest.repository.ChapterRepository;
+import com.ishine.ishinerest.repository.QuestionRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class ChapterService {
 
     @Autowired
     private ChapterRepository chapterRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
 
     public List<Chapter> getAllChapters() {
         List<Chapter> chapters = chapterRepository.findAll();
@@ -131,6 +135,10 @@ public class ChapterService {
             e.printStackTrace();
             return "Failed to upload chapters: " + e.getMessage();
         }
+    }
+
+    public List<String> getSectionsForChapter(String chapterId) {
+        return questionRepository.findDistinctSectionIdsByChapterId(chapterId);
     }
 
 }

@@ -56,6 +56,7 @@ public class QuestionController {
         Optional<Question> questionOptional = questionService.getQuestionById(id);
         if (questionOptional.isPresent()) {
             Question question = questionOptional.get();
+            question.setSectionId(questionDetails.getSectionId());
             question.setQuestionText(questionDetails.getQuestionText());
             question.setOptionA(questionDetails.getOptionA());
             question.setOptionB(questionDetails.getOptionB());
@@ -100,8 +101,9 @@ public class QuestionController {
             @RequestParam String chapterId,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(name = "level", required = false) String level,
-            @RequestParam(name = "usageType", required = false) String usageType) {
-        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType);
+            @RequestParam(name = "usageType", required = false) String usageType,
+            @RequestParam(name = "sectionId", required = false) String sectionId) {
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType, sectionId);
     }
 
     // NEW ENDPOINTS WITH FLAG STATUS
@@ -113,8 +115,9 @@ public class QuestionController {
             @RequestParam String chapterId,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(name = "level", required = false) String level,
-            @RequestParam(name = "usageType", required = false) String usageType) {
-        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType);
+            @RequestParam(name = "usageType", required = false) String usageType,
+            @RequestParam(name = "sectionId", required = false) String sectionId) {
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType, sectionId);
     }
 
     // Endpoint for unpracticed questions by subject with flag status
