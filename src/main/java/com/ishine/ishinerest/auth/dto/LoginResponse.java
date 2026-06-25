@@ -8,5 +8,6 @@ public record LoginResponse(
         String name,
         String email,
         UserRole role,
-        Long studentId  // Only populated if role is STUDENT
+        Long studentId,  // Only populated if role is STUDENT
+        Boolean emailVerified  // Email verification status
 ) {}

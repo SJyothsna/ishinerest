@@ -1,6 +1,8 @@
 package com.ishine.ishinerest.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.ishine.ishinerest.util.StudentAnswerDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +26,7 @@ public class PracticeSessionDetail {
     private Long questionId;
 
     @Column(nullable = true)
+    @JsonDeserialize(using = StudentAnswerDeserializer.class)
     private String studentAnswer;
 
     @Column(nullable = false)
@@ -40,7 +43,10 @@ public class PracticeSessionDetail {
     @Column(nullable = false)
     private Integer attemptCount = 1; // Default 1 for new attempts
 
-    // Transient field to accept subjectId from JSON payload but not persist it
+    // Transient fields to accept subjectId and chapterId from JSON payload but not persist them
     @Transient
     private String subjectId;
+    
+    @Transient
+    private String chapterId;
 }

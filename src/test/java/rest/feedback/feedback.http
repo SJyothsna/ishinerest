@@ -1,0 +1,324 @@
+### Feedback API - IntelliJ HTTP Client
+### Run the Spring Boot app, then click the green run icon beside any request.
+
+@baseUrl = http://localhost:8080
+
+### ============================================================================
+### VALID FEEDBACK SUBMISSIONS
+### ============================================================================
+
+### 1. Submit feedback - Valid inquiry
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "type": "inquiry",
+  "subject": "Question about subscription plans",
+  "message": "I would like to know more about the premium features and pricing options available for students."
+}
+
+###
+
+### 2. Submit feedback - Valid feedback
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "type": "feedback",
+  "subject": "Great platform!",
+  "message": "I love using iStudy for my studies. The practice questions are very helpful and the interface is user-friendly."
+}
+
+###
+
+### 3. Submit feedback - Valid support request
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Mike Johnson",
+  "email": "mike.j@example.com",
+  "type": "support",
+  "subject": "Login issue",
+  "message": "I am having trouble logging into my account. I keep getting an error message saying 'Invalid credentials' even though I'm sure my password is correct."
+}
+
+###
+
+### 4. Submit feedback - Valid other type
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Sarah Williams",
+  "email": "sarah.w@example.com",
+  "type": "other",
+  "subject": "Partnership opportunity",
+  "message": "I represent an educational institution and would like to discuss a potential partnership with iStudy for our students."
+}
+
+###
+
+### 5. Submit feedback - Long message
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "David Brown",
+  "email": "david.brown@example.com",
+  "type": "feedback",
+  "subject": "Detailed feedback on the platform",
+  "message": "I have been using iStudy for the past three months and wanted to share my detailed feedback. The platform has been incredibly helpful for my exam preparation. The question bank is comprehensive and covers all topics thoroughly. However, I would suggest adding more video explanations for complex topics. The progress tracking feature is excellent and helps me identify my weak areas. The mobile app works smoothly and I can practice on the go. Overall, I'm very satisfied with the service and would recommend it to other students. Keep up the great work!"
+}
+
+###
+
+### ============================================================================
+### VALIDATION ERROR TESTS
+### ============================================================================
+
+### 6. Submit feedback - Missing name (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "test@example.com",
+  "type": "inquiry",
+  "subject": "Test subject",
+  "message": "This should fail because name is missing."
+}
+
+###
+
+### 7. Submit feedback - Invalid email format (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "invalid-email",
+  "type": "inquiry",
+  "subject": "Test subject",
+  "message": "This should fail because email format is invalid."
+}
+
+###
+
+### 8. Submit feedback - Empty email (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "",
+  "type": "inquiry",
+  "subject": "Test subject",
+  "message": "This should fail because email is empty."
+}
+
+###
+
+### 9. Submit feedback - Invalid type (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "invalid_type",
+  "subject": "Test subject",
+  "message": "This should fail because type is invalid."
+}
+
+###
+
+### 10. Submit feedback - Missing subject (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "inquiry",
+  "message": "This should fail because subject is missing."
+}
+
+###
+
+### 11. Submit feedback - Message too short (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "inquiry",
+  "subject": "Test subject",
+  "message": "Too short"
+}
+
+###
+
+### 12. Submit feedback - Empty message (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "inquiry",
+  "subject": "Test subject",
+  "message": ""
+}
+
+###
+
+### 13. Submit feedback - Name too long (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "This is a very long name that exceeds the maximum allowed length of 255 characters. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+  "email": "test@example.com",
+  "type": "inquiry",
+  "subject": "Test subject",
+  "message": "This should fail because name is too long."
+}
+
+###
+
+### 14. Submit feedback - Subject too long (should fail)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "inquiry",
+  "subject": "This is a very long subject that exceeds the maximum allowed length of 500 characters. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+  "message": "This should fail because subject is too long."
+}
+
+###
+
+### ============================================================================
+### EDGE CASES
+### ============================================================================
+
+### 15. Submit feedback - Minimum valid message length (10 characters)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "inquiry",
+  "subject": "Test",
+  "message": "Ten chars!"
+}
+
+###
+
+### 16. Submit feedback - Special characters in name
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "O'Brien-Smith, Jr.",
+  "email": "obrien@example.com",
+  "type": "inquiry",
+  "subject": "Test with special characters",
+  "message": "Testing special characters in name field."
+}
+
+###
+
+### 17. Submit feedback - Unicode characters
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "José García",
+  "email": "jose.garcia@example.com",
+  "type": "feedback",
+  "subject": "Feedback en español",
+  "message": "¡Excelente plataforma! Me encanta usar iStudy para mis estudios. 你好世界 🎓📚"
+}
+
+###
+
+### 18. Submit feedback - Type in uppercase (should work - case insensitive)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "FEEDBACK",
+  "subject": "Testing uppercase type",
+  "message": "This should work because type validation is case-insensitive."
+}
+
+###
+
+### 19. Submit feedback - Type in mixed case (should work)
+POST {{baseUrl}}/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "type": "FeedBack",
+  "subject": "Testing mixed case type",
+  "message": "This should work because type validation is case-insensitive."
+}
+
+###
+
+### ============================================================================
+### NOTES
+### ============================================================================
+# 
+# Expected Behavior:
+# - Valid submissions return 201 Created with success response
+# - Invalid submissions return 400 Bad Request with error message
+# - Email notifications are sent asynchronously (check logs)
+# - Admin notification goes to support@istudy.ie
+# - User confirmation goes to the submitted email address
+# 
+# Email Configuration:
+# Make sure these properties are set in application.properties:
+# - spring.mail.username (from email)
+# - app.support.email (admin email)
+# - spring.mail.host, port, password (SMTP settings)
+# 
+# Database:
+# Run database_migration_create_feedback_table.sql before testing
+# 
+# Authentication:
+# This endpoint works for both authenticated and anonymous users
+# If user is authenticated, their user_id will be linked to the feedback
+#

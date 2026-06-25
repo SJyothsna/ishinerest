@@ -31,6 +31,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
                 AND (:usageType IS NULL OR :usageType = ''
                      OR LOWER(COALESCE(q.usage_type, 'both')) = LOWER(:usageType)
                      OR LOWER(COALESCE(q.usage_type, 'both')) = 'both')
+                AND (:questionSet IS NULL OR :questionSet = ''
+                     OR LOWER(COALESCE(q.question_set, '1')) = LOWER(:questionSet))
                 ORDER BY
                     CASE WHEN LOWER(:usageType) = 'test' THEN RAND() END,
                     CASE WHEN :usageType IS NULL OR :usageType = '' OR LOWER(:usageType) <> 'test' THEN q.question_id END ASC
@@ -39,7 +41,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findUnpracticedQuestionsBySubject(@Param("subjectId") String subjectId,
             @Param("practicedQuestionIds") List<Long> practicedQuestionIds,
             @Param("limit") int limit,
-            @Param("usageType") String usageType);
+            @Param("usageType") String usageType,
+            @Param("questionSet") String questionSet);
 
     // Fetch questions by subject with limit (when no practiced questions)
     @Query(value = """
@@ -49,12 +52,14 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
                 AND (:usageType IS NULL OR :usageType = ''
                      OR LOWER(COALESCE(q.usage_type, 'both')) = LOWER(:usageType)
                      OR LOWER(COALESCE(q.usage_type, 'both')) = 'both')
+                AND (:questionSet IS NULL OR :questionSet = ''
+                     OR LOWER(COALESCE(q.question_set, '1')) = LOWER(:questionSet))
                 ORDER BY
                     CASE WHEN LOWER(:usageType) = 'test' THEN RAND() END,
                     CASE WHEN :usageType IS NULL OR :usageType = '' OR LOWER(:usageType) <> 'test' THEN q.question_id END ASC
                 LIMIT :limit
             """, nativeQuery = true)
-    List<Question> findBySubjectIdWithLimit(@Param("subjectId") String subjectId, @Param("limit") int limit, @Param("usageType") String usageType);
+    List<Question> findBySubjectIdWithLimit(@Param("subjectId") String subjectId, @Param("limit") int limit, @Param("usageType") String usageType, @Param("questionSet") String questionSet);
 
     // Fetch unpracticed questions by chapter
     @Query(value = """
@@ -67,6 +72,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
                        OR LOWER(COALESCE(q.usage_type, 'both')) = 'both')
                   AND (:sectionId IS NULL OR :sectionId = ''
                        OR LOWER(COALESCE(q.section_id, '')) = LOWER(:sectionId))
+                  AND (:questionSet IS NULL OR :questionSet = ''
+                       OR LOWER(COALESCE(q.question_set, '1')) = LOWER(:questionSet))
                 ORDER BY q.question_id ASC
                 LIMIT :limit
             """, nativeQuery = true)
@@ -75,7 +82,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
             @Param("limit") int limit,
             @Param("level") String level,
             @Param("usageType") String usageType,
-            @Param("sectionId") String sectionId);
+            @Param("sectionId") String sectionId,
+            @Param("questionSet") String questionSet);
 
     @Query(value = """
                 SELECT * FROM questions
@@ -85,13 +93,16 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
                        OR LOWER(COALESCE(usage_type, 'both')) = 'both')
                   AND (:sectionId IS NULL OR :sectionId = ''
                        OR LOWER(COALESCE(section_id, '')) = LOWER(:sectionId))
+                  AND (:questionSet IS NULL OR :questionSet = ''
+                       OR LOWER(COALESCE(question_set, '1')) = LOWER(:questionSet))
                 ORDER BY question_id ASC
                 LIMIT :limit
             """, nativeQuery = true)
     List<Question> findByChapterIdWithLimit(@Param("chapterId") String chapterId,
             @Param("limit") int limit,
             @Param("usageType") String usageType,
-            @Param("sectionId") String sectionId);
+            @Param("sectionId") String sectionId,
+            @Param("questionSet") String questionSet);
 
     // Creator tracking methods
     List<Question> findByCreatedBy(User creator);

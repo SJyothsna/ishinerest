@@ -153,9 +153,15 @@ public class UserController {
     /**
      * Get all users (admin only)
      * GET /users
+     * Optional query parameter: role (e.g., ?role=STUDENT)
      */
     @GetMapping
-    public List<UserDTO> getAllUsers() {
+    public List<UserDTO> getAllUsers(@RequestParam(required = false) UserRole role) {
+        if (role != null) {
+            return userService.getUsersByRole(role).stream()
+                    .map(UserDTO::fromEntity)
+                    .collect(Collectors.toList());
+        }
         return userService.getAllUsers().stream()
                 .map(UserDTO::fromEntity)
                 .collect(Collectors.toList());

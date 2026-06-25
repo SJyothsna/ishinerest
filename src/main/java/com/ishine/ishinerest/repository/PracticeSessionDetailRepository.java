@@ -140,4 +140,86 @@ public interface PracticeSessionDetailRepository extends JpaRepository<PracticeS
             """, nativeQuery = true)
     List<Object[]> getSubjectProgress(@Param("studentId") Long studentId, @Param("subjectId") String subjectId);
 
+    // Get progress for a specific question set by chapter
+    @Query(value = """
+            SELECT
+                (SELECT COUNT(*)
+                 FROM questions q
+                 WHERE q.chapter_id = :chapterId
+                   AND q.question_set = :questionSet
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
+
+                (SELECT COUNT(DISTINCT psd.question_id)
+                 FROM practice_session_details psd
+                 JOIN questions q ON psd.question_id = q.question_id
+                 WHERE psd.student_id = :studentId
+                   AND q.chapter_id = :chapterId
+                   AND q.question_set = :questionSet
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
+
+                (SELECT COUNT(*)
+                 FROM practice_session_details psd
+                 JOIN questions q ON psd.question_id = q.question_id
+                 WHERE psd.student_id = :studentId
+                   AND q.chapter_id = :chapterId
+                   AND q.question_set = :questionSet
+                   AND psd.is_correct = true
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
+
+                (SELECT COUNT(*)
+                 FROM practice_session_details psd
+                 JOIN questions q ON psd.question_id = q.question_id
+                 WHERE psd.student_id = :studentId
+                   AND q.chapter_id = :chapterId
+                   AND q.question_set = :questionSet
+                   AND psd.is_correct = false
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both'))
+            """, nativeQuery = true)
+    List<Object[]> getChapterProgressBySet(@Param("studentId") Long studentId,
+                                          @Param("chapterId") String chapterId,
+                                          @Param("questionSet") String questionSet);
+
+    // Get progress for a specific question set by subject
+    @Query(value = """
+            SELECT
+                (SELECT COUNT(*)
+                 FROM questions q
+                 JOIN chapters c ON q.chapter_id = c.chapter_id
+                 WHERE c.subject_id = :subjectId
+                   AND q.question_set = :questionSet
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
+
+                (SELECT COUNT(DISTINCT psd.question_id)
+                 FROM practice_session_details psd
+                 JOIN questions q ON psd.question_id = q.question_id
+                 JOIN chapters c ON q.chapter_id = c.chapter_id
+                 WHERE psd.student_id = :studentId
+                   AND c.subject_id = :subjectId
+                   AND q.question_set = :questionSet
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
+
+                (SELECT COUNT(*)
+                 FROM practice_session_details psd
+                 JOIN questions q ON psd.question_id = q.question_id
+                 JOIN chapters c ON q.chapter_id = c.chapter_id
+                 WHERE psd.student_id = :studentId
+                   AND c.subject_id = :subjectId
+                   AND q.question_set = :questionSet
+                   AND psd.is_correct = true
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both')),
+
+                (SELECT COUNT(*)
+                 FROM practice_session_details psd
+                 JOIN questions q ON psd.question_id = q.question_id
+                 JOIN chapters c ON q.chapter_id = c.chapter_id
+                 WHERE psd.student_id = :studentId
+                   AND c.subject_id = :subjectId
+                   AND q.question_set = :questionSet
+                   AND psd.is_correct = false
+                   AND LOWER(COALESCE(q.usage_type, 'both')) IN ('practice', 'both'))
+            """, nativeQuery = true)
+    List<Object[]> getSubjectProgressBySet(@Param("studentId") Long studentId,
+                                          @Param("subjectId") String subjectId,
+                                          @Param("questionSet") String questionSet);
+
 }

@@ -70,6 +70,9 @@ public class Question {
     @Column
     private String questionImageUrl; // URL to the question image
 
+    @Column(length = 20)
+    private String questionSet = "1"; // Question set number (1, 2, 3, etc.) for progressive practice
+
     // NEW: Creator tracking
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_user_id")

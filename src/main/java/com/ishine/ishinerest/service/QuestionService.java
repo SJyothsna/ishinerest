@@ -149,6 +149,12 @@ public class QuestionService {
                         ? usageType.trim()
                         : "Both");
 
+                // Handle QuestionSet - default to "1" if empty
+                String questionSet = getCellValue(row.getCell(15));
+                question.setQuestionSet(questionSet != null && !questionSet.trim().isEmpty()
+                        ? questionSet.trim()
+                        : "1");
+
                 Chapter chapter = chapterRepository.findById(chapterId)
                         .orElseThrow(() -> new RuntimeException("Chapter not found for ID: " + chapterId));
 
@@ -233,24 +239,27 @@ public class QuestionService {
     }
 
     // Unpracticed questions by subject
-    public List<Question> getUnpracticedQuestionsBySubject(Long studentId, String subjectId, int limit, String usageType) {
+    public List<Question> getUnpracticedQuestionsBySubject(Long studentId, String subjectId, int limit, String usageType, String questionSet) {
         // Normalize usageType parameter - treat "all" as null to get all usage types
         String normalizedUsageType = (usageType != null && usageType.equalsIgnoreCase("all")) ? null : usageType;
+        
+        // Normalize questionSet parameter - treat "all" or empty as null to get all sets
+        String normalizedQuestionSet = (questionSet != null && (questionSet.equalsIgnoreCase("all") || questionSet.trim().isEmpty())) ? null : questionSet;
         
         // Get practiced question IDs for the student
         List<Long> practicedQuestionIds = practiceSessionDetailRepository.findAnsweredQuestionIds(studentId);
 
         // If no questions have been practiced, return questions with limit
         if (practicedQuestionIds == null || practicedQuestionIds.isEmpty()) {
-            return questionRepository.findBySubjectIdWithLimit(subjectId, limit, normalizedUsageType);
+            return questionRepository.findBySubjectIdWithLimit(subjectId, limit, normalizedUsageType, normalizedQuestionSet);
         }
 
         // Get unpracticed questions for the subject
-        return questionRepository.findUnpracticedQuestionsBySubject(subjectId, practicedQuestionIds, limit, normalizedUsageType);
+        return questionRepository.findUnpracticedQuestionsBySubject(subjectId, practicedQuestionIds, limit, normalizedUsageType, normalizedQuestionSet);
     }
 
     // Unpracticed questions by chapter
-    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level, String usageType, String sectionId) {
+    public List<Question> getUnpracticedQuestionsByChapter(Long studentId, String chapterId, int limit, String level, String usageType, String sectionId, String questionSet) {
         // Normalize level parameter - treat "all" as null to get all difficulty levels
         String normalizedLevel = (level != null && level.equalsIgnoreCase("all")) ? null : level;
         
@@ -260,29 +269,32 @@ public class QuestionService {
         // Normalize sectionId parameter - treat blank as null
         String normalizedSectionId = (sectionId != null && sectionId.isBlank()) ? null : sectionId;
 
+        // Normalize questionSet parameter - treat "all" or empty as null to get all sets
+        String normalizedQuestionSet = (questionSet != null && (questionSet.equalsIgnoreCase("all") || questionSet.trim().isEmpty())) ? null : questionSet;
+
         // Get answered question IDs for the student and chapter
         List<Long> practicedQuestionIds = practiceSessionDetailRepository
                 .findCorrectlyAnsweredQuestionIdsByChapter(studentId, chapterId);
 
         if (practicedQuestionIds == null || practicedQuestionIds.isEmpty()) {
-            return questionRepository.findByChapterIdWithLimit(chapterId, limit, normalizedUsageType, normalizedSectionId);
+            return questionRepository.findByChapterIdWithLimit(chapterId, limit, normalizedUsageType, normalizedSectionId, normalizedQuestionSet);
         }
         // Get unpracticed questions for the chapter
         return questionRepository.findUnpracticedQuestionsByChapter(chapterId, practicedQuestionIds, limit,
-                normalizedLevel, normalizedUsageType, normalizedSectionId);
+                normalizedLevel, normalizedUsageType, normalizedSectionId, normalizedQuestionSet);
     }
 
     // Get unpracticed questions by chapter with flag status
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsByChapterWithFlags(
-            Long studentId, String chapterId, int limit, String level, String usageType, String sectionId) {
-        List<Question> questions = getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level, usageType, sectionId);
+            Long studentId, String chapterId, int limit, String level, String usageType, String sectionId, String questionSet) {
+        List<Question> questions = getUnpracticedQuestionsByChapter(studentId, chapterId, limit, level, usageType, sectionId, questionSet);
         return addFlagStatusToQuestions(questions, studentId);
     }
 
     // Get unpracticed questions by subject with flag status
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubjectWithFlags(
-            Long studentId, String subjectId, int limit, String usageType) {
-        List<Question> questions = getUnpracticedQuestionsBySubject(studentId, subjectId, limit, usageType);
+            Long studentId, String subjectId, int limit, String usageType, String questionSet) {
+        List<Question> questions = getUnpracticedQuestionsBySubject(studentId, subjectId, limit, usageType, questionSet);
         return addFlagStatusToQuestions(questions, studentId);
     }
 

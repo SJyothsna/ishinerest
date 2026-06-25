@@ -40,6 +40,18 @@ public class User {
     @Column(nullable = false)
     private Boolean isActive = true;
 
+    @Column(nullable = false)
+    private Boolean emailVerified = false;
+
+    @Column(length = 255)
+    private String verificationToken;
+
+    @Column
+    private LocalDateTime verificationTokenExpiry;
+
+    @Column
+    private LocalDateTime emailVerifiedAt;
+
     @Column
     private LocalDateTime deletedAt;
 

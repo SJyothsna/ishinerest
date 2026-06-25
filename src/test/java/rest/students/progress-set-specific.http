@@ -1,0 +1,221 @@
+### Set-Specific Progress Tracking Tests
+### Test the practice and test progress endpoints with set-aware logic
+
+### Variables
+@baseUrl = http://localhost:8080
+@studentId = 1
+@chapterId = LC5H0101
+@subjectId = MATH
+
+### ============================================
+### PRACTICE PROGRESS TESTS
+### ============================================
+
+### Test 1: Get Practice Progress by Chapter
+# Expected: Set-aware response with set1/set2 breakdowns
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Test 2: Get Practice Progress by Subject
+# Expected: Set-aware response with set1/set2 breakdowns
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/subject?subjectId={{subjectId}}
+Accept: application/json
+
+### ============================================
+### TEST PROGRESS TESTS
+### ============================================
+
+### Test 3: Get Test Progress by Chapter
+# Expected: Set-aware response with set1/set2 breakdowns
+GET {{baseUrl}}/students/{{studentId}}/testProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Test 4: Get Test Progress by Subject
+# Expected: Set-aware response with set1/set2 breakdowns
+GET {{baseUrl}}/students/{{studentId}}/testProgress/subject?subjectId={{subjectId}}
+Accept: application/json
+
+### ============================================
+### SCENARIO TESTS
+### ============================================
+
+### Scenario 1: Set 1 Incomplete (Student with partial Set 1 progress)
+# Expected Response:
+# - totalQuestions = set1Total
+# - practicedQuestions = set1Practiced
+# - set1Complete = false
+# - Main fields show Set 1 only
+GET {{baseUrl}}/students/2/practiceProgress/chapter?chapterId=LC5H0102
+Accept: application/json
+
+### Scenario 2: Set 1 Complete, Set 2 Not Started
+# Expected Response:
+# - totalQuestions = set1Total + set2Total
+# - practicedQuestions = set1Practiced (set2Practiced = 0)
+# - set1Complete = true
+# - Main fields show combined totals
+GET {{baseUrl}}/students/3/practiceProgress/chapter?chapterId=LC5H0103
+Accept: application/json
+
+### Scenario 3: Set 1 Complete, Set 2 In Progress
+# Expected Response:
+# - totalQuestions = set1Total + set2Total
+# - practicedQuestions = set1Practiced + set2Practiced
+# - set1Complete = true
+# - Main fields show combined totals
+GET {{baseUrl}}/students/4/practiceProgress/chapter?chapterId=LC5H0104
+Accept: application/json
+
+### Scenario 4: Both Sets Complete
+# Expected Response:
+# - totalQuestions = set1Total + set2Total
+# - practicedQuestions = totalQuestions
+# - set1Complete = true
+# - notPracticed = 0
+GET {{baseUrl}}/students/5/practiceProgress/chapter?chapterId=LC5H0105
+Accept: application/json
+
+### Scenario 5: No Questions Available
+# Expected Response:
+# - All fields = 0
+# - set1Complete = false
+GET {{baseUrl}}/students/1/practiceProgress/chapter?chapterId=NONEXISTENT
+Accept: application/json
+
+### ============================================
+### VALIDATION TESTS
+### ============================================
+
+### Test: Invalid Student ID
+# Expected: 404 Not Found
+GET {{baseUrl}}/students/99999/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Test: Missing Chapter ID Parameter
+# Expected: 400 Bad Request
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter
+Accept: application/json
+
+### Test: Missing Subject ID Parameter
+# Expected: 400 Bad Request
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/subject
+Accept: application/json
+
+### ============================================
+### VERIFICATION TESTS
+### ============================================
+
+### Verify Set 1 Breakdown Always Populated
+# Check that set1Total, set1Practiced, set1Correct, set1Incorrect are always present
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Verify Set 2 Breakdown Always Populated
+# Check that set2Total, set2Practiced, set2Correct, set2Incorrect are always present
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Verify set1Complete Flag
+# Check that set1Complete is boolean (true/false)
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### ============================================
+### CALCULATION VERIFICATION
+### ============================================
+
+### Verify: notPracticed = totalQuestions - practicedQuestions
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Verify: set1NotPracticed = set1Total - set1Practiced
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Verify: set2NotPracticed = set2Total - set2Practiced
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Verify: When set1Complete=false, totalQuestions = set1Total
+GET {{baseUrl}}/students/2/practiceProgress/chapter?chapterId=LC5H0102
+Accept: application/json
+
+### Verify: When set1Complete=true, totalQuestions = set1Total + set2Total
+GET {{baseUrl}}/students/3/practiceProgress/chapter?chapterId=LC5H0103
+Accept: application/json
+
+### ============================================
+### CROSS-ENDPOINT CONSISTENCY TESTS
+### ============================================
+
+### Compare Practice vs Test Progress (Same Student, Same Chapter)
+# Both should have same structure but different data
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+###
+GET {{baseUrl}}/students/{{studentId}}/testProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+### Compare Chapter vs Subject Progress (Same Student, Same Subject)
+# Subject should aggregate all chapters in that subject
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/chapter?chapterId={{chapterId}}
+Accept: application/json
+
+###
+GET {{baseUrl}}/students/{{studentId}}/practiceProgress/subject?subjectId={{subjectId}}
+Accept: application/json
+
+### ============================================
+### NOTES FOR MANUAL TESTING
+### ============================================
+
+# 1. Set 1 Incomplete Test:
+#    - Create a student who has practiced some but not all Set 1 questions
+#    - Verify main fields show Set 1 only
+#    - Verify set1Complete = false
+
+# 2. Set 1 Complete Test:
+#    - Create a student who has practiced all Set 1 questions
+#    - Verify main fields show Set 1 + Set 2 combined
+#    - Verify set1Complete = true
+#    - Verify this works even if Set 2 not started
+
+# 3. Set 2 Progress Test:
+#    - After Set 1 complete, practice some Set 2 questions
+#    - Verify main fields include Set 2 progress
+#    - Verify set2Practiced > 0
+
+# 4. Accuracy Calculation:
+#    - Verify correctAnswers + incorrectAnswers = practicedQuestions
+#    - Verify set1Correct + set1Incorrect = set1Practiced
+#    - Verify set2Correct + set2Incorrect = set2Practiced
+
+# 5. Edge Cases:
+#    - Test with 0 questions in Set 1
+#    - Test with 0 questions in Set 2
+#    - Test with only Set 1 questions (no Set 2)
+#    - Test with only Set 2 questions (no Set 1)
+
+### ============================================
+### EXPECTED RESPONSE STRUCTURE
+### ============================================
+
+# {
+#   "totalQuestions": 50,           // Set 1 only OR Set 1 + Set 2
+#   "practicedQuestions": 20,       // Set 1 only OR Set 1 + Set 2
+#   "correctAnswers": 15,           // Set 1 only OR Set 1 + Set 2
+#   "incorrectAnswers": 5,          // Set 1 only OR Set 1 + Set 2
+#   "notPracticed": 30,             // Set 1 only OR Set 1 + Set 2
+#   "set1Total": 50,                // Always populated
+#   "set1Practiced": 20,            // Always populated
+#   "set1Correct": 15,              // Always populated
+#   "set1Incorrect": 5,             // Always populated
+#   "set1NotPracticed": 30,         // Always populated
+#   "set2Total": 45,                // Always populated
+#   "set2Practiced": 0,             // Always populated
+#   "set2Correct": 0,               // Always populated
+#   "set2Incorrect": 0,             // Always populated
+#   "set2NotPracticed": 45,         // Always populated
+#   "set1Complete": false           // true if all Set 1 practiced
+# }

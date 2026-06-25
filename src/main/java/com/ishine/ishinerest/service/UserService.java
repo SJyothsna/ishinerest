@@ -5,6 +5,8 @@ import com.ishine.ishinerest.entity.UserRole;
 import com.ishine.ishinerest.repository.ParentStudentRepository;
 import com.ishine.ishinerest.repository.StudentRepository;
 import com.ishine.ishinerest.repository.TeacherStudentRepository;
+import com.ishine.ishinerest.repository.TeacherTestRepository;
+import com.ishine.ishinerest.repository.TestAssignmentRepository;
 import com.ishine.ishinerest.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,8 @@ public class UserService {
     private final StudentRepository studentRepository;
     private final ParentStudentRepository parentStudentRepository;
     private final TeacherStudentRepository teacherStudentRepository;
+    private final TeacherTestRepository teacherTestRepository;
+    private final TestAssignmentRepository testAssignmentRepository;
     
     /**
      * Get user by ID
@@ -160,37 +164,55 @@ public class UserService {
         
         // Delete all related records first to avoid foreign key constraint violations
         
-        // 1. Delete parent-student relationships where user is parent
+        // 1. Delete test assignments where user is the student
+        var studentAssignments = testAssignmentRepository.findByStudent_UserIdOrderByAssignedAtDesc(userId);
+        if (!studentAssignments.isEmpty()) {
+            testAssignmentRepository.deleteAll(studentAssignments);
+        }
+        
+        // 2. Delete test assignments where user assigned the test
+        var assignedByAssignments = testAssignmentRepository.findByAssignedBy_UserIdOrderByAssignedAtDesc(userId);
+        if (!assignedByAssignments.isEmpty()) {
+            testAssignmentRepository.deleteAll(assignedByAssignments);
+        }
+        
+        // 3. Delete teacher tests created by the user
+        var teacherTests = teacherTestRepository.findByCreatedBy_UserIdOrderByCreatedAtDesc(userId);
+        if (!teacherTests.isEmpty()) {
+            teacherTestRepository.deleteAll(teacherTests);
+        }
+        
+        // 4. Delete parent-student relationships where user is parent
         var parentLinks = parentStudentRepository.findByParent_UserId(userId);
         if (!parentLinks.isEmpty()) {
             parentStudentRepository.deleteAll(parentLinks);
         }
         
-        // 2. Delete parent-student relationships where user is student
+        // 5. Delete parent-student relationships where user is student
         var studentParentLinks = parentStudentRepository.findByStudent_UserId(userId);
         if (!studentParentLinks.isEmpty()) {
             parentStudentRepository.deleteAll(studentParentLinks);
         }
         
-        // 3. Delete teacher-student relationships where user is teacher
+        // 6. Delete teacher-student relationships where user is teacher
         var teacherLinks = teacherStudentRepository.findByTeacher_UserId(userId);
         if (!teacherLinks.isEmpty()) {
             teacherStudentRepository.deleteAll(teacherLinks);
         }
         
-        // 4. Delete teacher-student relationships where user is student
+        // 7. Delete teacher-student relationships where user is student
         var studentTeacherLinks = teacherStudentRepository.findByStudent_UserId(userId);
         if (!studentTeacherLinks.isEmpty()) {
             teacherStudentRepository.deleteAll(studentTeacherLinks);
         }
         
-        // 5. Delete student record if user has one
+        // 8. Delete student record if user has one
         var studentRecord = studentRepository.findByUser(user);
         if (studentRecord.isPresent()) {
             studentRepository.delete(studentRecord.get());
         }
         
-        // 6. Finally, delete the user
+        // 9. Finally, delete the user
         userRepository.deleteById(userId);
     }
 }

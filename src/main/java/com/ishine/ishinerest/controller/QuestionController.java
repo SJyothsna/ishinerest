@@ -3,6 +3,9 @@ package com.ishine.ishinerest.controller;
 import com.ishine.ishinerest.entity.Question;
 import com.ishine.ishinerest.pojo.QuestionWithFlagDTO;
 import com.ishine.ishinerest.service.QuestionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/questions")
+@Tag(name = "Questions", description = "Question management APIs with support for question sets")
 public class QuestionController {
 
     @Autowired
@@ -73,6 +77,7 @@ public class QuestionController {
             question.setHint(questionDetails.getHint());
             question.setUsageType(questionDetails.getUsageType());
             question.setQuestionImageUrl(questionDetails.getQuestionImageUrl());
+            question.setQuestionSet(questionDetails.getQuestionSet());
 
             return questionService.saveQuestion(question);
         }
@@ -85,49 +90,61 @@ public class QuestionController {
     }
 
     // Endpoint for unpracticed questions by subject (NOW WITH isFlagged)
+    @Operation(summary = "Get unpracticed questions by subject",
+               description = "Returns unpracticed questions for a student filtered by subject, with optional question set filtering for progressive practice")
     @GetMapping("/unpracticed/subject")
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubject(
-            @RequestParam Long studentId,
-            @RequestParam String subjectId,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(name = "usageType", required = false) String usageType) {
-        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit, usageType);
+            @Parameter(description = "Student ID", required = true) @RequestParam Long studentId,
+            @Parameter(description = "Subject ID", required = true) @RequestParam String subjectId,
+            @Parameter(description = "Maximum number of questions to return", example = "10") @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Usage type filter (Practice, Test, Both, or 'all' for all types)") @RequestParam(name = "usageType", required = false) String usageType,
+            @Parameter(description = "Question set number for progressive practice (1, 2, 3, etc. or 'all' for all sets)", example = "1") @RequestParam(name = "questionSet", required = false) String questionSet) {
+        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit, usageType, questionSet);
     }
 
     // Endpoint for unpracticed questions by chapter (NOW WITH isFlagged)
+    @Operation(summary = "Get unpracticed questions by chapter",
+               description = "Returns unpracticed questions for a student filtered by chapter, with optional filters for difficulty, usage type, section, and question set")
     @GetMapping("/unpracticed/chapter")
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsByChapter(
-            @RequestParam Long studentId,
-            @RequestParam String chapterId,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(name = "level", required = false) String level,
-            @RequestParam(name = "usageType", required = false) String usageType,
-            @RequestParam(name = "sectionId", required = false) String sectionId) {
-        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType, sectionId);
+            @Parameter(description = "Student ID", required = true) @RequestParam Long studentId,
+            @Parameter(description = "Chapter ID", required = true) @RequestParam String chapterId,
+            @Parameter(description = "Maximum number of questions to return", example = "10") @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Difficulty level filter (Easy, Medium, Hard, or 'all')") @RequestParam(name = "level", required = false) String level,
+            @Parameter(description = "Usage type filter (Practice, Test, Both, or 'all')") @RequestParam(name = "usageType", required = false) String usageType,
+            @Parameter(description = "Section ID filter") @RequestParam(name = "sectionId", required = false) String sectionId,
+            @Parameter(description = "Question set number for progressive practice (1, 2, 3, etc. or 'all' for all sets)", example = "1") @RequestParam(name = "questionSet", required = false) String questionSet) {
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType, sectionId, questionSet);
     }
 
     // NEW ENDPOINTS WITH FLAG STATUS
 
     // Endpoint for unpracticed questions by chapter with flag status
+    @Operation(summary = "Get unpracticed questions by chapter with flag status",
+               description = "Returns unpracticed questions with flag status, filtered by chapter and optional question set")
     @GetMapping("/unpracticed/chapter/with-flags")
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsByChapterWithFlags(
-            @RequestParam Long studentId,
-            @RequestParam String chapterId,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(name = "level", required = false) String level,
-            @RequestParam(name = "usageType", required = false) String usageType,
-            @RequestParam(name = "sectionId", required = false) String sectionId) {
-        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType, sectionId);
+            @Parameter(description = "Student ID", required = true) @RequestParam Long studentId,
+            @Parameter(description = "Chapter ID", required = true) @RequestParam String chapterId,
+            @Parameter(description = "Maximum number of questions", example = "10") @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Difficulty level filter") @RequestParam(name = "level", required = false) String level,
+            @Parameter(description = "Usage type filter") @RequestParam(name = "usageType", required = false) String usageType,
+            @Parameter(description = "Section ID filter") @RequestParam(name = "sectionId", required = false) String sectionId,
+            @Parameter(description = "Question set number (1, 2, 3, etc.)", example = "1") @RequestParam(name = "questionSet", required = false) String questionSet) {
+        return questionService.getUnpracticedQuestionsByChapterWithFlags(studentId, chapterId, limit, level, usageType, sectionId, questionSet);
     }
 
     // Endpoint for unpracticed questions by subject with flag status
+    @Operation(summary = "Get unpracticed questions by subject with flag status",
+               description = "Returns unpracticed questions with flag status, filtered by subject and optional question set")
     @GetMapping("/unpracticed/subject/with-flags")
     public List<QuestionWithFlagDTO> getUnpracticedQuestionsBySubjectWithFlags(
-            @RequestParam Long studentId,
-            @RequestParam String subjectId,
-            @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(name = "usageType", required = false) String usageType) {
-        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit, usageType);
+            @Parameter(description = "Student ID", required = true) @RequestParam Long studentId,
+            @Parameter(description = "Subject ID", required = true) @RequestParam String subjectId,
+            @Parameter(description = "Maximum number of questions", example = "10") @RequestParam(defaultValue = "10") int limit,
+            @Parameter(description = "Usage type filter") @RequestParam(name = "usageType", required = false) String usageType,
+            @Parameter(description = "Question set number (1, 2, 3, etc.)", example = "1") @RequestParam(name = "questionSet", required = false) String questionSet) {
+        return questionService.getUnpracticedQuestionsBySubjectWithFlags(studentId, subjectId, limit, usageType, questionSet);
     }
 
     // Endpoint for questions by chapter with flag status

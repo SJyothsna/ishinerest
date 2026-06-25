@@ -570,6 +570,17 @@
                             <option value="Both">Both</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>Filter by Question Set:</label>
+                        <select id="filterQuestionSet">
+                            <option value="">All Sets</option>
+                            <option value="1">Set 1</option>
+                            <option value="2">Set 2</option>
+                            <option value="3">Set 3</option>
+                            <option value="4">Set 4</option>
+                            <option value="5">Set 5</option>
+                        </select>
+                    </div>
                 </div>
                 
                 <!-- Action Buttons -->
@@ -696,6 +707,17 @@
                                 <option value="Practice">Practice</option>
                                 <option value="Test">Test</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Question Set</label>
+                            <select id="questionSet">
+                                <option value="1" selected>Set 1</option>
+                                <option value="2">Set 2</option>
+                                <option value="3">Set 3</option>
+                                <option value="4">Set 4</option>
+                                <option value="5">Set 5</option>
+                            </select>
+                            <small style="color: #666; display: block; margin-top: 5px;">Organize questions into sets for progressive practice</small>
                         </div>
                         <button type="submit" class="btn btn-primary" id="questionSubmitBtn">Add Question</button>
                         <button type="button" class="btn btn-secondary" onclick="hideAddQuestionForm()">Cancel</button>
@@ -1797,6 +1819,7 @@
                 notes: document.getElementById('notes').value || null,
                 hint: document.getElementById('hint').value || null,
                 usageType: document.getElementById('usageType').value,
+                questionSet: document.getElementById('questionSet').value,
                 questionImageUrl: null, // Will be updated after upload if image exists
                 chapter: {
                     chapterId: chapterId
@@ -2012,7 +2035,19 @@
                                         <option value="Test" ${q.usageType === 'Test' ? 'selected' : ''}>Test</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; align-items: flex-end; gap: 10px;">
+                                <div>
+                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Question Set:</label>
+                                    <select id="edit-questionSet-${questionId}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <option value="1" ${(q.questionSet === '1' || !q.questionSet) ? 'selected' : ''}>Set 1</option>
+                                        <option value="2" ${q.questionSet === '2' ? 'selected' : ''}>Set 2</option>
+                                        <option value="3" ${q.questionSet === '3' ? 'selected' : ''}>Set 3</option>
+                                        <option value="4" ${q.questionSet === '4' ? 'selected' : ''}>Set 4</option>
+                                        <option value="5" ${q.questionSet === '5' ? 'selected' : ''}>Set 5</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
                                     <button class="btn btn-success" onclick="updateQuestionInline(${questionId})" style="flex: 1;">Update</button>
                                     <button class="btn btn-secondary" onclick="cancelEditInline(${questionId})" style="flex: 1;">Cancel</button>
                                 </div>
@@ -2136,6 +2171,7 @@
                     notes: document.getElementById(`edit-notes-${questionId}`).value || null,
                     hint: document.getElementById(`edit-hint-${questionId}`).value || null,
                     usageType: document.getElementById(`edit-usageType-${questionId}`).value,
+                    questionSet: document.getElementById(`edit-questionSet-${questionId}`).value,
                     questionImageUrl: questionImageUrl || null,
                     chapter: { chapterId: currentChapterId }
                 };
@@ -2385,6 +2421,15 @@
                     });
                 }
                 
+                // Filter by question set if selected
+                const filterQuestionSet = document.getElementById('filterQuestionSet').value;
+                if (filterQuestionSet) {
+                    questions = questions.filter(q => {
+                        const qSet = q.questionSet || '1';
+                        return qSet === filterQuestionSet;
+                    });
+                }
+                
                 const container = document.getElementById('questionsList');
                 if (questions.length === 0) {
                     container.innerHTML = '<p>No questions found for this chapter with the selected filters.</p>';
@@ -2402,6 +2447,7 @@
                                 <th>Type</th>
                                 <th>Difficulty</th>
                                 <th>Usage Type</th>
+                                <th>Question Set</th>
                                 <th>Hint</th>
                                 <th>Explanation</th>
                                 <th>Actions</th>
@@ -2437,6 +2483,7 @@
                                     <td><span class="badge badge-info">${questionTypeLabel}</span></td>
                                     <td><span class="badge badge-primary">${q.difficultyLevel || 'Basic'}</span></td>
                                     <td><span class="badge ${usageTypeBadgeClass}">${usageTypeDisplay}</span></td>
+                                    <td><span class="badge badge-secondary">Set ${q.questionSet || '1'}</span></td>
                                     <td style="max-width: 300px; white-space: pre-wrap;">${q.hint || 'No hint'}</td>
                                     <td style="max-width: 300px; white-space: pre-wrap;">${q.explanation || 'No explanation'}</td>
                                     <td class="action-buttons">
@@ -2865,11 +2912,13 @@
         function showAddParentStudentLinkForm() {
             document.getElementById('parentStudentLinkFormSection').style.display = 'block';
             document.getElementById('parentStudentLinkForm').reset();
+            document.getElementById('parent-student-link-alert').innerHTML = ''; // Clear any previous alerts
         }
 
         function hideAddParentStudentLinkForm() {
             document.getElementById('parentStudentLinkFormSection').style.display = 'none';
             document.getElementById('parentStudentLinkForm').reset();
+            document.getElementById('parent-student-link-alert').innerHTML = ''; // Clear any alerts
         }
 
         async function loadParentStudentLinks() {
@@ -2963,11 +3012,13 @@
         function showAddTeacherStudentLinkForm() {
             document.getElementById('teacherStudentLinkFormSection').style.display = 'block';
             document.getElementById('teacherStudentLinkForm').reset();
+            document.getElementById('teacher-student-link-alert').innerHTML = ''; // Clear any previous alerts
         }
 
         function hideAddTeacherStudentLinkForm() {
             document.getElementById('teacherStudentLinkFormSection').style.display = 'none';
             document.getElementById('teacherStudentLinkForm').reset();
+            document.getElementById('teacher-student-link-alert').innerHTML = ''; // Clear any alerts
         }
 
         async function loadTeacherStudentLinks() {
