@@ -1,0 +1,1 @@
+CREATE TABLE account_action_tokens(token_hash text PRIMARY KEY,user_id uuid NOT NULL REFERENCES app_users(user_id),purpose text NOT NULL CHECK(purpose IN ('RESET','VERIFY')),expires_at timestamp with time zone NOT NULL,consumed_at timestamp with time zone);

@@ -1,0 +1,918 @@
+{
+  "title": "Ireland · Leaving Certificate Mathematics · Starter content",
+  "source": "Original illustrative examples; strand names follow the current NCCA syllabus. No exam level or full syllabus coverage is claimed.",
+  "chapters": [
+    {
+      "code": "statistics-probability",
+      "title": "Statistics and probability",
+      "description": "Interpret data and reason about chance.",
+      "topics": [
+        {
+          "code": "probability",
+          "title": "Probability",
+          "questions": [
+            {
+              "externalId": "starter-probability-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "A fair six-sided die is rolled. What is the probability of a 6?",
+              "correctAnswer": "A",
+              "explanation": "One of the six equally likely outcomes is a 6.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "1/6"
+                },
+                {
+                  "id": "B",
+                  "text": "1/3"
+                },
+                {
+                  "id": "C",
+                  "text": "1/2"
+                },
+                {
+                  "id": "D",
+                  "text": "5/6"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-probability-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "A bag contains 3 red and 5 blue counters. What is the probability of choosing red?",
+              "correctAnswer": "B",
+              "explanation": "There are 3 red counters out of 8 counters.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "3/5"
+                },
+                {
+                  "id": "B",
+                  "text": "3/8"
+                },
+                {
+                  "id": "C",
+                  "text": "5/8"
+                },
+                {
+                  "id": "D",
+                  "text": "1/3"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-probability-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "Two fair coins are tossed. What is the probability of exactly one head?",
+              "correctAnswer": "C",
+              "explanation": "The equally likely outcomes are HH, HT, TH and TT. Two have exactly one head.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "1/4"
+                },
+                {
+                  "id": "B",
+                  "text": "3/4"
+                },
+                {
+                  "id": "C",
+                  "text": "1/2"
+                },
+                {
+                  "id": "D",
+                  "text": "1"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "statistics",
+          "title": "Describing data",
+          "questions": [
+            {
+              "externalId": "starter-statistics-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "Find the mean of 2, 4 and 6.",
+              "correctAnswer": "D",
+              "explanation": "Add the three values and divide by 3: 12 ÷ 3 = 4.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "3"
+                },
+                {
+                  "id": "B",
+                  "text": "6"
+                },
+                {
+                  "id": "C",
+                  "text": "12"
+                },
+                {
+                  "id": "D",
+                  "text": "4"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-statistics-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "Find the median of 2, 4, 5, 8 and 11.",
+              "correctAnswer": "A",
+              "explanation": "The values are ordered. The middle of five values is the third value, 5.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "5"
+                },
+                {
+                  "id": "B",
+                  "text": "4"
+                },
+                {
+                  "id": "C",
+                  "text": "6"
+                },
+                {
+                  "id": "D",
+                  "text": "8"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-statistics-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "The mean of four values is 7. Three values are 5, 6 and 8. Find the fourth.",
+              "correctAnswer": "B",
+              "explanation": "The total is 4 × 7 = 28. Subtract 5 + 6 + 8 = 19 to get 9.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "7"
+                },
+                {
+                  "id": "B",
+                  "text": "9"
+                },
+                {
+                  "id": "C",
+                  "text": "8"
+                },
+                {
+                  "id": "D",
+                  "text": "28"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sourceChapterCodes": [
+        "LC01H01",
+        "LC01H02",
+        "LC01H03",
+        "LC01H04",
+        "LC01H05",
+        "LC01H06",
+        "LC01H07"
+      ],
+      "note": "Probability describes chance as a number between 0 and 1. For equally likely outcomes, divide the number of favourable outcomes by the total. Summarise data with a measure appropriate to its distribution, and always check the context."
+    },
+    {
+      "code": "geometry-trigonometry",
+      "title": "Geometry and trigonometry",
+      "description": "Connect angles, shapes and distances.",
+      "topics": [
+        {
+          "code": "geometry",
+          "title": "Geometry",
+          "questions": [
+            {
+              "externalId": "starter-geometry-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "Two angles of a triangle are 50° and 60°. Find the third angle in degrees.",
+              "correctAnswer": "C",
+              "explanation": "Angles in a triangle total 180°. Subtract 50° and 60°.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "50"
+                },
+                {
+                  "id": "B",
+                  "text": "60"
+                },
+                {
+                  "id": "C",
+                  "text": "70"
+                },
+                {
+                  "id": "D",
+                  "text": "110"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-geometry-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "A right triangle has perpendicular sides 6 cm and 8 cm. Find the hypotenuse in cm.",
+              "correctAnswer": "D",
+              "explanation": "By Pythagoras, the hypotenuse is √(36 + 64) = 10 cm.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "8"
+                },
+                {
+                  "id": "B",
+                  "text": "14"
+                },
+                {
+                  "id": "C",
+                  "text": "100"
+                },
+                {
+                  "id": "D",
+                  "text": "10"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-geometry-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "A circle has radius 3 cm. What is its area in square centimetres?",
+              "correctAnswer": "A",
+              "explanation": "Area = pi × r² = 9pi square centimetres.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "$9\\pi$"
+                },
+                {
+                  "id": "B",
+                  "text": "$3\\pi$"
+                },
+                {
+                  "id": "C",
+                  "text": "$6\\pi$"
+                },
+                {
+                  "id": "D",
+                  "text": "$18\\pi$"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "trigonometry",
+          "title": "Trigonometry",
+          "questions": [
+            {
+              "externalId": "starter-trigonometry-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "In a right triangle, the side opposite an angle is 3 and the hypotenuse is 5. Find the sine of the angle as a fraction.",
+              "correctAnswer": "B",
+              "explanation": "Sine is opposite divided by hypotenuse.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "4/5"
+                },
+                {
+                  "id": "B",
+                  "text": "3/5"
+                },
+                {
+                  "id": "C",
+                  "text": "5/3"
+                },
+                {
+                  "id": "D",
+                  "text": "3/4"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-trigonometry-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "A right triangle has angle 45° and adjacent side 7 cm. Find the opposite side in cm.",
+              "correctAnswer": "C",
+              "explanation": "tan 45° = 1, so the opposite side equals the adjacent side.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "3.5"
+                },
+                {
+                  "id": "B",
+                  "text": "$7\\sqrt{2}$"
+                },
+                {
+                  "id": "C",
+                  "text": "7"
+                },
+                {
+                  "id": "D",
+                  "text": "14"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-trigonometry-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "A triangle has sides 5 cm and 8 cm enclosing a 30° angle. Find its area in square cm.",
+              "correctAnswer": "D",
+              "explanation": "Area = ½ab sin C = ½ × 5 × 8 × ½ = 10.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "5"
+                },
+                {
+                  "id": "B",
+                  "text": "20"
+                },
+                {
+                  "id": "C",
+                  "text": "40"
+                },
+                {
+                  "id": "D",
+                  "text": "10"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sourceChapterCodes": [
+        "LC01H08",
+        "LC01H09",
+        "LC01H10",
+        "LC01H11"
+      ],
+      "note": "For a right triangle, a² + b² = c², where c is the hypotenuse. Use sine, cosine or tangent by identifying the opposite, adjacent and hypotenuse relative to the chosen angle. Sketch and label your diagram first."
+    },
+    {
+      "code": "number",
+      "title": "Number",
+      "description": "Work confidently with number and financial calculations.",
+      "topics": [
+        {
+          "code": "fractions-indices",
+          "title": "Fractions and indices",
+          "questions": [
+            {
+              "externalId": "starter-fractions-indices-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "Calculate $2^3$.",
+              "correctAnswer": "A",
+              "explanation": "2 × 2 × 2 = 8.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "8"
+                },
+                {
+                  "id": "B",
+                  "text": "6"
+                },
+                {
+                  "id": "C",
+                  "text": "9"
+                },
+                {
+                  "id": "D",
+                  "text": "16"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-fractions-indices-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "Calculate $\\frac{3}{4}+\\frac{1}{8}$.",
+              "correctAnswer": "B",
+              "explanation": "Write 3/4 as 6/8, then add 1/8.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "4/12"
+                },
+                {
+                  "id": "B",
+                  "text": "7/8"
+                },
+                {
+                  "id": "C",
+                  "text": "3/8"
+                },
+                {
+                  "id": "D",
+                  "text": "1"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-fractions-indices-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "Simplify $\\frac{2^5\\times2^3}{2^4}$.",
+              "correctAnswer": "C",
+              "explanation": "Add exponents when multiplying and subtract when dividing: 2⁴ = 16.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "4"
+                },
+                {
+                  "id": "B",
+                  "text": "8"
+                },
+                {
+                  "id": "C",
+                  "text": "16"
+                },
+                {
+                  "id": "D",
+                  "text": "256"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "financial-maths",
+          "title": "Financial mathematics",
+          "questions": [
+            {
+              "externalId": "starter-financial-maths-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "Find 15% of €80. Give the number of euro.",
+              "correctAnswer": "D",
+              "explanation": "0.15 × 80 = 12.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "15"
+                },
+                {
+                  "id": "B",
+                  "text": "65"
+                },
+                {
+                  "id": "C",
+                  "text": "68"
+                },
+                {
+                  "id": "D",
+                  "text": "12"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-financial-maths-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "An item costing €120 is reduced by 25%. Find the sale price in euro.",
+              "correctAnswer": "A",
+              "explanation": "A 25% reduction leaves 75%: 0.75 × 120 = 90.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "90"
+                },
+                {
+                  "id": "B",
+                  "text": "25"
+                },
+                {
+                  "id": "C",
+                  "text": "30"
+                },
+                {
+                  "id": "D",
+                  "text": "95"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-financial-maths-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "€1000 earns 10% compound interest per year for two years. Find the final amount in euro.",
+              "correctAnswer": "B",
+              "explanation": "1000 × 1.1² = 1210.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "1100"
+                },
+                {
+                  "id": "B",
+                  "text": "1210"
+                },
+                {
+                  "id": "C",
+                  "text": "1200"
+                },
+                {
+                  "id": "D",
+                  "text": "12000"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sourceChapterCodes": [
+        "LC01H12",
+        "LC01H13",
+        "LC01H14",
+        "LC01H15"
+      ],
+      "note": "Use common denominators when adding fractions. Multiplication of powers with the same base adds their indices; division subtracts them. A percentage is a fraction out of 100. Check units and round only at the end."
+    },
+    {
+      "code": "algebra",
+      "title": "Algebra",
+      "description": "Use symbols to describe and solve problems.",
+      "topics": [
+        {
+          "code": "equations",
+          "title": "Equations",
+          "questions": [
+            {
+              "externalId": "starter-equations-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "Solve $x+5=12$.",
+              "correctAnswer": "C",
+              "explanation": "Subtract 5 from both sides.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "5"
+                },
+                {
+                  "id": "B",
+                  "text": "12"
+                },
+                {
+                  "id": "C",
+                  "text": "7"
+                },
+                {
+                  "id": "D",
+                  "text": "17"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-equations-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "Solve $3x-4=17$.",
+              "correctAnswer": "D",
+              "explanation": "Add 4 to get 3x = 21, then divide by 3.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "13/3"
+                },
+                {
+                  "id": "B",
+                  "text": "17/3"
+                },
+                {
+                  "id": "C",
+                  "text": "21"
+                },
+                {
+                  "id": "D",
+                  "text": "7"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-equations-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "The roots of $x^2-5x+6=0$ are 2 and one other number. Find the other root.",
+              "correctAnswer": "A",
+              "explanation": "Factorise as (x − 2)(x − 3) = 0.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "3"
+                },
+                {
+                  "id": "B",
+                  "text": "-3"
+                },
+                {
+                  "id": "C",
+                  "text": "5"
+                },
+                {
+                  "id": "D",
+                  "text": "6"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "sequences",
+          "title": "Sequences",
+          "questions": [
+            {
+              "externalId": "starter-sequences-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "Find the next term in 3, 6, 9, 12, …",
+              "correctAnswer": "B",
+              "explanation": "Add 3 each time.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "13"
+                },
+                {
+                  "id": "B",
+                  "text": "15"
+                },
+                {
+                  "id": "C",
+                  "text": "14"
+                },
+                {
+                  "id": "D",
+                  "text": "18"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-sequences-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "An arithmetic sequence starts at 4 and has common difference 3. Find its tenth term.",
+              "correctAnswer": "C",
+              "explanation": "The tenth term is 4 + 9 × 3 = 31.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "27"
+                },
+                {
+                  "id": "B",
+                  "text": "30"
+                },
+                {
+                  "id": "C",
+                  "text": "31"
+                },
+                {
+                  "id": "D",
+                  "text": "34"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-sequences-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "Find the sum of the first five terms of 2, 6, 18, …",
+              "correctAnswer": "D",
+              "explanation": "The first five terms are 2, 6, 18, 54 and 162; their sum is 242.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "80"
+                },
+                {
+                  "id": "B",
+                  "text": "162"
+                },
+                {
+                  "id": "C",
+                  "text": "243"
+                },
+                {
+                  "id": "D",
+                  "text": "242"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sourceChapterCodes": [
+        "LC01H16",
+        "LC01H17",
+        "LC01H18",
+        "LC01H19"
+      ],
+      "note": "Keep both sides of an equation balanced by applying the same operation to each side. Factorisation can turn a quadratic into a product equal to zero. Substitute your answer into the original equation to check it."
+    },
+    {
+      "code": "functions",
+      "title": "Functions",
+      "description": "Explore how quantities change and relate.",
+      "topics": [
+        {
+          "code": "function-values",
+          "title": "Function values",
+          "questions": [
+            {
+              "externalId": "starter-function-values-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "If $f(x)=2x+1$, find $f(3)$.",
+              "correctAnswer": "A",
+              "explanation": "Substitute x = 3: 2 × 3 + 1 = 7.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "7"
+                },
+                {
+                  "id": "B",
+                  "text": "5"
+                },
+                {
+                  "id": "C",
+                  "text": "6"
+                },
+                {
+                  "id": "D",
+                  "text": "9"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-function-values-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "If $f(x)=x^2-3x$, find $f(-2)$.",
+              "correctAnswer": "B",
+              "explanation": "Substitute −2: 4 + 6 = 10.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "-10"
+                },
+                {
+                  "id": "B",
+                  "text": "10"
+                },
+                {
+                  "id": "C",
+                  "text": "-2"
+                },
+                {
+                  "id": "D",
+                  "text": "4"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-function-values-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "If $f(x)=2x+1$ and $g(x)=x^2$, find $g(f(2))$.",
+              "correctAnswer": "C",
+              "explanation": "First f(2) = 5, then g(5) = 25.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "9"
+                },
+                {
+                  "id": "B",
+                  "text": "10"
+                },
+                {
+                  "id": "C",
+                  "text": "25"
+                },
+                {
+                  "id": "D",
+                  "text": "17"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "rates-change",
+          "title": "Rates of change",
+          "questions": [
+            {
+              "externalId": "starter-rates-change-1",
+              "type": "single",
+              "difficulty": "FOUNDATION",
+              "prompt": "A line passes through (0, 1) and (2, 5). Find its slope.",
+              "correctAnswer": "D",
+              "explanation": "Slope = (5 − 1) / (2 − 0) = 2.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "1"
+                },
+                {
+                  "id": "B",
+                  "text": "3"
+                },
+                {
+                  "id": "C",
+                  "text": "4"
+                },
+                {
+                  "id": "D",
+                  "text": "2"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-rates-change-2",
+              "type": "single",
+              "difficulty": "INTERMEDIATE",
+              "prompt": "For $f(x)=x^2$, find the gradient of the tangent at $x=3$.",
+              "correctAnswer": "A",
+              "explanation": "The derivative is 2x. At x = 3 the gradient is 6.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "6"
+                },
+                {
+                  "id": "B",
+                  "text": "3"
+                },
+                {
+                  "id": "C",
+                  "text": "9"
+                },
+                {
+                  "id": "D",
+                  "text": "12"
+                }
+              ]
+            },
+            {
+              "externalId": "starter-rates-change-3",
+              "type": "single",
+              "difficulty": "ADVANCED",
+              "prompt": "For $f(x)=x^3-3x$, find the gradient at $x=2$.",
+              "correctAnswer": "B",
+              "explanation": "The derivative is 3x² − 3. At x = 2 this is 12 − 3 = 9.",
+              "options": [
+                {
+                  "id": "A",
+                  "text": "3"
+                },
+                {
+                  "id": "B",
+                  "text": "9"
+                },
+                {
+                  "id": "C",
+                  "text": "6"
+                },
+                {
+                  "id": "D",
+                  "text": "12"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sourceChapterCodes": [
+        "LC01H20",
+        "LC01H21"
+      ],
+      "note": "A function assigns an output to each permitted input. Substitute carefully when evaluating a function. A derivative describes an instantaneous rate of change; for a graph, it gives the gradient of a tangent."
+    }
+  ],
+  "curriculumSource": "https://www.curriculumonline.ie/senior-cycle/senior-cycle-subjects/mathematics/"
+}

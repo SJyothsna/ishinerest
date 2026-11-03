@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local redesign databases and private files
+/data/istudy-redesign*
+/data/private-assets/
+
+/.env.redesign
+
+/data/legacy-paper-sources/
+/data/backups/
+
+/data/legacy-frontend-uploads/
+
+/data/question-bank-imports/
