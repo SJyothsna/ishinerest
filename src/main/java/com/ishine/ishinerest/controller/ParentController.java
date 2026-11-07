@@ -6,6 +6,7 @@ import com.ishine.ishinerest.pojo.LinkStudentRequest;
 import com.ishine.ishinerest.pojo.ParentStudentLinkDTO;
 import com.ishine.ishinerest.pojo.UserDTO;
 import com.ishine.ishinerest.service.ParentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/parents")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
+@Tag(name = "Parents", description = "Parent-student link requests with approval workflow")
 public class ParentController {
     
     private final ParentService parentService;

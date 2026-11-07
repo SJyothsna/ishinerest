@@ -2,10 +2,12 @@ package com.ishine.ishinerest.controller;
 
 import com.ishine.ishinerest.entity.Student;
 import com.ishine.ishinerest.entity.StudentSubject;
+import com.ishine.ishinerest.pojo.StudentHomeSummaryDTO;
 import com.ishine.ishinerest.pojo.StudentPracticeProgressDTO;
 import com.ishine.ishinerest.pojo.StudentProfileDTO;
 import com.ishine.ishinerest.pojo.StudentSelectedSubjectDTO;
 import com.ishine.ishinerest.repository.PracticeSessionDetailRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Tag(name = "Students", description = "Student profiles, subject selection and progress tracking")
 @RequestMapping("/students")
 public class StudentController {
 
@@ -109,6 +112,16 @@ public class StudentController {
             @RequestBody List<String> subjectIds) {
         List<StudentSubject> savedSelections = studentService.saveStudentSubjects(studentId, subjectIds);
         return ResponseEntity.ok(savedSelections);
+    }
+
+    /**
+     * Home screen summary for a student.
+     * Returns current practice streak, recent chapter activity, and recommended next chapter.
+     * GET /students/{studentId}/home-summary
+     */
+    @GetMapping("/{studentId}/home-summary")
+    public ResponseEntity<StudentHomeSummaryDTO> getHomeSummary(@PathVariable Long studentId) {
+        return ResponseEntity.ok(studentService.getHomeSummary(studentId));
     }
 
 }

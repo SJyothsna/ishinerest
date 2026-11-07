@@ -2,6 +2,7 @@ package com.ishine.ishinerest.controller;
 
 import com.ishine.ishinerest.pojo.TeacherTestResponseDTO;
 import com.ishine.ishinerest.service.TeacherTestService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/tests")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
+@Tag(name = "Public Tests", description = "Public access to published tests without authentication")
 public class PublicTestController {
 
     private final TeacherTestService teacherTestService;

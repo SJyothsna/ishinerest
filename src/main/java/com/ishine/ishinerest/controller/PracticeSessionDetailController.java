@@ -3,6 +3,7 @@ package com.ishine.ishinerest.controller;
 import com.ishine.ishinerest.entity.PracticeSessionDetail;
 import com.ishine.ishinerest.pojo.QuestionWithFlagDTO;
 import com.ishine.ishinerest.service.PracticeSessionDetailService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/practice-session-details")
+@Tag(name = "Practice Sessions", description = "Student practice session tracking and progress")
 public class PracticeSessionDetailController {
 
     @Autowired

@@ -6,6 +6,7 @@ import com.ishine.ishinerest.entity.Question;
 import com.ishine.ishinerest.entity.SubjectEntity;
 import com.ishine.ishinerest.service.ChapterService;
 import com.ishine.ishinerest.service.SubjectService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/chapters")
+@Tag(name = "Chapters", description = "Chapter management and bulk Excel upload")
 public class ChapterController {
 
     @Autowired

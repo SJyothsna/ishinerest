@@ -7,6 +7,7 @@ import com.ishine.ishinerest.pojo.TeacherSelectedSubjectDTO;
 import com.ishine.ishinerest.pojo.TeacherSubjectSelectionRequest;
 import com.ishine.ishinerest.pojo.UserDTO;
 import com.ishine.ishinerest.service.TeacherService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/teachers")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
+@Tag(name = "Teachers", description = "Teacher-student linking, subject assignments and student management")
 public class TeacherController {
     
     private final TeacherService teacherService;

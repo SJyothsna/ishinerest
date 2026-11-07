@@ -5,6 +5,7 @@ import com.ishine.ishinerest.pojo.ChangePasswordRequest;
 import com.ishine.ishinerest.pojo.UpdateUserProfileRequest;
 import com.ishine.ishinerest.pojo.UserDTO;
 import com.ishine.ishinerest.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
+@Tag(name = "Users", description = "User profile management, roles, password changes and account status")
 public class UserController {
     
     private final UserService userService;

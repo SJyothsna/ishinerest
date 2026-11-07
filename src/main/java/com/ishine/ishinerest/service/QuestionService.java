@@ -9,17 +9,23 @@ import com.ishine.ishinerest.repository.ChapterRepository;
 import com.ishine.ishinerest.repository.FlaggedQuestionRepository;
 import com.ishine.ishinerest.repository.QuestionRepository;
 import com.ishine.ishinerest.repository.PracticeSessionDetailRepository;
+import com.ishine.ishinerest.repository.SectionRepository;
 import com.ishine.ishinerest.repository.TeacherSubjectRepository;
+import com.ishine.ishinerest.repository.TeacherTestQuestionRepository;
+import com.ishine.ishinerest.repository.TestDetailRepository;
 import com.ishine.ishinerest.repository.UserRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,6 +49,15 @@ public class QuestionService {
 
     @Autowired
     private TeacherSubjectRepository teacherSubjectRepository;
+
+    @Autowired
+    private SectionRepository sectionRepository;
+
+    @Autowired
+    private TestDetailRepository testDetailRepository;
+
+    @Autowired
+    private TeacherTestQuestionRepository teacherTestQuestionRepository;
 
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
@@ -77,11 +92,29 @@ public class QuestionService {
                 .findFirst()
                 .orElse(null);
 
+        List<Question> questions;
         if (adminUser != null) {
-            return questionRepository.findByCreatedByAndChapter_ChapterId(adminUser, chapterId);
+            questions = questionRepository.findByCreatedByAndChapter_ChapterId(adminUser, chapterId);
+        } else {
+            questions = questionRepository.findByCreatedByIsNullAndChapter_ChapterId(chapterId);
         }
+        enrichWithSectionNames(questions);
+        return questions;
+    }
 
-        return questionRepository.findByCreatedByIsNullAndChapter_ChapterId(chapterId);
+    /** Populate the transient sectionName field on each question from the sections table. */
+    private void enrichWithSectionNames(List<Question> questions) {
+        Set<String> ids = questions.stream()
+                .map(Question::getSectionId)
+                .filter(s -> s != null && !s.isBlank())
+                .collect(Collectors.toSet());
+        if (ids.isEmpty()) return;
+        Map<String, String> nameMap = sectionRepository.buildNameMap(ids);
+        questions.forEach(q -> {
+            if (q.getSectionId() != null) {
+                q.setSectionName(nameMap.getOrDefault(q.getSectionId(), null));
+            }
+        });
     }
 
     public List<Question> getQuestionsBySubject(String subjectId) {
@@ -123,37 +156,51 @@ public class QuestionService {
                     continue;
                 }
 
-                question.setQuestionText(getCellValue(row.getCell(1)));
-                question.setCorrectAnswer(getCellValue(row.getCell(2)));
-                question.setOptionA(getCellValue(row.getCell(3)));
-                question.setOptionB(getCellValue(row.getCell(4)));
-                question.setOptionC(getCellValue(row.getCell(5)));
-                question.setOptionD(getCellValue(row.getCell(6)));
-                question.setOptionE(getCellValue(row.getCell(7)));
-                question.setOptionF(getCellValue(row.getCell(8)));
-                question.setExplanation(getCellValue(row.getCell(9)));
-                question.setDifficultyLevel(getCellValue(row.getCell(10)));
+                // SectionId in Column B (index 1) - optional
+                String sectionId = getCellValue(row.getCell(1));
+                question.setSectionId(sectionId != null && !sectionId.trim().isEmpty() ? sectionId.trim() : null);
+
+                question.setQuestionText(getCellValue(row.getCell(2)));
+                question.setCorrectAnswer(getCellValue(row.getCell(3)));
+                question.setOptionA(getCellValue(row.getCell(4)));
+                question.setOptionB(getCellValue(row.getCell(5)));
+                question.setOptionC(getCellValue(row.getCell(6)));
+                question.setOptionD(getCellValue(row.getCell(7)));
+                question.setOptionE(getCellValue(row.getCell(8)));
+                question.setOptionF(getCellValue(row.getCell(9)));
+                question.setExplanation(getCellValue(row.getCell(10)));
+                question.setDifficultyLevel(getCellValue(row.getCell(11)));
 
                 // Handle QuestionType - default to 1 if empty
-                String questionTypeStr = getCellValue(row.getCell(11));
+                String questionTypeStr = getCellValue(row.getCell(12));
                 question.setQuestionType(questionTypeStr != null && !questionTypeStr.trim().isEmpty()
                         ? Integer.parseInt(questionTypeStr.trim())
                         : 1);
 
-                question.setCorrectAnswers(getCellValue(row.getCell(12)));
-                question.setNotes(getCellValue(row.getCell(13)));
+                question.setCorrectAnswers(getCellValue(row.getCell(13)));
+                question.setNotes(getCellValue(row.getCell(14)));
                 
                 // Handle UsageType - default to "Both" if empty
-                String usageType = getCellValue(row.getCell(14));
+                String usageType = getCellValue(row.getCell(15));
                 question.setUsageType(usageType != null && !usageType.trim().isEmpty()
                         ? usageType.trim()
                         : "Both");
 
                 // Handle QuestionSet - default to "1" if empty
-                String questionSet = getCellValue(row.getCell(15));
+                String questionSet = getCellValue(row.getCell(16));
                 question.setQuestionSet(questionSet != null && !questionSet.trim().isEmpty()
                         ? questionSet.trim()
                         : "1");
+
+                // QuestionFamilyId (col R) and QuestionStyle (col S) - optional
+                String questionFamilyId = getCellValue(row.getCell(17));
+                question.setQuestionFamilyId(questionFamilyId != null && !questionFamilyId.trim().isEmpty()
+                        ? questionFamilyId.trim()
+                        : null);
+                String questionStyle = getCellValue(row.getCell(18));
+                question.setQuestionStyle(questionStyle != null && !questionStyle.trim().isEmpty()
+                        ? questionStyle.trim()
+                        : null);
 
                 Chapter chapter = chapterRepository.findById(chapterId)
                         .orElseThrow(() -> new RuntimeException("Chapter not found for ID: " + chapterId));
@@ -182,7 +229,12 @@ public class QuestionService {
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue().toString();
                 } else {
-                    return String.valueOf((long) cell.getNumericCellValue());
+                    double numVal = cell.getNumericCellValue();
+                    if (numVal == (long) numVal) {
+                        return String.valueOf((long) numVal);
+                    } else {
+                        return BigDecimal.valueOf(numVal).stripTrailingZeros().toPlainString();
+                    }
                 }
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
@@ -193,6 +245,7 @@ public class QuestionService {
         }
     }
 
+    @Transactional
     public void deleteQuestion(Long id) {
         // Get the question first to check if it has an image
         Optional<Question> questionOpt = questionRepository.findById(id);
@@ -201,12 +254,18 @@ public class QuestionService {
             Question question = questionOpt.get();
             String imageUrl = question.getQuestionImageUrl();
             
-            // Delete the image file if it exists
-            if (imageUrl != null && !imageUrl.isEmpty()) {
+            // Delete the image file if it exists (only if it's a dedicated question image, not shared)
+            if (imageUrl != null && !imageUrl.isEmpty() && imageUrl.contains("/q_" + id + ".")) {
                 deleteImageFile(imageUrl);
             }
         }
         
+        // Clean up child/referencing records to avoid foreign key constraint violations
+        practiceSessionDetailRepository.deleteByQuestion_QuestionId(id);
+        flaggedQuestionRepository.deleteByQuestion_QuestionId(id);
+        testDetailRepository.deleteByQuestion_QuestionId(id);
+        teacherTestQuestionRepository.deleteByQuestion_QuestionId(id);
+
         // Delete the question from database
         questionRepository.deleteById(id);
     }
@@ -595,6 +654,64 @@ public class QuestionService {
      */
     public List<Question> getAllCustomQuestions() {
         return questionRepository.findByIsCustom(true);
+    }
+
+    /**
+     * Returns up to {@code limit} questions that are "similar" to the given source question.
+     *
+     * Similarity is determined by:
+     *  1. Same chapter
+     *  2. Same difficulty level
+     *  3. At least one overlapping tag (comma-separated tags field)
+     *  4. Excludes questions the student has already answered correctly
+     *
+     * Falls back to sectionId match if the source question has no tags.
+     */
+    public List<QuestionWithFlagDTO> getSimilarQuestions(Long sourceQuestionId, Long studentId, int limit) {
+        Question source = questionRepository.findById(sourceQuestionId)
+                .orElseThrow(() -> new RuntimeException("Question not found: " + sourceQuestionId));
+
+        String chapterId      = source.getChapter().getChapterId();
+        String difficultyLevel = source.getDifficultyLevel() != null ? source.getDifficultyLevel() : "";
+
+        // Parse up to 3 tags from the source question for the query
+        String[] tagArray = parseTags(source.getTags());
+
+        List<Question> similar;
+        if (tagArray[0].isBlank() && tagArray[1].isBlank() && tagArray[2].isBlank()) {
+            // No tags — fall back: same section, same chapter, same difficulty
+            String sectionId = source.getSectionId() != null ? source.getSectionId() : "";
+            similar = questionRepository.findSimilarQuestions(
+                    chapterId, sourceQuestionId, difficultyLevel, studentId,
+                    sectionId, sectionId, sectionId, limit);
+        } else {
+            similar = questionRepository.findSimilarQuestions(
+                    chapterId, sourceQuestionId, difficultyLevel, studentId,
+                    tagArray[0], tagArray[1], tagArray[2], limit);
+        }
+
+        Set<Long> flaggedIds = flaggedQuestionRepository
+                .findByStudent_StudentId(studentId)
+                .stream()
+                .map(fq -> fq.getQuestion().getQuestionId())
+                .collect(Collectors.toSet());
+
+        return similar.stream()
+                .map(q -> new QuestionWithFlagDTO(q, flaggedIds.contains(q.getQuestionId())))
+                .collect(Collectors.toList());
+    }
+
+    /** Splits a comma-separated tags string into exactly 3 slots (empty string for missing slots). */
+    private String[] parseTags(String tags) {
+        String[] result = {"", "", ""};
+        if (tags == null || tags.isBlank()) {
+            return result;
+        }
+        String[] parts = tags.split(",");
+        for (int i = 0; i < Math.min(parts.length, 3); i++) {
+            result[i] = parts[i].trim();
+        }
+        return result;
     }
 
     private void applyCreatedByRule(Question question) {

@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/feedback")
-@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:5173" }, allowCredentials = "true")
 @RequiredArgsConstructor
 @Tag(name = "Feedback", description = "Contact form and feedback submission API")
 public class FeedbackController {

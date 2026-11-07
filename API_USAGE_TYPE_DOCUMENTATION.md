@@ -405,23 +405,25 @@ When uploading questions via Excel, the columns should be in this order:
 
 | Column | Field | Example |
 |--------|-------|---------|
-| 0 | chapterId | LC5H0102 |
-| 1 | questionText | What is 2 + 2? |
-| 2 | correctAnswer | B |
-| 3 | optionA | 3 |
-| 4 | optionB | 4 |
-| 5 | optionC | 5 |
-| 6 | optionD | 6 |
-| 7 | optionE | (optional) |
-| 8 | optionF | (optional) |
-| 9 | explanation | Basic addition |
-| 10 | difficultyLevel | Basic |
-| 11 | questionType | 1 |
-| 12 | correctAnswers | (for multi-select) |
-| 13 | notes | Additional notes |
-| 14 | **usageType** | **Practice / Test / Both** |
+| 0 (A) | chapterId | LC5H0102 |
+| 1 (B) | **sectionId** | LC5H0101-S1 (optional) |
+| 2 (C) | questionText | What is 2 + 2? |
+| 3 (D) | correctAnswer | B |
+| 4 (E) | optionA | 3 |
+| 5 (F) | optionB | 4 |
+| 6 (G) | optionC | 5 |
+| 7 (H) | optionD | 6 |
+| 8 (I) | optionE | (optional) |
+| 9 (J) | optionF | (optional) |
+| 10 (K) | explanation | Basic addition |
+| 11 (L) | difficultyLevel | Basic |
+| 12 (M) | questionType | 1 |
+| 13 (N) | correctAnswers | (for multi-select) |
+| 14 (O) | notes | Additional notes |
+| 15 (P) | **usageType** | **Practice / Test / Both** |
+| 16 (Q) | **questionSet** | 1 / 2 / 3 ... (defaults to 1) |
 
-**Note:** If usageType is not provided in Excel, it defaults to "Both"
+**Note:** If usageType is not provided in Excel, it defaults to "Both". If questionSet is not provided, it defaults to "1".
 
 ---
 

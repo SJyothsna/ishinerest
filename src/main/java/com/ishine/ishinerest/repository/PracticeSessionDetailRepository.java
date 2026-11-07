@@ -62,6 +62,8 @@ public interface PracticeSessionDetailRepository extends JpaRepository<PracticeS
 
     Optional<PracticeSessionDetail> findByStudentIdAndQuestionId(Long studentId, Long questionId);
 
+    void deleteByQuestion_QuestionId(Long questionId);
+
     // Delete practice session details by student and chapter
     @Modifying
     @Transactional
@@ -221,5 +223,60 @@ public interface PracticeSessionDetailRepository extends JpaRepository<PracticeS
     List<Object[]> getSubjectProgressBySet(@Param("studentId") Long studentId,
                                           @Param("subjectId") String subjectId,
                                           @Param("questionSet") String questionSet);
+
+    // -------------------------------------------------------------------------
+    // Home summary queries
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns each distinct calendar date (UTC) on which the student practised,
+     * ordered newest first. Used to compute the current streak.
+     */
+    @Query(value = """
+            SELECT DISTINCT CAST(psd.attempted_at AS DATE)
+            FROM practice_session_details psd
+            WHERE psd.student_id = :studentId
+              AND psd.attempted_at IS NOT NULL
+            ORDER BY 1 DESC
+            """, nativeQuery = true)
+    List<Object> findDistinctPracticeDatesByStudent(@Param("studentId") Long studentId);
+
+    /**
+     * Returns up to {@code limit} chapters the student has practised, ordered by
+     * the most recent attempt, together with the chapter name and subject name.
+     * Result columns: chapter_id, chapter_name, subject_name, last_practiced (datetime), questions_answered (count)
+     */
+    @Query(value = """
+            SELECT
+                c.chapter_id,
+                c.chapter_name,
+                s.subject_name,
+                MAX(psd.attempted_at)   AS last_practiced,
+                COUNT(psd.session_detail_id) AS questions_answered
+            FROM practice_session_details psd
+            JOIN questions   q ON psd.question_id  = q.question_id
+            JOIN chapters    c ON q.chapter_id     = c.chapter_id
+            JOIN subjects    s ON c.subject_id     = s.subject_id
+            WHERE psd.student_id = :studentId
+            GROUP BY c.chapter_id, c.chapter_name, s.subject_name
+            ORDER BY last_practiced DESC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<Object[]> findRecentChapterActivity(@Param("studentId") Long studentId,
+                                             @Param("limit") int limit);
+
+    /**
+     * Returns the chapter_id of the most recently practised chapter for the student.
+     * Used as the anchor to find the "next" chapter in the same subject.
+     */
+    @Query(value = """
+            SELECT q.chapter_id
+            FROM practice_session_details psd
+            JOIN questions q ON psd.question_id = q.question_id
+            WHERE psd.student_id = :studentId
+            ORDER BY psd.attempted_at DESC
+            LIMIT 1
+            """, nativeQuery = true)
+    String findLastPracticedChapterId(@Param("studentId") Long studentId);
 
 }

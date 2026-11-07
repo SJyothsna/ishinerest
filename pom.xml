@@ -89,6 +89,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<!-- OpenAI Java SDK — kept for future use; not the active AI provider (Gemini is).
+		     Uncomment if switching back to OpenAI.
+		<dependency>
+			<groupId>com.openai</groupId>
+			<artifactId>openai-java</artifactId>
+			<version>0.8.0</version>
+		</dependency>
+		-->
 	</dependencies>
 	<build>
 		<plugins>

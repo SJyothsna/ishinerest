@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "questions")
 public class Question {
@@ -60,9 +62,13 @@ public class Question {
 
     @Column
     private String tags;
-    // section number in chapter
+    // section number in chapter — FK into the sections table (just the ID stored on questions)
     @Column
     private String sectionId;
+
+    /** Populated at query time — not persisted. Holds the human-readable name for sectionId. */
+    @Transient
+    private String sectionName;
 
     @Column
     private String usageType; // Possible values: "Practice", "Test", "Both"
@@ -72,6 +78,12 @@ public class Question {
 
     @Column(length = 20)
     private String questionSet = "1"; // Question set number (1, 2, 3, etc.) for progressive practice
+
+    @Column(name = "question_family_id", length = 100)
+    private String questionFamilyId; // Groups questions following the same problem-solving pattern
+
+    @Column(name = "question_style", length = 30)
+    private String questionStyle; // DIRECT, APPLICATION, WORD_PROBLEM, REASONING
 
     // NEW: Creator tracking
     @ManyToOne(fetch = FetchType.LAZY)

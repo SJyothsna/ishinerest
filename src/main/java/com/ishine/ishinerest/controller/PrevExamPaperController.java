@@ -3,6 +3,7 @@ package com.ishine.ishinerest.controller;
 import com.ishine.ishinerest.entity.PrevExamPaper;
 import com.ishine.ishinerest.pojo.PrevExamPaperResponse;
 import com.ishine.ishinerest.service.PrevExamPaperService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/prevexam-papers")
+@Tag(name = "Previous Exam Papers", description = "Previous exam paper management and Excel upload")
 public class PrevExamPaperController {
 
     private final PrevExamPaperService paperService;

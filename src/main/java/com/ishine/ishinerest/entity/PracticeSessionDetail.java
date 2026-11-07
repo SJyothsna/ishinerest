@@ -6,6 +6,7 @@ import com.ishine.ishinerest.util.StudentAnswerDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -42,6 +43,16 @@ public class PracticeSessionDetail {
 
     @Column(nullable = false)
     private Integer attemptCount = 1; // Default 1 for new attempts
+
+    @Column(name = "attempted_at", nullable = true)
+    private LocalDateTime attemptedAt;
+
+    @PrePersist
+    @PreUpdate
+    private void setTimestamp() {
+        // Always set on every insert and re-attempt
+        attemptedAt = LocalDateTime.now();
+    }
 
     // Transient fields to accept subjectId and chapterId from JSON payload but not persist them
     @Transient

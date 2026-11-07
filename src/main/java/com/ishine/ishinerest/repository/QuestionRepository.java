@@ -124,4 +124,42 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
             ORDER BY q.sectionId
             """)
     List<String> findDistinctSectionIdsByChapterId(@Param("chapterId") String chapterId);
+
+    /**
+     * Finds questions similar to a source question using tag overlap.
+     * Matches questions in the same chapter and difficulty that share at least one
+     * comma-separated tag with the source. Excludes the source question and any
+     * question the student has already answered correctly.
+     *
+     * H2 does not support FIND_IN_SET, so we use LOCATE / INSTR compatible syntax
+     * that works on both H2 and MySQL: we look for each tag as a substring of the
+     * tags column. This is intentionally loose (good for small tag sets).
+     */
+    @Query(value = """
+            SELECT q.* FROM questions q
+            WHERE q.chapter_id       = :chapterId
+              AND q.question_id     != :sourceQuestionId
+              AND q.difficulty_level = :difficultyLevel
+              AND q.question_id NOT IN (
+                  SELECT psd.question_id
+                  FROM practice_session_details psd
+                  WHERE psd.student_id = :studentId
+                    AND psd.is_correct = true
+              )
+              AND (
+                  LOCATE(:tag1, COALESCE(q.tags,'')) > 0
+                  OR LOCATE(:tag2, COALESCE(q.tags,'')) > 0
+                  OR LOCATE(:tag3, COALESCE(q.tags,'')) > 0
+              )
+            ORDER BY q.question_id ASC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<Question> findSimilarQuestions(@Param("chapterId") String chapterId,
+                                        @Param("sourceQuestionId") Long sourceQuestionId,
+                                        @Param("difficultyLevel") String difficultyLevel,
+                                        @Param("studentId") Long studentId,
+                                        @Param("tag1") String tag1,
+                                        @Param("tag2") String tag2,
+                                        @Param("tag3") String tag3,
+                                        @Param("limit") int limit);
 }

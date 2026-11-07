@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,6 +79,8 @@ public class QuestionController {
             question.setUsageType(questionDetails.getUsageType());
             question.setQuestionImageUrl(questionDetails.getQuestionImageUrl());
             question.setQuestionSet(questionDetails.getQuestionSet());
+            question.setQuestionFamilyId(questionDetails.getQuestionFamilyId());
+            question.setQuestionStyle(questionDetails.getQuestionStyle());
 
             return questionService.saveQuestion(question);
         }
@@ -263,5 +266,23 @@ public class QuestionController {
     @GetMapping("/all-custom")
     public List<Question> getAllCustomQuestions() {
         return questionService.getAllCustomQuestions();
+    }
+
+    /**
+     * Get questions similar to a given question, based on tag overlap and difficulty.
+     * Intended for "Try a similar question" after a wrong answer.
+     * GET /questions/{questionId}/similar?studentId=X&limit=2
+     */
+    @Operation(summary = "Get similar questions",
+               description = "Returns questions with overlapping tags and same difficulty as the source question. " +
+                             "Excludes questions the student has already answered correctly. " +
+                             "Falls back to same sectionId if the source question has no tags.")
+    @GetMapping("/{questionId}/similar")
+    public ResponseEntity<List<QuestionWithFlagDTO>> getSimilarQuestions(
+            @PathVariable Long questionId,
+            @Parameter(description = "Student ID", required = true) @RequestParam Long studentId,
+            @Parameter(description = "Maximum number of similar questions to return", example = "2")
+            @RequestParam(defaultValue = "2") int limit) {
+        return ResponseEntity.ok(questionService.getSimilarQuestions(questionId, studentId, limit));
     }
 }

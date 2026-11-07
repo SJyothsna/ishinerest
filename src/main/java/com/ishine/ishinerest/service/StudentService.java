@@ -1,10 +1,13 @@
 package com.ishine.ishinerest.service;
 
+import com.ishine.ishinerest.entity.Chapter;
 import com.ishine.ishinerest.entity.Student;
 import com.ishine.ishinerest.entity.StudentSubject;
 import com.ishine.ishinerest.entity.SubjectEntity;
+import com.ishine.ishinerest.pojo.StudentHomeSummaryDTO;
 import com.ishine.ishinerest.pojo.StudentPracticeProgressDTO;
 import com.ishine.ishinerest.pojo.StudentSelectedSubjectDTO;
+import com.ishine.ishinerest.repository.ChapterRepository;
 import com.ishine.ishinerest.repository.PracticeSessionDetailRepository;
 import com.ishine.ishinerest.repository.StudentRepository;
 import com.ishine.ishinerest.repository.TestDetailRepository;
@@ -18,6 +21,7 @@ import com.ishine.ishinerest.repository.ClassRepository;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +43,8 @@ public class StudentService {
     private ClassRepository classRepository;
     @Autowired
     private TestDetailRepository testDetailRepository;
+    @Autowired
+    private ChapterRepository chapterRepository;
 
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
@@ -284,6 +290,101 @@ public class StudentService {
     public void replaceStudentSubjects(Long studentId, List<String> subjectIds) {
         studentSubjectRepository.deleteByStudentId(studentId);
         saveStudentSubjects(studentId, subjectIds); // reuse your existing saver
+    }
+
+    // -------------------------------------------------------------------------
+    // Home summary
+    // -------------------------------------------------------------------------
+
+    public StudentHomeSummaryDTO getHomeSummary(Long studentId) {
+        studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Student not found with ID: " + studentId));
+
+        int streak = computeStreak(studentId);
+        List<StudentHomeSummaryDTO.RecentActivityItem> recentActivity = buildRecentActivity(studentId);
+        StudentHomeSummaryDTO.RecommendedChapter recommended = buildRecommendedNext(studentId);
+
+        return new StudentHomeSummaryDTO(streak, recentActivity, recommended);
+    }
+
+    /**
+     * Counts consecutive calendar days (including today or ending yesterday)
+     * on which the student has at least one practice record.
+     *
+     * The native query returns java.sql.Date objects (not LocalDate) so we convert
+     * each element explicitly and skip nulls.
+     */
+    private int computeStreak(Long studentId) {
+        List<Object> raw = practiceSessionDetailRepository.findDistinctPracticeDatesByStudent(studentId);
+
+        List<LocalDate> dates = raw.stream()
+                .filter(o -> o != null)
+                .map(o -> {
+                    if (o instanceof java.sql.Date d) return d.toLocalDate();
+                    if (o instanceof LocalDate ld) return ld;
+                    // H2 may return a string like "2025-06-10"
+                    return LocalDate.parse(o.toString());
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        if (dates.isEmpty()) {
+            return 0;
+        }
+
+        LocalDate cursor = LocalDate.now();
+        // If the student hasn't practised today yet, allow the streak to start from yesterday
+        if (!dates.contains(cursor)) {
+            cursor = cursor.minusDays(1);
+        }
+
+        int streak = 0;
+        for (LocalDate date : dates) {
+            if (date.equals(cursor)) {
+                streak++;
+                cursor = cursor.minusDays(1);
+            } else if (date.isBefore(cursor)) {
+                // Gap found — stop counting
+                break;
+            }
+        }
+        return streak;
+    }
+
+    /**
+     * Builds up to 3 most recently practised chapters for the recent-activity feed.
+     */
+    private List<StudentHomeSummaryDTO.RecentActivityItem> buildRecentActivity(Long studentId) {
+        List<Object[]> rows = practiceSessionDetailRepository.findRecentChapterActivity(studentId, 3);
+        List<StudentHomeSummaryDTO.RecentActivityItem> items = new ArrayList<>();
+        for (Object[] row : rows) {
+            String chapterId       = (String) row[0];
+            String chapterName     = (String) row[1];
+            String subjectName     = (String) row[2];
+            LocalDateTime lastPracticed = row[3] instanceof LocalDateTime ldt ? ldt
+                    : row[3] != null ? ((java.sql.Timestamp) row[3]).toLocalDateTime() : null;
+            long questionsAnswered = row[4] != null ? ((Number) row[4]).longValue() : 0L;
+            items.add(new StudentHomeSummaryDTO.RecentActivityItem(
+                    chapterId, chapterName, subjectName, lastPracticed, questionsAnswered));
+        }
+        return items;
+    }
+
+    /**
+     * Finds the chapter that follows the student's last practised chapter
+     * in the same subject. Returns null when no next chapter exists.
+     */
+    private StudentHomeSummaryDTO.RecommendedChapter buildRecommendedNext(Long studentId) {
+        String lastChapterId = practiceSessionDetailRepository.findLastPracticedChapterId(studentId);
+        if (lastChapterId == null) {
+            return null;
+        }
+        Optional<Chapter> next = chapterRepository.findNextChapterInSubject(lastChapterId);
+        return next.map(c -> new StudentHomeSummaryDTO.RecommendedChapter(
+                c.getChapterId(),
+                c.getChapterName(),
+                c.getSubject() != null ? c.getSubject().getSubjectName() : null
+        )).orElse(null);
     }
 
 }

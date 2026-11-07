@@ -1,5 +1,6 @@
 package com.ishine.ishinerest.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
+@Tag(name = "Question Images", description = "Image upload and management for questions")
 @RequestMapping("/question-images")
 public class QuestionImageController {
 
@@ -26,7 +28,7 @@ public class QuestionImageController {
     public ResponseEntity<?> uploadQuestionImage(
             @RequestParam("file") MultipartFile file,
             @RequestParam("chapterId") String chapterId,
-            @RequestParam("questionId") Long questionId) {
+            @RequestParam(value = "questionId", required = false) Long questionId) {
         
         try {
             if (file.isEmpty()) {
@@ -46,13 +48,15 @@ public class QuestionImageController {
                 directory.mkdirs();
             }
 
-            // Generate filename using question ID: q_{questionId}.{ext}
+            // Generate filename: q_{questionId}.{ext} if questionId present, else shared_{uuid}.{ext}
             String originalFilename = file.getOriginalFilename();
             String fileExtension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
-            String filename = "q_" + questionId + fileExtension;
+            String filename = (questionId != null)
+                    ? "q_" + questionId + fileExtension
+                    : "shared_" + UUID.randomUUID().toString().substring(0, 8) + fileExtension;
 
             // Save file
             Path filePath = Paths.get(directoryPath, filename);

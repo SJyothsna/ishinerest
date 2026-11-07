@@ -5,6 +5,7 @@ import com.ishine.ishinerest.service.TestAssignmentService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +17,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/students/{studentUserId}/assigned-tests")
+@Tag(name = "Test Assignments", description = "Student assigned tests — start, complete and view results")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
 public class TestAssignmentController {
 
     private final TestAssignmentService testAssignmentService;

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>iShine REST API — Recent Changes</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.6; background: #ffffff; color: #1f2328; padding: 32px 20px; }
+  .page { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: #57606a; font-size: 13px; margin-bottom: 28px; }
+  h2 { font-size: 15px; font-weight: 700; margin: 28px 0 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; }
+  h3 { font-size: 13px; font-weight: 600; margin: 16px 0 6px; color: #3b82d4; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }
+  th { background: #f7f8fa; text-align: left; padding: 7px 10px; font-weight: 600; border: 1px solid #e5e7eb; }
+  td { padding: 6px 10px; border: 1px solid #e5e7eb; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+  .get    { background: #dbeafe; color: #1d4ed8; }
+  .post   { background: #dcfce7; color: #166534; }
+  .put    { background: #fef9c3; color: #854d0e; }
+  .delete { background: #fee2e2; color: #991b1b; }
+  .new    { background: #ede9fe; color: #6d28d9; font-size: 10px; }
+  code { font-family: "SFMono-Regular", Consolas, monospace; background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  .note { font-size: 12px; color: #57606a; background: #f7f8fa; border-left: 3px solid #3b82d4; padding: 8px 12px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+  .warn { border-left-color: #f59e0b; }
+  .section-tag { font-size: 10px; font-weight: 600; color: #57606a; background: #f1f5f9; border-radius: 3px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #57606a; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>iShine REST API — Recent Changes</h1>
+<p class="subtitle">Frontend integration reference · Base URL: <code>http://localhost:8080</code> · CORS: <code>localhost:3000</code>, <code>localhost:5173</code></p>
+
+<!-- NEW: SECTIONS -->
+<h2>🆕 New Feature: Sections <span class="section-tag">NEW</span></h2>
+<p class="note">A new <strong>Sections</strong> layer has been added between Chapter and Question. Questions now carry a <code>sectionId</code> and a transient <code>sectionName</code> field. Sections are ordered within a chapter via <code>displayOrder</code>.</p>
+
+<h3>Section Model</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td><code>sectionId</code></td><td>String</td><td>Manually assigned ID</td></tr>
+  <tr><td><code>sectionName</code></td><td>String</td><td>Required</td></tr>
+  <tr><td><code>displayOrder</code></td><td>Integer</td><td>Default 0 — use for ordering</td></tr>
+  <tr><td><code>chapter</code></td><td>Object</td><td>Nested chapter (without subject)</td></tr>
+</table>
+
+<h3>Section Endpoints — <code>/sections</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/sections</code></td><td>Get all sections</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/sections/{sectionId}</code></td><td>Get a section by ID</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/sections/chapter/{chapterId}</code></td><td>Get all sections for a chapter</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/sections</code></td><td>Create a section</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/sections/bulk</code></td><td>Create multiple sections at once</td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/sections/{sectionId}</code></td><td>Update a section</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/sections/{sectionId}</code></td><td>Delete a section</td></tr>
+</table>
+
+<!-- UPDATED: QUESTIONS -->
+<h2>Updated: Questions</h2>
+<p class="note">The <code>Question</code> model has several new fields. Front-end forms and display components should be updated to handle them.</p>
+<table>
+  <tr><th>New Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td><code>sectionId</code></td><td>String</td><td>FK to <code>sections.sectionId</code> (persisted)</td></tr>
+  <tr><td><code>sectionName</code></td><td>String</td><td>Human-readable section name — <strong>transient, not persisted</strong>, populated at query time</td></tr>
+  <tr><td><code>hint</code></td><td>String (TEXT)</td><td>Optional hint text for the question</td></tr>
+  <tr><td><code>optionE</code> / <code>optionF</code></td><td>String</td><td>MCQ now supports up to 6 options (A–F)</td></tr>
+  <tr><td><code>correctAnswers</code></td><td>String</td><td>Comma-separated for multi-correct questions</td></tr>
+  <tr><td><code>questionSet</code></td><td>String</td><td>Default <code>"1"</code> — progressive difficulty band</td></tr>
+  <tr><td><code>questionImageUrl</code></td><td>String</td><td>Optional image URL</td></tr>
+  <tr><td><code>isCustom</code></td><td>Boolean</td><td>Default <code>false</code></td></tr>
+  <tr><td><code>visibility</code></td><td>String</td><td><code>PUBLIC</code> / <code>PRIVATE</code> / <code>SHARED</code></td></tr>
+  <tr><td><code>createdBy</code></td><td>User object</td><td>Lazy-loaded creator reference</td></tr>
+  <tr><td><code>usageType</code></td><td>String</td><td><code>Practice</code> / <code>Test</code> / <code>Both</code></td></tr>
+</table>
+
+<!-- NEW: USERS -->
+<h2>🆕 New Feature: User Management <span class="section-tag">NEW</span></h2>
+<p class="note">A full User CRUD + lifecycle controller is now available at <code>/users</code>. The <code>UserDTO</code> is returned for all user reads (not the raw entity).</p>
+
+<h3>User Endpoints — <code>/users</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users</code></td><td>All users. Optional <code>?role=STUDENT|TEACHER|PARENT|ADMIN</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/{userId}</code></td><td>Get user by ID</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/email/{email}</code></td><td>Get user by email</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/active</code></td><td>All active users</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/role/{role}</code></td><td>Users by role</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/role/{role}/active</code></td><td>Active users by role</td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/users/{userId}/profile</code></td><td>Update name + email. Body: <code>{ name, email }</code></td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/users/{userId}/password</code></td><td>Change password. Body: <code>{ currentPassword, newPassword }</code> → 204</td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/users/{userId}/deactivate</code></td><td>Deactivate account → 204</td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/users/{userId}/activate</code></td><td>Reactivate account → 204</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/users/{userId}/reactivate</code></td><td>Reactivate account → 204 (alt endpoint)</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/users/{userId}</code></td><td>Soft-deactivate user → 204</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/users/{userId}/hard-delete</code></td><td>Permanently delete (inactive users only) → 204</td></tr>
+</table>
+
+<!-- UPDATED: TESTS -->
+<h2>Updated: Tests — URL Pattern Changed</h2>
+<p class="note warn">⚠️ <strong>Breaking change</strong>: Test creation and management endpoints have moved from <code>/teacher-tests</code> to <code>/users/{userId}/tests</code>. This now supports both teachers and parents creating tests.</p>
+
+<h3>Test Management — <code>/users/{userId}/tests</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/users/{userId}/tests</code></td><td>Create a test → 201. Body: <code>CreateTeacherTestRequest</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/{userId}/tests</code></td><td>Get all tests created by user</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/{userId}/tests/{testId}</code></td><td>Get specific test by ID</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/users/{userId}/tests/assign</code></td><td>Assign test to students → 201. Body: <code>AssignTestRequest</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/users/{userId}/tests/{testId}/assignments</code></td><td>Get all assignments for a test</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/users/{userId}/tests/assignments/{assignmentId}</code></td><td>Delete an assignment → 204</td></tr>
+</table>
+
+<h3>Public Test Access — <code>/tests</code></h3>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/tests/{testId}</code></td><td>Get a published test (no auth required)</td></tr>
+</table>
+
+<!-- UPDATED: STUDENT ASSIGNED TESTS -->
+<h2>Updated: Student Assigned Tests</h2>
+<p class="note warn">⚠️ <strong>Breaking change</strong>: Student test interactions now live at <code>/students/{studentUserId}/assigned-tests</code>.</p>
+
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/students/{studentUserId}/assigned-tests</code></td><td>Get all assigned tests for a student</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/students/{studentUserId}/assigned-tests/{assignmentId}</code></td><td>Get a specific assignment</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/students/{studentUserId}/assigned-tests/{assignmentId}/start</code></td><td>Start test → status becomes <code>IN_PROGRESS</code></td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/students/{studentUserId}/assigned-tests/{assignmentId}/complete</code></td><td>Complete test. Body: <code>{ score: 0–100 }</code></td></tr>
+</table>
+
+<!-- UPDATED: TEST DETAILS -->
+<h2>Updated: Test Details — New Endpoints</h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/test-details</code></td><td>All test details</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/test-details/{studentId}</code></td><td>By student ID</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/test-details/student/{studentId}/assignment/{assignmentId}</code></td><td>By student + assignment</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/test-details/wrong-answers/student/{studentId}/assignment/{assignmentId}</code></td><td>Wrong answers with <code>isFlagged</code> for a test assignment</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/test-details/{studentId}</code></td><td>Save test answers. Body: <code>List&lt;TestDetail&gt;</code></td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/test-details/{id}</code></td><td>Delete a test detail record</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/test-details/reset/student/{studentId}</code></td><td>Reset all test progress for student</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/test-details/reset/student/{studentId}/assignment/{assignmentId}</code></td><td>Reset progress for a specific assignment</td></tr>
+</table>
+
+<!-- UPDATED: PARENT CONTROLLER -->
+<h2>Updated: Parent-Student Links</h2>
+<p class="note">Link-by-email is now preferred. The old <code>/students</code> endpoint is kept for backward compatibility.</p>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/parents/{parentUserId}/link-student</code></td><td>Link by student email → 201. Body: <code>{ studentEmail, relationshipType }</code></td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/parents/{parentUserId}/students</code></td><td>Link by student ID (legacy). Body: <code>{ studentUserId }</code></td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/parents/{parentUserId}/students/{studentUserId}</code></td><td>Revoke link → 204</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/parents/{parentUserId}/students</code></td><td>Get linked students (active only) → <code>UserDTO[]</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/parents/{parentUserId}/links</code></td><td>Get all links. Optional: <code>?status=PENDING|ACTIVE|REJECTED|REVOKED</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/parents/students/{studentUserId}/parents</code></td><td>Get parents for a student</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/parents/{parentUserId}/students/{studentUserId}/linked</code></td><td>Check if actively linked → boolean</td></tr>
+</table>
+
+<!-- STUDENT LINK REQUESTS -->
+<h2>🆕 New Feature: Student Link Request Actions <span class="section-tag">NEW</span></h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/students/{studentUserId}/link-requests</code></td><td>Get pending parent link requests for a student</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/students/link-requests/{parentUserId}/approve</code></td><td>Approve a request. Body: <code>{ studentUserId }</code></td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/students/link-requests/{parentUserId}/reject</code></td><td>Reject a request. Body: <code>{ studentUserId }</code> → 204</td></tr>
+</table>
+
+<!-- STUDENT PROFILE / ONBOARDING -->
+<h2>Updated: Students — New Onboarding Endpoints</h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/students/{studentId}/profile</code></td><td>Get student profile for onboarding checks → <code>StudentProfileDTO</code></td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/students/{studentId}/class</code></td><td>Set student class. Query param: <code>?classId=</code> → 204</td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/students/{studentId}/subjects</code></td><td>Replace all subject selections. Body: <code>["subjectId1", ...]</code> → 204</td></tr>
+</table>
+
+<!-- AUTH ADDITIONS -->
+<h2>Updated: Authentication</h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/auth/signup</code></td><td>Register → 201. Body: <code>SignupRequest</code></td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/auth/login</code></td><td>Login → <code>LoginResponse</code> with token</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/auth/forgot-password</code></td><td>Request password reset email. Body: <code>{ email }</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/auth/validate-reset-token?token=</code></td><td>Validate a password reset token</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/auth/reset-password</code></td><td>Reset password. Body: <code>ResetPasswordRequest</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/auth/verify-email?token=</code></td><td>Verify email address</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/auth/resend-verification?email=</code></td><td>Resend verification email</td></tr>
+</table>
+
+<!-- STUDENT NOTES -->
+<h2>Updated: Student Notes — Image Support Added</h2>
+<p class="note">Notes now support an optional <code>imageUrl</code> and <code>color</code> field. Two new endpoints added for image notes and bulk migration from localStorage.</p>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/students/{studentId}/notes</code></td><td>All notes (paginated). Params: <code>limit, offset, sortBy, order</code></td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/students/{studentId}/notes/{chapterId}</code></td><td>Notes for a student + chapter</td></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/students/{studentId}/notes/note/{noteId}</code></td><td>Get single note by ID</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/students/{studentId}/notes</code></td><td>Create note. Body: <code>StudentNote</code> (title + chapterId required)</td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/students/{studentId}/notes/with-image</code></td><td>Create note with image upload (multipart). Fields: <code>image, chapterId, title?, content?, color?</code></td></tr>
+  <tr><td><span class="badge post">POST</span></td><td><code>/students/{studentId}/notes/migrate</code></td><td>Bulk import from localStorage. Body: <code>{ notes: [...] }</code></td></tr>
+  <tr><td><span class="badge put">PUT</span></td><td><code>/students/{studentId}/notes/{noteId}</code></td><td>Update a note</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/students/{studentId}/notes/{noteId}</code></td><td>Delete a note</td></tr>
+</table>
+
+<!-- PRACTICE SESSION -->
+<h2>Updated: Practice Sessions</h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/practice-session-details/wrong-answers/student/{studentId}/chapter/{chapterId}</code></td><td>Wrong answers with <code>isFlagged</code> per chapter</td></tr>
+  <tr><td><span class="badge delete">DELETE</span></td><td><code>/practice-session-details/reset/student/{studentId}/chapter/{chapterId}</code></td><td>Reset chapter practice progress</td></tr>
+</table>
+
+<!-- FLAGGED QUESTIONS -->
+<h2>Updated: Flagged Questions</h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>Description</th></tr>
+  <tr><td><span class="badge get">GET</span></td><td><code>/flagged-questions/student/{studentId}/chapter/{chapterId}/unpracticed</code></td><td>Flagged questions not yet answered correctly</td></tr>
+</table>
+
+<!-- NOTES -->
+<h2>Integration Notes</h2>
+<div class="note">
+  <strong>No auth filter enforced yet:</strong> The token from <code>/auth/login</code> is returned but not validated by a filter on each request. Auth enforcement is planned before production.
+</div>
+<div class="note">
+  <strong>Swagger UI:</strong> All endpoints are also documented at <code>http://localhost:8080/swagger-ui.html</code> — use for live testing when backend is running.
+</div>
+<div class="note warn">
+  <strong>LinkStatus values:</strong> PENDING → ACTIVE / REJECTED / REVOKED
+  <br><strong>TestAssignment status values:</strong> ASSIGNED → IN_PROGRESS → COMPLETED / OVERDUE
+</div>
+
+<footer>Made with IBM Bob</footer>
+</div>
+</body>
+</html>

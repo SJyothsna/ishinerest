@@ -66,6 +66,8 @@ public class ChapterService {
         if (chapterDetails.getSubject() != null) {
             chapter.setSubject(chapterDetails.getSubject());
         }
+        chapter.setSectionName(chapterDetails.getSectionName());
+        chapter.setSectionId(chapterDetails.getSectionId());
 
         return chapterRepository.save(chapter);
     }

@@ -3,6 +3,7 @@ package com.ishine.ishinerest.controller;
 import com.ishine.ishinerest.entity.TestDetail;
 import com.ishine.ishinerest.pojo.QuestionWithFlagDTO;
 import com.ishine.ishinerest.service.TestDetailService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/test-details")
 @RequiredArgsConstructor
+@Tag(name = "Test Details", description = "Student test attempt details and results")
 public class TestDetailController {
 
     private final TestDetailService service;

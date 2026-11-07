@@ -29,6 +29,8 @@ public class QuestionWithFlagDTO {
     private String tags;
     private String sectionId;
     private String questionImageUrl;
+    private String questionFamilyId;
+    private String questionStyle;
     private boolean isFlagged;
 
     // Constructor from Question entity
@@ -54,6 +56,8 @@ public class QuestionWithFlagDTO {
         this.tags = question.getTags();
         this.sectionId = question.getSectionId();
         this.questionImageUrl = question.getQuestionImageUrl();
+        this.questionFamilyId = question.getQuestionFamilyId();
+        this.questionStyle = question.getQuestionStyle();
         this.isFlagged = isFlagged;
     }
 

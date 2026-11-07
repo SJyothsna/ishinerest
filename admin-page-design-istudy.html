@@ -1,0 +1,256 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Page Design</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.6; color: #1f2328; background: #f4f6f9; }
+  .page { max-width: 760px; margin: 0 auto; padding: 32px 24px 48px; }
+  h1 { font-size: 1.4rem; font-weight: 800; color: #1a202c; margin: 0 0 4px; }
+  .subtitle { font-size: 0.82rem; color: #718096; margin-bottom: 32px; }
+  h2 { font-size: 0.95rem; font-weight: 700; color: #2d3748; margin: 32px 0 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+  h3 { font-size: 0.82rem; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 8px; }
+  p { margin: 0 0 12px; color: #4a5568; font-size: 0.875rem; }
+  code { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.78rem; background: #edf2f7; color: #4a5568; padding: 1px 6px; border-radius: 4px; }
+
+  /* Route badge */
+  .route-badge { display: inline-block; background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; border-radius: 6px; padding: 6px 14px; font-size: 0.95rem; font-weight: 700; margin-bottom: 24px; font-family: 'SFMono-Regular', Consolas, monospace; }
+
+  /* File tree */
+  .filetree { background: #1a202c; color: #e2e8f0; border-radius: 8px; padding: 16px 20px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.78rem; line-height: 1.8; margin-bottom: 20px; }
+  .filetree .dir  { color: #90cdf4; }
+  .filetree .file { color: #c6f6d5; }
+  .filetree .note { color: #fbd38d; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.84rem; }
+  thead th { background: #f7fafc; color: #4a5568; font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid #f0f4f8; color: #2d3748; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #f7fafc; }
+
+  /* Controller cards */
+  .controller-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .ctrl-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
+  .ctrl-card-icon { font-size: 1.2rem; margin-bottom: 6px; }
+  .ctrl-card-name { font-weight: 700; font-size: 0.875rem; color: #1a202c; margin-bottom: 4px; }
+  .ctrl-card-desc { font-size: 0.75rem; color: #718096; line-height: 1.5; }
+  .ctrl-card-tabs { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .tab-pill { font-size: 0.68rem; background: #ebf8ff; color: #2b6cb0; border-radius: 20px; padding: 2px 8px; font-weight: 600; }
+
+  /* Feature list */
+  .feature-list { list-style: none; padding: 0; margin: 0 0 20px; }
+  .feature-list li { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f4f8; font-size: 0.875rem; }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list .tag { min-width: 130px; font-weight: 700; color: #2b6cb0; font-size: 0.78rem; }
+  .feature-list .val { color: #4a5568; }
+
+  /* Cascade diagram */
+  .cascade { display: flex; align-items: center; gap: 8px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; font-size: 0.84rem; }
+  .cascade-box { background: #fff; border: 1px solid #bee3f8; border-radius: 6px; padding: 6px 14px; color: #2b6cb0; font-weight: 600; text-align: center; }
+  .cascade-arrow { color: #a0aec0; font-size: 1rem; }
+  .cascade-note { font-size: 0.72rem; color: #718096; margin-top: 4px; text-align: center; }
+
+  /* App.js changes */
+  .code-block { background: #1a202c; color: #e2e8f0; border-radius: 8px; padding: 14px 18px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.78rem; line-height: 1.8; margin-bottom: 20px; overflow-x: auto; }
+  .code-block .add { color: #9ae6b4; }
+  .code-block .dim { color: #718096; }
+
+  /* Footer */
+  .footer { text-align: center; font-size: 0.72rem; color: #a0aec0; border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Admin Page Design</h1>
+  <p class="subtitle">Full specification · ready to implement in <code>ishinerest</code></p>
+
+  <div class="route-badge">http://localhost:3000/admin</div>
+
+  
+  <h2>File Structure</h2>
+  <div class="filetree">
+<span class="dir">src/</span><br />
+  <span class="dir">pages/</span><br />
+    <span class="file">AdminPage.js</span>             <span class="note">← Page shell + sticky sidebar nav</span><br />
+    <span class="file">AdminPage.css</span>           <span class="note">← All scoped admin styles (388 lines)</span><br />
+  <span class="dir">components/admin/</span><br />
+    <span class="file">AdminContentPanel.js</span>   <span class="note">← Dispatches to correct controller</span><br />
+    <span class="file">AdminShared.js</span>         <span class="note">← Reusable primitives (Field, Select, Table…)</span><br />
+    <span class="file">adminApi.js</span>            <span class="note">← Hooks: useClasses, useSubjectsByClass,</span><br />
+                                  <span class="note">useChaptersBySubject, useNoteCategories,</span><br />
+                                  <span class="note">useResourceList, apiPost, apiDelete</span><br />
+    <span class="dir">controllers/</span><br />
+      <span class="file">QuestionsController.js</span><br />
+      <span class="file">ChaptersController.js</span><br />
+      <span class="file">SubjectsController.js</span><br />
+      <span class="file">ClassesController.js</span><br />
+      <span class="file">UsersController.js</span><br />
+      <span class="file">TeachersController.js</span><br />
+      <span class="file">ParentsController.js</span><br />
+      <span class="file">TestsController.js</span><br />
+      <span class="file">NotesController.js</span>
+  </div>
+
+  
+  <h2>Changes needed in App.js</h2>
+  <div class="code-block">
+<span class="dim">// 1. Add import (with other imports)</span><br />
+<span class="add">+ import AdminPage from './pages/AdminPage';</span><br /><br />
+<span class="dim">// 2. Add route (inside &lt;Routes&gt;)</span><br />
+<span class="add">+ &lt;Route path="/admin" element={&lt;AdminPage /&gt;} /&gt;</span>
+  </div>
+
+  
+  <h2>9 Controllers (Sidebar Tabs)</h2>
+  <div class="controller-grid">
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">❓</div>
+      <div class="ctrl-card-name">Questions</div>
+      <div class="ctrl-card-desc">POST /questions/custom · GET /questions</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">+ Create</span>
+        <span class="tab-pill">⊞ List</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">📖</div>
+      <div class="ctrl-card-name">Chapters</div>
+      <div class="ctrl-card-desc">GET /chapters?subjectId</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">⊞ List</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">📚</div>
+      <div class="ctrl-card-name">Subjects</div>
+      <div class="ctrl-card-desc">GET /subjects/class/{classId}</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">⊞ List</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">🏫</div>
+      <div class="ctrl-card-name">Classes</div>
+      <div class="ctrl-card-desc">GET /classes (auto-loads)</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">⊞ List</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">👤</div>
+      <div class="ctrl-card-name">Users / Students</div>
+      <div class="ctrl-card-desc">GET /students/{id}/profile · subjects · tests</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">🔍 Profile</span>
+        <span class="tab-pill">📚 Subjects</span>
+        <span class="tab-pill">📝 Tests</span>
+        <span class="tab-pill">🔗 Requests</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">🧑‍🏫</div>
+      <div class="ctrl-card-name">Teachers</div>
+      <div class="ctrl-card-desc">POST /teachers/{id}/students/add-or-link · GET students/subjects/tests</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">+ Add Student</span>
+        <span class="tab-pill">⊞ Students</span>
+        <span class="tab-pill">⊞ Subjects</span>
+        <span class="tab-pill">⊞ Tests</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">👨‍👩‍👧</div>
+      <div class="ctrl-card-name">Parents</div>
+      <div class="ctrl-card-desc">POST /parents/{id}/link-student · GET students · links?status</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">+ Link Student</span>
+        <span class="tab-pill">⊞ Linked</span>
+        <span class="tab-pill">⊞ All Links</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">📝</div>
+      <div class="ctrl-card-name">Tests</div>
+      <div class="ctrl-card-desc">POST /users/{id}/tests · assign · GET list · detail</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">+ Create</span>
+        <span class="tab-pill">⊞ List</span>
+        <span class="tab-pill">→ Assign</span>
+        <span class="tab-pill">🔍 Detail</span>
+      </div>
+    </div>
+    <div class="ctrl-card">
+      <div class="ctrl-card-icon">🗒️</div>
+      <div class="ctrl-card-name">Common Notes</div>
+      <div class="ctrl-card-desc">POST /common-notes · GET /common-notes/chapter/{id}</div>
+      <div class="ctrl-card-tabs">
+        <span class="tab-pill">+ Create</span>
+        <span class="tab-pill">⊞ List</span>
+      </div>
+    </div>
+  </div>
+
+  
+  <h2>Smart Linked Dropdown Logic</h2>
+  <p>Wherever a foreign-key ID is needed (chapterId, subjectId etc.), the form shows a human-readable name loaded from the API. The ID is sent to the backend silently.</p>
+  <div class="cascade">
+    <div>
+      <div class="cascade-box">Class</div>
+      <div class="cascade-note">GET /classes</div>
+    </div>
+    <div class="cascade-arrow">→</div>
+    <div>
+      <div class="cascade-box">Subject</div>
+      <div class="cascade-note">GET /subjects/class/{classId}</div>
+    </div>
+    <div class="cascade-arrow">→</div>
+    <div>
+      <div class="cascade-box">Chapter</div>
+      <div class="cascade-note">GET /chapters?subjectId</div>
+    </div>
+    <div class="cascade-arrow">→</div>
+    <div>
+      <div class="cascade-box">Backend ID</div>
+      <div class="cascade-note">sent in POST body</div>
+    </div>
+  </div>
+  <p>This cascade is used in: <strong>Questions · Notes</strong> (create &amp; list filter). Subjects, Chapters, Classes use partial cascades for their list filters.</p>
+
+  
+  <h2>UI / Design Features</h2>
+  <ul class="feature-list">
+    <li><span class="tag">Sidebar Nav</span><span class="val">Sticky left column, 220px wide, active state with blue left-bar indicator, grouped under "Controllers" heading</span></li>
+    <li><span class="tag">Sub-tabs</span><span class="val">Every controller has Create and List sub-tabs (some have more e.g. Assign, Detail)</span></li>
+    <li><span class="tag">Filter Bar</span><span class="val">Query-param inputs above every list view; Fetch button triggers the request on demand</span></li>
+    <li><span class="tag">Resource Table</span><span class="val">Compact thead, ID badges in monospace code style, text truncation with full tooltip on hover</span></li>
+    <li><span class="tag">Inline Alerts</span><span class="val">Success (green) / error (red) / info (blue) alerts with × dismiss button, auto-clear on success</span></li>
+    <li><span class="tag">Spinners</span><span class="val">CSS-only spinner on all async operations — no library dependency</span></li>
+    <li><span class="tag">Form Grid</span><span class="val">2-col and 3-col CSS grid layouts, collapses to 1-col on mobile</span></li>
+    <li><span class="tag">Zero hard-coded IDs</span><span class="val">All reference data loaded live from backend; dropdowns disabled until parent is selected</span></li>
+    <li><span class="tag">Role guard</span><span class="val">Page redirects to / if userRole is not ADMIN or TEACHER</span></li>
+  </ul>
+
+  
+  <h2>adminApi.js — Exported Hooks &amp; Functions</h2>
+  <table>
+    <thead><tr><th>Export</th><th>Endpoint</th><th>Used by</th></tr></thead>
+    <tbody>
+      <tr><td><code>useClasses()</code></td><td>GET /classes</td><td>All controllers with class dropdown</td></tr>
+      <tr><td><code>useSubjectsByClass(classId)</code></td><td>GET /subjects/class/{id}</td><td>Questions, Chapters, Notes</td></tr>
+      <tr><td><code>useChaptersBySubject(subjectId)</code></td><td>GET /chapters?subjectId</td><td>Questions, Notes</td></tr>
+      <tr><td><code>useSectionsByChapter(chapterId)</code></td><td>GET /sections/chapters/{id}</td><td>Available for future use</td></tr>
+      <tr><td><code>useNoteCategories()</code></td><td>GET /common-notes/categories</td><td>Notes controller</td></tr>
+      <tr><td><code>useResourceList(url)</code></td><td>Any GET url</td><td>All list views</td></tr>
+      <tr><td><code>apiPost(path, body)</code></td><td>Any POST url</td><td>All create/assign forms</td></tr>
+      <tr><td><code>apiDelete(path)</code></td><td>Any DELETE url</td><td>Available for future use</td></tr>
+    </tbody>
+  </table>
+
+  <div class="footer">Made with IBM Bob</div>
+</div>
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.ishine.ishinerest.controller;
 
 import com.ishine.ishinerest.pojo.ParentStudentLinkDTO;
 import com.ishine.ishinerest.service.ParentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,8 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/students")
+@Tag(name = "Student Link Requests", description = "Student approval and rejection of parent link requests")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
 public class StudentLinkController {
     
     private final ParentService parentService;

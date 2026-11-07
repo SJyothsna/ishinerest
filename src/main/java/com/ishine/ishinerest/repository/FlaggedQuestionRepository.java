@@ -26,6 +26,8 @@ public interface FlaggedQuestionRepository extends JpaRepository<FlaggedQuestion
 
     // Delete a specific flagged question
     void deleteByStudent_StudentIdAndQuestion_QuestionId(Long studentId, Long questionId);
+
+    void deleteByQuestion_QuestionId(Long questionId);
 }
 
 // Made with Bob

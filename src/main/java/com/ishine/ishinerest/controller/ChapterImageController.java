@@ -2,6 +2,7 @@ package com.ishine.ishinerest.controller;
 
 import com.ishine.ishinerest.pojo.ChapterImageDTO;
 import com.ishine.ishinerest.service.ChapterImageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/chapters")
-@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:5173" }, allowCredentials = "true")
+@Tag(name = "Chapter Images", description = "Image management for chapters")
 public class ChapterImageController {
 
     @Autowired

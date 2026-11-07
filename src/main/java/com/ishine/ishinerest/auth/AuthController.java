@@ -6,6 +6,7 @@ import com.ishine.ishinerest.auth.dto.LoginResponse;
 import com.ishine.ishinerest.auth.dto.ResetPasswordRequest;
 import com.ishine.ishinerest.auth.dto.SignupRequest;
 import com.ishine.ishinerest.auth.dto.SignupResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000","http://localhost:5173"}, allowCredentials = "true")
+@Tag(name = "Authentication", description = "User registration, login, email verification and password reset")
 public class AuthController {
 
     private final AuthService authService;

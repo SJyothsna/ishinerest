@@ -24,6 +24,8 @@ public interface TestDetailRepository extends JpaRepository<TestDetail, Long> {
 
     void deleteByStudentIdAndAssignmentId(Long studentId, Long assignmentId);
 
+    void deleteByQuestion_QuestionId(Long questionId);
+
     @Query("""
             SELECT td.questionId
             FROM TestDetail td

@@ -3,6 +3,7 @@ package com.ishine.ishinerest.controller;
 import com.ishine.ishinerest.entity.ExamQuestion;
 import com.ishine.ishinerest.entity.SubjectEntity;
 import com.ishine.ishinerest.service.SubjectService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/subjects")
+@Tag(name = "Subjects", description = "Subject management within classes")
 public class SubjectController {
 
     @Autowired

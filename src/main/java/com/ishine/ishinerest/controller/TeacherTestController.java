@@ -6,6 +6,7 @@ import com.ishine.ishinerest.pojo.TeacherTestResponseDTO;
 import com.ishine.ishinerest.pojo.TestAssignmentDTO;
 import com.ishine.ishinerest.service.TeacherTestService;
 import com.ishine.ishinerest.service.TestAssignmentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{userId}/tests")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
+@Tag(name = "Tests", description = "Test creation and assignment by teachers and parents")
 public class TeacherTestController {
 
     private final TeacherTestService teacherTestService;

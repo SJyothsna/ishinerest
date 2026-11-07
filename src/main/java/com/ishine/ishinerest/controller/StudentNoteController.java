@@ -3,6 +3,7 @@ package com.ishine.ishinerest.controller;
 import com.ishine.ishinerest.entity.StudentNote;
 import com.ishine.ishinerest.service.ChapterImageService;
 import com.ishine.ishinerest.service.StudentNoteService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/students")
-@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:5173" }, allowCredentials = "true")
+@Tag(name = "Student Notes", description = "Student personal notes per chapter")
 public class StudentNoteController {
 
     @Autowired
