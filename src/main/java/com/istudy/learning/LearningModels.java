@@ -15,8 +15,17 @@ public final class LearningModels {
     @NotBlank String scope,
     @NotBlank String difficulty,
     @Min(1) @Max(100) int questionCount,
-    @Min(60) @Max(10800) Integer timerSeconds
-  ) {}
+    @Min(60) @Max(10800) Integer timerSeconds,
+    UUID objectiveId
+  ) {
+    public CreateSession(
+      UUID offeringId, UUID chapterId, List<UUID> sectionIds, String kind,
+      String mode, String scope, String difficulty, int questionCount, Integer timerSeconds
+    ) {
+      this(offeringId, chapterId, sectionIds, kind, mode, scope, difficulty,
+        questionCount, timerSeconds, null);
+    }
+  }
 
   public record Answer(
     @NotNull UUID sessionQuestionId,
@@ -50,10 +59,23 @@ public final class LearningModels {
     int attempts,
     int correct,
     boolean flagged,
-    Boolean lastCorrect,
     int questionSet,
-    boolean seen
-  ) {}
+    boolean seen,
+    boolean familySeen,
+    UUID objectiveId,
+    String familyCode,
+    String difficulty
+  ) {
+    UUID coverageKey() {
+      return objectiveId == null ? sectionId : objectiveId;
+    }
+
+    String familyKey() {
+      return objectiveId == null || familyCode == null
+        ? questionId.toString()
+        : objectiveId + "/" + familyCode;
+    }
+  }
 
   private LearningModels() {}
 }

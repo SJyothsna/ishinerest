@@ -1,0 +1,43 @@
+{
+  "chapterCode": "LCM07",
+  "topics": [
+    {
+      "code": "LCM07.S01",
+      "objectives": [
+        {"code":"fixed-fee-model","title":"Solve a fixed fee plus a per-item charge","familyCode":"fixed-fee-and-unit-rate"},
+        {"code":"brackets","title":"Solve linear equations involving brackets"},
+        {"code":"both-sides","title":"Solve linear equations with a variable on both sides"},
+        {"code":"fractional-coefficients","title":"Solve linear equations involving fractional coefficients"},
+        {"code":"cancellation","title":"Identify no solution or infinitely many solutions after cancellation"}
+      ]
+    },
+    {
+      "code":"LCM07.S02",
+      "objectives":[
+        {"code":"solve-two-variable","title":"Solve two linear equations in two variables","familyCode":"fixed-coefficient-elimination"},
+        {"code":"dependent-and-inconsistent","title":"Recognise dependent or inconsistent pairs of linear equations"}
+      ]
+    },
+    {
+      "code":"LCM07.S03",
+      "objectives":[
+        {"code":"intersection-algebra","title":"Calculate the intersection of two lines from their equations","familyCode":"slope-intercept-intersection"},
+        {"code":"read-intersection","title":"Identify the solution to a linear system on a graph"}
+      ]
+    },
+    {
+      "code":"LCM07.S04",
+      "objectives":[
+        {"code":"linear-quadratic","title":"Find the intersections of a line and a parabola by substitution","familyCode":"parabola-origin-and-line"},
+        {"code":"tangent-or-no-intersection","title":"Recognise a tangent or no intersection from a simultaneous system"}
+      ]
+    },
+    {
+      "code":"LCM07.S05",
+      "objectives":[
+        {"code":"solve-three-variable","title":"Solve three simultaneous linear equations","familyCode":"pair-sums-and-total"},
+        {"code":"three-variable-elimination","title":"Choose elimination steps for a general three-variable system"}
+      ]
+    }
+  ]
+}

@@ -22,7 +22,7 @@ public class EnrolmentController {
   @GetMapping
   public List<Map<String, Object>> subjects() {
     return db.queryForList(
-      "select o.offering_id as \"offeringId\",s.name as \"subjectName\",o.track_code as \"trackCode\",o.syllabus_version as \"syllabusVersion\",o.is_starter as \"isStarter\",c.name as \"curriculumName\",l.name as \"levelName\",ss.started_at as \"startedAt\" from student_subjects ss join subject_offerings o on o.offering_id=ss.offering_id join subjects s on s.subject_id=o.subject_id join curricula c on c.curriculum_id=o.curriculum_id join academic_levels l on l.level_id=o.level_id where ss.student_id=? and ss.status='ENROLLED' and o.status='PUBLISHED' and s.status='ACTIVE' and c.status='ACTIVE'",
+      "select o.offering_id as \"offeringId\",s.name as \"subjectName\",s.subject_id as \"subjectId\",o.track_code as \"trackCode\",o.syllabus_version as \"syllabusVersion\",o.is_starter as \"isStarter\",c.name as \"curriculumName\",l.name as \"levelName\",ss.started_at as \"startedAt\" from student_subjects ss join subject_offerings o on o.offering_id=ss.offering_id join subjects s on s.subject_id=o.subject_id join curricula c on c.curriculum_id=o.curriculum_id join academic_levels l on l.level_id=o.level_id where ss.student_id=? and ss.status='ENROLLED' and o.status='PUBLISHED' and s.status='ACTIVE' and c.status='ACTIVE'",
       current.id()
     );
   }
@@ -53,25 +53,34 @@ public class EnrolmentController {
       UUID.class,
       id
     );
-    for (UUID offering : offerings) {
-      if (
-        !Boolean.TRUE.equals(
-          db.queryForObject(
-            "select exists(select 1 from subject_offerings where offering_id=? and status='PUBLISHED')",
-            Boolean.class,
-            offering
-          )
-        )
-      ) throw new ResponseStatusException(
+    var choices = new LinkedHashSet<>(offerings);
+    var courses = new HashSet<List<Object>>();
+    for (UUID offering : choices) {
+      var matches = db.queryForList(
+        """
+        select o.curriculum_id,o.level_id,o.subject_id
+        from subject_offerings o join subjects s on s.subject_id=o.subject_id
+        join curricula c on c.curriculum_id=o.curriculum_id
+        where o.offering_id=? and o.status='PUBLISHED' and s.status='ACTIVE' and c.status='ACTIVE'
+        """,
+        offering
+      );
+      if (matches.isEmpty()) throw new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
         "Subject is not available"
       );
+      var match = matches.get(0);
+      if (!courses.add(List.of(match.get("curriculum_id"), match.get("level_id"), match.get("subject_id"))))
+        throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Choose one level per subject"
+        );
     }
     db.update(
       "update student_subjects set status='ARCHIVED' where student_id=?",
       id
     );
-    for (UUID offering : new HashSet<>(offerings)) if (
+    for (UUID offering : choices) if (
       db.update(
         "update student_subjects set status='ENROLLED' where student_id=? and offering_id=?",
         id,

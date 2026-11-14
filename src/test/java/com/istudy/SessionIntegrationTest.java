@@ -508,6 +508,72 @@ class SessionIntegrationTest {
   }
 
   @Test
+  void plannedBankPublishesObjectiveMappingsAndRejectsCrossLevelSources()
+    throws Exception {
+    UUID doc = textbook();
+    db.update("update subject_offerings set track_code='ORDINARY' where offering_id=?", offering);
+    UUID higher = UUID.randomUUID();
+    db.update(
+      """
+      insert into subject_offerings(offering_id,curriculum_id,level_id,subject_id,syllabus_version,status,track_code)
+      select ?,curriculum_id,level_id,subject_id,syllabus_version,'PUBLISHED','HIGHER'
+      from subject_offerings where offering_id=?
+      """,
+      higher, offering
+    );
+    var bank = manifest(1).put("formatVersion", "2.0");
+    var topic = (com.fasterxml.jackson.databind.node.ObjectNode) bank.path("chapters").get(0).path("topics").get(0);
+    topic.putArray("objectives").addObject()
+      .put("code", "add").put("title", "Add single-digit numbers").put("required", true);
+    var q = (com.fasterxml.jackson.databind.node.ObjectNode) topic.path("questions").get(0);
+    q.put("objectiveCode", "different").put("familyCode", "addition");
+    assertEquals(false, bankValidator.validate(offering, bank).get("valid"));
+    q.put("objectiveCode", "add").put("examLevel", "HIGHER");
+    assertEquals(false, bankValidator.validate(offering, bank).get("valid"));
+    q.put("examLevel", "ORDINARY");
+    var request = new com.istudy.content.QuestionBankController.Bank(offering, doc, bank);
+    var review = new com.istudy.content.QuestionBankController.Review(true);
+    var validation = bankController.validate(request);
+    assertEquals(1, json.valueToTree(validation).path("objectiveCoverage").get(0).path("resultingFamilies").asInt());
+    var plan = bank.deepCopy();
+    var planTopic = (com.fasterxml.jackson.databind.node.ObjectNode) plan.path("chapters").get(0).path("topics").get(0);
+    planTopic.putArray("questions");
+    ((com.fasterxml.jackson.databind.node.ObjectNode) planTopic.path("expectedCounts")).put("EASY", 0);
+    var planRequest = new com.istudy.content.QuestionBankController.Bank(offering, doc, plan);
+    bankController.publish((UUID) bankController.upload(planRequest).get("importId"), review);
+    assertEquals(1, bankController.objectives(offering).size());
+    assertEquals(0, db.queryForObject(
+      "select count(*) from question_placements where section_id=? and objective_id is not null",
+      Integer.class, section
+    ));
+    bankController.publish((UUID) bankController.upload(request).get("importId"), review);
+    assertEquals("addition", db.queryForObject(
+      "select p.family_code from question_placements p join learning_objectives o on o.objective_id=p.objective_id where p.section_id=? and o.code='add'",
+      String.class, section
+    ));
+    UUID mappedQuestion = db.queryForObject(
+      "select question_id from question_placements where section_id=? and family_code='addition'",
+      UUID.class, section
+    );
+    // Map the same existing content from a separately approved source without duplicating it.
+    UUID revisedSource = textbook();
+    q.remove("examLevel");
+    q.put("familyCode", "single-digit-addition");
+    var remap = new com.istudy.content.QuestionBankController.Bank(offering, revisedSource, bank);
+    bankController.publish((UUID) bankController.upload(remap).get("importId"), review);
+    assertEquals(mappedQuestion, db.queryForObject(
+      "select question_id from question_placements where section_id=? and family_code='single-digit-addition'",
+      UUID.class, section
+    ));
+    assertEquals(0, db.queryForObject(
+      "select count(*) from question_placements where section_id=? and family_code='addition'",
+      Integer.class, section
+    ));
+    assertThrows(org.springframework.web.server.ResponseStatusException.class, () ->
+      bankController.upload(new com.istudy.content.QuestionBankController.Bank(higher, doc, bank)));
+  }
+
+  @Test
   void setTwoDraftsStayHiddenUntilReviewAndThenPrecedeRepeats()
     throws Exception {
     UUID doc = textbook();
@@ -781,11 +847,52 @@ class SessionIntegrationTest {
   }
 
   @Test
+  @org.springframework.transaction.annotation.Transactional
+  void trackSplitPreservesArchivedResultsAndSeparatesStarterQuestions() throws Exception {
+    var seed = new com.istudy.bootstrap.StarterContent(db, json);
+    seed.run(null);
+    UUID old = com.istudy.bootstrap.StarterContent.id("offering");
+    var request = new CreateSession(old, null, List.of(), "PRACTICE",
+      "QUICK", "SUBJECT_ALL", "ALL", 1, null);
+    var session = sessions.create(student, null, request);
+    sessions.submit(id(session), student, null,
+      new Submit((UUID) session.get("submissionToken"), List.of()));
+    var split = new com.istudy.bootstrap.LeavingCertificateTracks(db, json);
+    split.run(null);
+    split.run(null);
+    assertEquals(Set.of("ORDINARY", "HIGHER"), new HashSet<>(db.queryForList(
+      "select track_code from subject_offerings where status='PUBLISHED'",
+      String.class
+    )));
+    assertEquals(60, db.queryForObject(
+      """
+      select count(distinct p.question_id) from question_placements p
+      join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id
+      join subject_offerings o on o.offering_id=c.offering_id
+      where o.status='PUBLISHED' and p.active
+      """,
+      Integer.class
+    ));
+    mvc.perform(
+      org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        .get("/api/v1/students/me/archived-sessions")
+        .header("Authorization", "Bearer " + authToken)
+    ).andExpect(
+      org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk()
+    ).andExpect(
+      org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$[0].sessionId")
+        .value(id(session).toString())
+    );
+    assertEquals("SUBMITTED", sessions.read(id(session), student, null).get("status"));
+  }
+
+  @Test
   void flagsAreRestoredWhenOwnedSessionResumes() {
     var session = sessions.create(student, null, config());
     db.update(
-      "insert into student_question_flags(student_id,question_id) values(?,?)",
+      "insert into student_question_flags(student_id,offering_id,question_id) values(?,?,?)",
       student,
+      offering,
       question
     );
     var restored = json.valueToTree(sessions.read(id(session), student, null));
@@ -1060,6 +1167,17 @@ class SessionIntegrationTest {
         org.springframework.test.web.servlet.result.MockMvcResultMatchers.status()
           .isOk()
       );
+    var reviewer = auth.signup("Reviewer", UUID.randomUUID() + "@example.test", "test-password", "STUDENT");
+    db.update("update app_users set content_admin=true where user_id=?", reviewer.get("studentId"));
+    mvc.perform(
+      org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/v1/assets/" + asset + "/content")
+        .header("Authorization", "Bearer " + reviewer.get("token"))
+    ).andExpect(
+      org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk()
+    ).andExpect(
+      org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+        .string("Content-Disposition", "attachment")
+    );
     db.update(
       "update app_users set content_admin=false where user_id=?",
       student
@@ -1537,4 +1655,70 @@ class SessionIntegrationTest {
       )
     );
   }
+
+  @Test
+  void profileUsesFreshFrozenFamiliesAndKeepsFeedbackSeparate() {
+    UUID objective = UUID.randomUUID();
+    db.update("insert into learning_objectives(objective_id,section_id,code,title) values(?,?,?,?)",
+      objective, section, "core", "Core method");
+    db.update("update question_placements set objective_id=?,family_code='direct' where question_id=?",
+      objective, question);
+    var profiles = new LearningProfileService(db);
+    var config = new CreateSession(offering, chapter, List.of(section), "PRACTICE",
+      "PERSONALIZED", "SELECTED_SECTIONS", "ALL", 1, null, objective);
+    assertEquals(objective, profiles.profile(student, offering, chapter)
+      .recommendations().get(0).objectiveId());
+
+    var first = sessions.create(student, null, config);
+    sessions.check(id(first), student, new Answer(sq(first), json.getNodeFactory().textNode("B")));
+    sessions.submit(id(first), student, null, new Submit((UUID) first.get("submissionToken"),
+      List.of(new Answer(sq(first), json.getNodeFactory().textNode("A")))));
+    var afterFeedback = profiles.profile(student, offering, chapter).objectives().get(0);
+    assertEquals(0, afterFeedback.independentCorrect());
+    assertEquals(1, afterFeedback.correctionsAfterFeedback());
+    assertTrue(profiles.profile(student, offering, chapter).recommendations().isEmpty());
+
+    var repeat = sessions.create(student, null, config);
+    sessions.submit(id(repeat), student, null, new Submit((UUID) repeat.get("submissionToken"),
+      List.of(new Answer(sq(repeat), json.getNodeFactory().textNode("A")))));
+    assertEquals(1, profiles.profile(student, offering, chapter).objectives().get(0).evidenceCount());
+
+    UUID related = UUID.randomUUID();
+    db.update("insert into questions(question_id,question_text,correct_answer,difficulty_level,approval_status) values(?,'2+3','A','FOUNDATION','PUBLISHED')",
+      related);
+    db.update("insert into question_revisions(question_id,revision_number,content_snapshot) select ?,1,content_snapshot from question_revisions where question_id=?",
+      related, question);
+    db.update("insert into question_placements(question_id,section_id,usage_type,objective_id,family_code) values(?,?,'BOTH',?,'direct')",
+      related, section, objective);
+    var relatedSession = sessions.create(student, null, config);
+    sessions.submit(id(relatedSession), student, null, new Submit((UUID) relatedSession.get("submissionToken"),
+      List.of(new Answer(sq(relatedSession), json.getNodeFactory().textNode("A")))));
+    var relatedEvidence = profiles.profile(student, offering, chapter).objectives().get(0);
+    assertEquals(1, relatedEvidence.evidenceCount());
+    assertEquals(0, relatedEvidence.independentCorrect());
+    assertEquals(0, relatedEvidence.freshSuccessAfterCorrection());
+
+    UUID variant = UUID.randomUUID();
+    db.update("insert into questions(question_id,question_text,correct_answer,difficulty_level,approval_status) values(?,'3+3','A','FOUNDATION','PUBLISHED')",
+      variant);
+    db.update("insert into question_revisions(question_id,revision_number,content_snapshot) select ?,1,content_snapshot from question_revisions where question_id=?",
+      variant, question);
+    db.update("insert into question_placements(question_id,section_id,usage_type,objective_id,family_code,difficulty_override) values(?,?,'BOTH',?,'transfer','INTERMEDIATE')",
+      variant, section, objective);
+    var fresh = sessions.create(student, null, config);
+    // Future edits to a placement must leave the current session's evidence intact.
+    db.update("update question_placements set family_code='direct',difficulty_override='ADVANCED' where question_id=?",
+      variant);
+    assertEquals("INTERMEDIATE", json.valueToTree(sessions.read(id(fresh), student, null))
+      .path("questions").get(0).path("difficulty").asText());
+    sessions.submit(id(fresh), student, null, new Submit((UUID) fresh.get("submissionToken"),
+      List.of(new Answer(sq(fresh), json.getNodeFactory().textNode("A")))));
+    var evidence = profiles.profile(student, offering, chapter).objectives().get(0);
+    assertEquals(2, evidence.evidenceCount());
+    assertEquals(1, evidence.independentCorrect());
+    assertEquals(1, evidence.freshSuccessAfterCorrection());
+    assertEquals(LearningProfileService.Status.DEVELOPING, evidence.status());
+    assertNull(evidence.demonstratedDifficulty());
+  }
+
 }

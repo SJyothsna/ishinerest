@@ -45,7 +45,7 @@ public class ParentLinksController {
   public List<Map<String, Object>> subjects(@PathVariable UUID studentId) {
     verified(studentId);
     return db.queryForList(
-      "select o.offering_id as \"offeringId\",s.name as \"subjectName\" from student_subjects ss join subject_offerings o on o.offering_id=ss.offering_id join subjects s on s.subject_id=o.subject_id where ss.student_id=? and ss.status='ENROLLED' and o.status='PUBLISHED'",
+      "select o.offering_id as \"offeringId\",s.name as \"subjectName\",o.track_code as \"trackCode\" from student_subjects ss join subject_offerings o on o.offering_id=ss.offering_id join subjects s on s.subject_id=o.subject_id where ss.student_id=? and ss.status='ENROLLED' and o.status='PUBLISHED'",
       studentId
     );
   }

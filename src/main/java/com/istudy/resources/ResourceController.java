@@ -13,10 +13,14 @@ public class ResourceController {
 
   private final JdbcTemplate db;
   private final CurrentStudent current;
+  private final com.istudy.learning.SessionService sessions;
 
-  public ResourceController(JdbcTemplate db, CurrentStudent current) {
+  public ResourceController(
+    JdbcTemplate db, CurrentStudent current, com.istudy.learning.SessionService sessions
+  ) {
     this.db = db;
     this.current = current;
+    this.sessions = sessions;
   }
 
   @GetMapping("/videos")
@@ -102,29 +106,31 @@ public class ResourceController {
   }
 
   @PutMapping("/questions/{questionId}/flag")
-  public void flag(@PathVariable UUID questionId) {
-    UUID student = current.id();
-    if (
-      db.queryForObject(
-        "select count(*) from student_question_flags where student_id=? and question_id=?",
-        Integer.class,
-        student,
-        questionId
-      ) ==
-      0
-    ) db.update(
-      "insert into student_question_flags(student_id,question_id) values(?,?)",
-      student,
-      questionId
-    );
+  public void flag(@PathVariable UUID questionId, @RequestParam UUID offeringId) {
+    saveQuestionFlag(questionId, offeringId, true);
   }
 
   @DeleteMapping("/questions/{questionId}/flag")
-  public void unflag(@PathVariable UUID questionId) {
-    db.update(
-      "delete from student_question_flags where student_id=? and question_id=?",
-      current.id(),
-      questionId
+  public void unflag(@PathVariable UUID questionId, @RequestParam UUID offeringId) {
+    saveQuestionFlag(questionId, offeringId, false);
+  }
+
+  private void saveQuestionFlag(UUID questionId, UUID offeringId, boolean flagged) {
+    UUID student = current.id();
+    boolean available = Boolean.TRUE.equals(db.queryForObject(
+      """
+      select exists(
+        select 1 from student_subjects ss join chapters c on c.offering_id=ss.offering_id
+        join sections s on s.chapter_id=c.chapter_id
+        join question_placements p on p.section_id=s.section_id
+        where ss.student_id=? and ss.offering_id=? and ss.status='ENROLLED' and p.question_id=?
+      )
+      """,
+      Boolean.class, student, offeringId, questionId
+    ));
+    if (!available) throw new org.springframework.web.server.ResponseStatusException(
+      org.springframework.http.HttpStatus.NOT_FOUND, "Question not found in this course"
     );
+    sessions.saveFlag(student, offeringId, questionId, flagged);
   }
 }

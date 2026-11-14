@@ -25,7 +25,7 @@ public class QuestionBankValidator {
 
   public ObjectNode snapshot(JsonNode q) {
     var copy = ((ObjectNode) q).deepCopy();
-    copy.remove(List.of("externalId", "sourcePage"));
+    copy.remove(List.of("externalId", "sourcePage", "objectiveCode", "familyCode"));
     String value = q.path("difficulty").asText();
     copy.put(
       "difficulty",
@@ -50,9 +50,16 @@ public class QuestionBankValidator {
     int topicCount = 0, total = 0;
     var levels = new LinkedHashMap<String, Integer>();
     for (String level : List.of("EASY", "MEDIUM", "HARD")) levels.put(level, 0);
-    if (!manifest.path("formatVersion").asText().equals("1.0")) errors.add(
-      "formatVersion must be 1.0."
+    String version = manifest.path("formatVersion").asText();
+    boolean planned = version.equals("2.0");
+    if (!planned && !version.equals("1.0")) errors.add("formatVersion must be 2.0 or 1.0.");
+    String track = db.queryForObject(
+      "select track_code from subject_offerings where offering_id=?",
+      String.class, offering
     );
+    boolean levelled = Set.of("ORDINARY", "HIGHER").contains(track);
+    var publishedObjectives = planned ? publishedObjectives(offering) : Map.<String, Map<String, Objective>>of();
+    var coverage = new ArrayList<Map<String, Object>>();
     String sourceType = manifest.path("sourceType").asText("TEXTBOOK");
     if (!Set.of("TEXTBOOK", "ORIGINAL").contains(sourceType)) errors.add(
       "sourceType must be TEXTBOOK or ORIGINAL."
@@ -99,9 +106,13 @@ public class QuestionBankValidator {
           topic.path("title").asText().isBlank()
         ) errors.add(key + ": topic code/title is missing or repeated.");
         var actual = new HashMap<String, Integer>();
+        var objectives = planned
+          ? validateObjectives(key, topic, set, publishedObjectives.getOrDefault(key, Map.of()), errors)
+          : Map.<String, Objective>of();
+        var batchFamilies = new HashMap<String, Set<String>>();
         if (
           !topic.path("questions").isArray() ||
-          topic.path("questions").isEmpty()
+          ((!planned || set != 1) && topic.path("questions").isEmpty())
         ) errors.add(key + ": include questions.");
         for (var q : topic.path("questions")) {
           total++;
@@ -112,6 +123,18 @@ public class QuestionBankValidator {
             ": use a readable externalId with letters, numbers, dots, hyphens or underscores."
           );
           String level = q.path("difficulty").asText();
+          if (planned) {
+            String objectiveCode = q.path("objectiveCode").asText();
+            String familyCode = q.path("familyCode").asText();
+            if (!objectives.containsKey(objectiveCode)) errors.add(
+              prefix + ": choose an objectiveCode from this subtopic's plan."
+            );
+            if (!code(familyCode)) errors.add(prefix + ": include a stable familyCode.");
+            if (
+              set == 1 && objectives.containsKey(objectiveCode) &&
+              code(familyCode) && !"worked".equals(q.path("type").asText())
+            ) batchFamilies.computeIfAbsent(objectiveCode, unused -> new HashSet<>()).add(familyCode);
+          }
           if (!levels.containsKey(level)) errors.add(
             prefix + ": difficulty must be EASY, MEDIUM or HARD."
           );
@@ -152,6 +175,10 @@ public class QuestionBankValidator {
           ) errors.add(
             prefix + ": examLevel must be COMMON, ORDINARY or HIGHER."
           );
+          String examLevel = q.path("examLevel").asText("COMMON");
+          if (levelled && !examLevel.equals("COMMON") && !examLevel.equals(track)) errors.add(
+            prefix + ": " + examLevel + " questions do not belong to this " + track + " course."
+          );
           try {
             questions.validate(snapshot(q));
           } catch (Exception e) {
@@ -181,6 +208,27 @@ public class QuestionBankValidator {
             ": this repeats a Set 1 question. Set 2 needs a fresh variation."
           );
         }
+        if (planned) for (var entry : objectives.entrySet()) {
+          var objective = entry.getValue();
+          Set<String> incoming = batchFamilies.getOrDefault(entry.getKey(), Set.of());
+          var available = new HashSet<>(objective.publishedFamilies());
+          available.addAll(incoming);
+          coverage.add(Map.of(
+            "chapterCode", ch,
+            "topicCode", topicCode,
+            "objectiveCode", entry.getKey(),
+            "title", objective.title(),
+            "required", objective.required(),
+            "publishedFamilies", objective.publishedFamilies().size(),
+            "uploadFamilies", incoming.size(),
+            "resultingFamilies", available.size()
+          ));
+          if (objective.required() && available.size() < 2) warnings.add(
+            key + " / " + entry.getKey() + ": " +
+            (available.isEmpty() ? "no graded Set 1 questions" : "only one Set 1 question family") +
+            " across the live bank and this upload."
+          );
+        }
         for (String level : levels.keySet()) {
           JsonNode expected = topic.path("expectedCounts").path(level);
           if (!expected.isIntegralNumber() || expected.asInt() < 0) errors.add(
@@ -201,7 +249,7 @@ public class QuestionBankValidator {
             actual.getOrDefault(level, 0) +
             "."
           );
-          if (actual.getOrDefault(level, 0) == 0) warnings.add(
+          if (!planned && actual.getOrDefault(level, 0) == 0) warnings.add(
             key + ": no " + level.toLowerCase(Locale.ROOT) + " questions."
           );
         }
@@ -247,6 +295,8 @@ public class QuestionBankValidator {
       errors,
       "warnings",
       warnings,
+      "objectiveCoverage",
+      coverage,
       "summary",
       Map.of(
         "chapters",
@@ -263,6 +313,69 @@ public class QuestionBankValidator {
         set
       )
     );
+  }
+
+  private record Objective(String title, boolean required, Set<String> publishedFamilies) {}
+
+  private Map<String, Map<String, Objective>> publishedObjectives(UUID offering) {
+    var result = new LinkedHashMap<String, Map<String, Objective>>();
+    db.query(
+      """
+      select c.code as chapter_code, s.code as topic_code, o.code, o.title, o.required,
+             case when q.question_id is not null then p.family_code end as family_code
+      from learning_objectives o
+      join sections s on s.section_id=o.section_id
+      join chapters c on c.chapter_id=s.chapter_id
+      left join question_placements p on p.objective_id=o.objective_id and p.active and p.question_set=1
+      left join questions q on q.question_id=p.question_id and q.approval_status='PUBLISHED'
+        and q.visibility='GLOBAL' and q.question_type<>'WORKED_EXAMPLE'
+      where c.offering_id=?
+      order by c.code,s.code,o.code
+      """,
+      rs -> {
+        String key = rs.getString("chapter_code") + "/" + rs.getString("topic_code");
+        var byCode = result.computeIfAbsent(key, unused -> new LinkedHashMap<>());
+        String code = rs.getString("code");
+        if (!byCode.containsKey(code)) byCode.put(
+          code, new Objective(rs.getString("title"), rs.getBoolean("required"), new HashSet<>())
+        );
+        String family = rs.getString("family_code");
+        if (family != null) byCode.get(code).publishedFamilies().add(family);
+      },
+      offering
+    );
+    return result;
+  }
+
+  private Map<String, Objective> validateObjectives(
+    String key, JsonNode topic, int set, Map<String, Objective> existing, List<String> errors
+  ) {
+    var result = new LinkedHashMap<String, Objective>();
+    if (!topic.path("objectives").isArray() || topic.path("objectives").isEmpty()) {
+      errors.add(key + ": include the reviewed subtopic objectives.");
+      return result;
+    }
+    for (var definition : topic.path("objectives")) {
+      String code = definition.path("code").asText();
+      String title = definition.path("title").asText();
+      if (!code(code) || !definition.path("title").isTextual() || title.isBlank() ||
+          title.length() > 300 || !definition.path("required").isBoolean() || result.containsKey(code)) {
+        errors.add(key + ": each objective needs a unique code, title and required flag.");
+        continue;
+      }
+      boolean required = definition.path("required").asBoolean();
+      var previous = existing.get(code);
+      if (set == 2 && (previous == null || !previous.title().equals(title) || previous.required() != required))
+        errors.add(key + "/" + code + ": Set 2 must reuse the published Set 1 objective.");
+      result.put(code, new Objective(title, required, previous == null ? Set.of() : previous.publishedFamilies()));
+    }
+    for (String code : existing.keySet()) if (!result.containsKey(code)) errors.add(
+      key + ": include existing objective " + code + " in the plan."
+    );
+    if (set == 1 && result.values().stream().noneMatch(Objective::required)) errors.add(
+      key + ": include at least one required objective."
+    );
+    return result;
   }
 
   private boolean code(String value) {

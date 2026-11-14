@@ -19,7 +19,7 @@ public class CatalogueController {
     return db.queryForList(
       """
       select o.offering_id as "offeringId",s.subject_id as "subjectId",s.name as "subjectName",
-      l.level_id as "levelId",l.name as "levelName",c.curriculum_id as "curriculumId",c.name as "curriculumName",
+      l.level_id as "levelId",l.name as "levelName",c.curriculum_id as "curriculumId",c.name as "curriculumName",c.country_code as "countryCode",
       o.track_code as "trackCode",o.syllabus_version as "syllabusVersion",o.is_starter as "isStarter"
       from subject_offerings o join subjects s on s.subject_id=o.subject_id join academic_levels l on l.level_id=o.level_id join curricula c on c.curriculum_id=o.curriculum_id
       where o.status='PUBLISHED' and s.status='ACTIVE' and c.status='ACTIVE' order by l.sort_order,s.name,o.track_code

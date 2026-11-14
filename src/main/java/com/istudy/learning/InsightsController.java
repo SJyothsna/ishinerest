@@ -2,8 +2,10 @@ package com.istudy.learning;
 
 import com.istudy.identity.CurrentStudent;
 import java.util.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/students/me")
@@ -11,10 +13,12 @@ public class InsightsController {
 
   private final JdbcTemplate db;
   private final CurrentStudent current;
+  private final LearningProfileService profiles;
 
   public InsightsController(JdbcTemplate db, CurrentStudent current) {
     this.db = db;
     this.current = current;
+    this.profiles = new LearningProfileService(db);
   }
 
   @GetMapping("/progress")
@@ -39,7 +43,7 @@ public class InsightsController {
     );
     // No multiplication when a canonical question has several placements.
     var evidence = db.queryForList(
-      "select sq.question_id,coalesce(ck.is_correct,a.is_correct) as is_correct,a.grading_version from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id left join session_answer_checks ck on ck.session_question_id=sq.session_question_id join question_placements p on p.placement_id=sq.placement_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id where a.student_id=? and c.offering_id=? and (?::uuid is null or c.chapter_id=?::uuid)",
+      "select sq.question_id,coalesce(ck.is_correct,a.is_correct) as is_correct,a.grading_version from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id join practice_sessions ps on ps.session_id=sq.session_id left join session_answer_checks ck on ck.session_question_id=sq.session_question_id join question_placements p on p.placement_id=sq.placement_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id where a.student_id=? and ps.offering_id=? and (?::uuid is null or c.chapter_id=?::uuid)",
       student,
       offeringId,
       chapterId,
@@ -81,72 +85,50 @@ public class InsightsController {
     return result;
   }
 
+  @GetMapping("/learning-profile")
+  public LearningProfileService.Profile profile(
+    @RequestParam UUID offeringId,
+    @RequestParam(required = false) UUID chapterId
+  ) {
+    UUID student = current.id();
+    var allowed = db.queryForObject(
+      "select exists(select 1 from student_subjects ss join subject_offerings so on so.offering_id=ss.offering_id where ss.student_id=? and ss.offering_id=? and ss.status='ENROLLED' and so.status='PUBLISHED')",
+      Boolean.class, student, offeringId
+    );
+    if (!Boolean.TRUE.equals(allowed)) throw new ResponseStatusException(
+      HttpStatus.NOT_FOUND, "Enrolled course not found"
+    );
+    return profiles.profile(student, offeringId, chapterId);
+  }
+
   @GetMapping("/recommendations")
   public Map<String, Object> recommendations(
     @RequestParam(required = false) UUID offeringId,
     @RequestParam(required = false) UUID chapterId
   ) {
-    // Thresholds are conservative provisional product parameters, not a knowledge-level label.
-    var rows = db.queryForList(
+    if (offeringId != null) {
+      var profile = profile(offeringId, chapterId);
+      return Map.of(
+        "hasSufficientHistory", profile.hasSufficientHistory(),
+        "recommendations", profile.recommendations(),
+        "statsVersion", "v2"
+      );
+    }
+    UUID student = current.id();
+    var courses = db.queryForList(
       """
-      select s.section_id as "sectionId",s.title,c.chapter_id as "chapterId",c.offering_id as "offeringId",
-      count(distinct sq.question_id) as diversity,count(*) as attempts,
-      sum(case when coalesce(ck.is_correct,a.is_correct) then 1 else 0 end) as correct,count(distinct sq.session_id) as sessions
-      from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id left join session_answer_checks ck on ck.session_question_id=sq.session_question_id
-      join question_placements p on p.placement_id=sq.placement_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id
-      where a.grading_version<>'self-review-v1' and a.student_id=? and (?::uuid is null or c.offering_id=?::uuid) and (?::uuid is null or c.chapter_id=?::uuid)
-      group by s.section_id,s.title,c.chapter_id,c.offering_id
-      having count(distinct sq.question_id)>=3 and count(*)>=6 and count(distinct sq.session_id)>=2
-      order by sum(case when coalesce(ck.is_correct,a.is_correct) then 1.0 else 0 end)/count(*) asc
+      select ss.offering_id from student_subjects ss
+      join subject_offerings so on so.offering_id=ss.offering_id
+      where ss.student_id=? and ss.status='ENROLLED' and so.status='PUBLISHED'
+      order by ss.last_activity_at desc nulls last,ss.enrolled_at desc
       """,
-      current.id(),
-      offeringId,
-      offeringId,
-      chapterId,
-      chapterId
+      UUID.class, student
     );
-    if (rows.isEmpty()) return Map.of(
-      "hasSufficientHistory",
-      false,
-      "recommendations",
-      List.of(),
-      "statsVersion",
-      "v1"
-    );
-    var first = rows.get(0);
-    double accuracy =
-      ((Number) first.get("correct")).doubleValue() /
-      ((Number) first.get("attempts")).doubleValue();
-    if (accuracy >= 0.8) return Map.of(
-      "hasSufficientHistory",
-      true,
-      "recommendations",
-      List.of(),
-      "statsVersion",
-      "v1"
-    );
+    var available = courses.stream().map(course -> profiles.profile(student, course, chapterId)).toList();
     return Map.of(
-      "hasSufficientHistory",
-      true,
-      "recommendations",
-      List.of(
-        Map.of(
-          "title",
-          "Practise " + first.get("title"),
-          "reason",
-          "Your submitted answers suggest more practice could help with this topic.",
-          "chapterId",
-          first.get("chapterId"),
-          "sectionId",
-          first.get("sectionId"),
-          "offeringId",
-          first.get("offeringId"),
-          "evidenceCount",
-          first.get("attempts")
-        )
-      ),
-      "statsVersion",
-      "v1"
+      "hasSufficientHistory", available.stream().anyMatch(LearningProfileService.Profile::hasSufficientHistory),
+      "recommendations", available.stream().flatMap(p -> p.recommendations().stream()).limit(3).toList(),
+      "statsVersion", "v2"
     );
   }
 

@@ -276,7 +276,14 @@ public class LegacyImporter implements ApplicationRunner {
           )
         )
       ) target.update(
-        "insert into student_question_flags(student_id,question_id) values(?,?)",
+        """
+        insert into student_question_flags(student_id,offering_id,question_id)
+        select distinct ss.student_id,c.offering_id,p.question_id
+        from question_placements p join sections s on s.section_id=p.section_id
+        join chapters c on c.chapter_id=s.chapter_id
+        join student_subjects ss on ss.offering_id=c.offering_id
+        where ss.student_id=? and p.question_id=?
+        """,
         owner,
         id("question", flag.get("QUESTION_ID"))
       );

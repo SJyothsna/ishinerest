@@ -29,7 +29,7 @@ public class PracticeOptionsController {
     @RequestParam(required = false) UUID chapterId
   ) {
     var rows = db.queryForList(
-      "select distinct q.question_id,st.total_attempts,st.correct_attempts,case when f.question_id is null then false else true end as flagged from questions q join question_placements p on p.question_id=q.question_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id left join student_question_stats st on st.question_id=q.question_id and st.student_id=? left join student_question_flags f on f.question_id=q.question_id and f.student_id=? where c.offering_id=? and (?::uuid is null or c.chapter_id=?::uuid) and q.approval_status='PUBLISHED' and q.visibility='GLOBAL' and c.status='ACTIVE' and s.status='ACTIVE' and p.active",
+      "select distinct q.question_id,st.total_attempts,st.correct_attempts,case when f.question_id is null then false else true end as flagged from questions q join question_placements p on p.question_id=q.question_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id left join student_question_stats st on st.question_id=q.question_id and st.offering_id=c.offering_id and st.student_id=? left join student_question_flags f on f.question_id=q.question_id and f.offering_id=c.offering_id and f.student_id=? where c.offering_id=? and (?::uuid is null or c.chapter_id=?::uuid) and q.approval_status='PUBLISHED' and q.visibility='GLOBAL' and c.status='ACTIVE' and s.status='ACTIVE' and p.active",
       current.id(),
       current.id(),
       offeringId,

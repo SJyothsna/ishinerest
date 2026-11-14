@@ -37,7 +37,7 @@ public class SetProgressionService {
       chapter
     );
     int available = db.queryForObject(
-      "select count(distinct q.question_id) from question_placements p join questions q on q.question_id=p.question_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id where c.offering_id=? and (?::uuid is null or c.chapter_id=?::uuid) and p.question_set=2 and p.active and q.approval_status='PUBLISHED' and q.visibility='GLOBAL' and not exists(select 1 from session_questions sq join practice_sessions ps on ps.session_id=sq.session_id where (ps.student_id=? or ps.claimed_by=?) and sq.question_id=q.question_id)",
+      "select count(distinct q.question_id) from question_placements p join questions q on q.question_id=p.question_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id where c.offering_id=? and (?::uuid is null or c.chapter_id=?::uuid) and p.question_set=2 and p.active and q.approval_status='PUBLISHED' and q.visibility='GLOBAL' and not exists(select 1 from session_questions sq join practice_sessions ps on ps.session_id=sq.session_id where (ps.student_id=? or ps.claimed_by=?) and ps.offering_id=c.offering_id and sq.question_id=q.question_id)",
       Integer.class,
       offering,
       chapter,

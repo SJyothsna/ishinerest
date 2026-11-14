@@ -19,19 +19,22 @@ public class SessionService {
   private final QuestionSelector selector;
   private final Grader grader;
   private final SetProgressionService progression;
+  private final LearningProfileService profiles;
 
   public SessionService(
     JdbcTemplate db,
     ObjectMapper json,
     QuestionSelector selector,
     Grader grader,
-    SetProgressionService progression
+    SetProgressionService progression,
+    LearningProfileService profiles
   ) {
     this.db = db;
     this.json = json;
     this.selector = selector;
     this.grader = grader;
     this.progression = progression;
+    this.profiles = profiles;
   }
 
   JsonNode parse(String value) {
@@ -70,7 +73,7 @@ public class SessionService {
       "Unsupported session kind"
     );
     require(
-      Set.of("QUICK", "FLAGGED", "MISTAKES").contains(request.mode()),
+      Set.of("QUICK", "FLAGGED", "MISTAKES", "PERSONALIZED").contains(request.mode()),
       "Unsupported practice mode"
     );
     require(
@@ -155,25 +158,46 @@ public class SessionService {
       ),
       "Topic does not belong to the selected scope"
     );
+    boolean personalized = request.mode().equals("PERSONALIZED");
+    require(
+      !personalized || (student != null && Set.of("PRACTICE", "TEST").contains(request.kind())),
+      "Personalized selection requires a student practice session or test"
+    );
+    if (request.objectiveId() != null) require(
+      personalized && request.kind().equals("PRACTICE") && sections.size() == 1 &&
+      Boolean.TRUE.equals(db.queryForObject(
+        "select exists(select 1 from learning_objectives where objective_id=? and section_id=?)",
+        Boolean.class, request.objectiveId(), sections.get(0)
+      )),
+      "Choose a practice objective in the selected topic"
+    );
+    if (student != null) lockStudent(student);
     String sql =
       """
       select q.question_id,r.revision_id,p.placement_id,p.question_set,s.section_id,c.chapter_id,r.content_snapshot,
-      exists(select 1 from session_questions seenq join practice_sessions seenps on seenps.session_id=seenq.session_id where (seenps.student_id=? or seenps.claimed_by=?) and seenq.question_id=q.question_id) as seen,
-      coalesce(st.total_attempts,0) as attempts,coalesce(st.correct_attempts,0) as correct,st.last_correct,
-      exists(select 1 from student_question_flags f where f.student_id=? and f.question_id=q.question_id) as flagged
+      p.objective_id,p.family_code,coalesce(p.difficulty_override,q.difficulty_level) as effective_difficulty,
+      exists(select 1 from session_questions seenq join practice_sessions seenps on seenps.session_id=seenq.session_id
+        where (seenps.student_id=? or seenps.claimed_by=?) and seenps.offering_id=c.offering_id and seenq.question_id=q.question_id) as seen,
+      exists(select 1 from session_questions seenq join practice_sessions seenps on seenps.session_id=seenq.session_id
+        where (seenps.student_id=? or seenps.claimed_by=?) and seenps.offering_id=c.offering_id
+          and seenq.objective_id=p.objective_id and seenq.family_code=p.family_code) as family_seen,
+      coalesce(st.total_attempts,0) as attempts,coalesce(st.correct_attempts,0) as correct,
+      exists(select 1 from student_question_flags f where f.student_id=? and f.offering_id=c.offering_id and f.question_id=q.question_id) as flagged
       from question_placements p join questions q on q.question_id=p.question_id
       join question_revisions r on r.question_id=q.question_id and r.revision_number=q.current_revision
       join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id join subject_offerings o on o.offering_id=c.offering_id
-      left join student_question_stats st on st.question_id=q.question_id and st.student_id=?
+      left join student_question_stats st on st.question_id=q.question_id and st.offering_id=c.offering_id and st.student_id=?
       where c.offering_id=? and o.status='PUBLISHED' and c.status='ACTIVE' and s.status='ACTIVE' and p.active
       and q.approval_status='PUBLISHED' and q.visibility='GLOBAL'
+      and (?::uuid is null or p.objective_id=?::uuid)
       and (?='ALL' or coalesce(p.difficulty_override,q.difficulty_level)=?)
       and (?::uuid is null or c.chapter_id=?::uuid)
       and (? <> 'SUBJECT_STARTED' or exists(select 1 from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id
         join question_placements pp on pp.placement_id=sq.placement_id join sections ss on ss.section_id=pp.section_id
-        where a.student_id=? and ss.chapter_id=c.chapter_id))
-      and (q.question_type<>'WORKED_EXAMPLE' or ?='PRACTICE')
-      and (?<>'FLAGGED' or exists(select 1 from student_question_flags f where f.student_id=? and f.question_id=q.question_id))
+        join practice_sessions started on started.session_id=sq.session_id
+        where a.student_id=? and started.offering_id=c.offering_id and ss.chapter_id=c.chapter_id))
+      and (q.question_type<>'WORKED_EXAMPLE' or (?='PRACTICE' and ?<>'PERSONALIZED'))
+      and (?<>'FLAGGED' or exists(select 1 from student_question_flags f where f.student_id=? and f.offering_id=c.offering_id and f.question_id=q.question_id))
       and (?<>'MISTAKES' or coalesce(st.total_attempts,0)>coalesce(st.correct_attempts,0))
       and (? in ('SAMPLE','INITIAL_ASSESSMENT') or p.usage_type in ('BOTH','ALL') or p.usage_type=case when ?='TEST' then 'TEST' else 'PRACTICE' end)
       order by coalesce(st.total_attempts,0),s.sort_order,q.question_id limit 5000
@@ -184,7 +208,11 @@ public class SessionService {
         student,
         student,
         student,
+        student,
+        student,
         request.offeringId(),
+        request.objectiveId(),
+        request.objectiveId(),
         request.difficulty(),
         request.difficulty(),
         request.chapterId(),
@@ -192,6 +220,7 @@ public class SessionService {
         request.scope(),
         student,
         request.kind(),
+        request.mode(),
         request.mode(),
         student,
         request.mode(),
@@ -222,9 +251,12 @@ public class SessionService {
           rs.getInt("attempts"),
           rs.getInt("correct"),
           rs.getBoolean("flagged"),
-          (Boolean) rs.getObject("last_correct"),
           rs.getInt("question_set"),
-          rs.getBoolean("seen")
+          rs.getBoolean("seen"),
+          rs.getBoolean("family_seen"),
+          rs.getObject("objective_id", UUID.class),
+          rs.getString("family_code"),
+          rs.getString("effective_difficulty")
         ),
       arguments.toArray()
     );
@@ -242,7 +274,12 @@ public class SessionService {
       )
       .toList();
     var selected = new ArrayList<Candidate>();
-    if (request.mode().equals("QUICK") && !request.kind().equals("SAMPLE")) {
+    var selectedFamilies = new HashSet<String>();
+    var evidence = new HashMap<UUID, LearningProfileService.Evidence>();
+    if (personalized) profiles.profile(student, request.offeringId(), request.chapterId())
+      .objectives().forEach(item -> evidence.put(item.coverageKey(), item));
+    boolean balancedTest = personalized && request.kind().equals("TEST");
+    if ((request.mode().equals("QUICK") || personalized) && !request.kind().equals("SAMPLE")) {
       for (
         int stage = 0;
         stage < 4 && selected.size() < request.questionCount();
@@ -263,13 +300,14 @@ public class SessionService {
           )
           .toList();
         selected.addAll(
-          selector.select(candidates, request.questionCount() - selected.size())
+          selector.select(candidates, request.questionCount() - selected.size(),
+            selectedFamilies, evidence, balancedTest)
         );
       }
     } else selected.addAll(
       request.kind().equals("SAMPLE")
         ? selector.sample(pool, request.questionCount())
-        : selector.select(pool, request.questionCount())
+        : selector.select(pool, request.questionCount(), selectedFamilies, evidence, balancedTest)
     );
     require(
       !selected.isEmpty(),
@@ -307,12 +345,17 @@ public class SessionService {
     );
     int position = 1;
     for (var c : selected) db.update(
-      "insert into session_questions(session_id,question_id,revision_id,placement_id,question_position) values(?,?,?,?,?)",
+      "insert into session_questions(session_id,question_id,revision_id,placement_id,question_position,objective_id,family_code,effective_difficulty,previously_seen,family_previously_seen) values(?,?,?,?,?,?,?,?,?,?)",
       id,
       c.questionId(),
       c.revisionId(),
       c.placementId(),
-      position++
+      position++,
+      c.objectiveId(),
+      c.familyCode(),
+      c.difficulty(),
+      student == null ? null : c.seen(),
+      student == null ? null : c.familySeen()
     );
     db.update(
       "update practice_sessions set repeated_count=? where session_id=?",
@@ -322,7 +365,7 @@ public class SessionService {
     if (
       student != null &&
       request.kind().equals("PRACTICE") &&
-      request.mode().equals("QUICK")
+      (request.mode().equals("QUICK") || personalized)
     ) progression.prepare(
       student,
       request.offeringId(),
@@ -366,7 +409,7 @@ public class SessionService {
     result.put("timerSeconds", s.get("timer_seconds"));
     result.putAll(
       db.queryForMap(
-        "select sub.name as \"subjectName\",l.name as \"levelName\",c.title as \"chapterName\" from subject_offerings o join subjects sub on sub.subject_id=o.subject_id join academic_levels l on l.level_id=o.level_id left join chapters c on c.chapter_id=? where o.offering_id=?",
+        "select sub.name as \"subjectName\",l.name as \"levelName\",o.track_code as \"trackCode\",c.title as \"chapterName\" from subject_offerings o join subjects sub on sub.subject_id=o.subject_id join academic_levels l on l.level_id=o.level_id left join chapters c on c.chapter_id=? where o.offering_id=?",
         s.get("chapter_id"),
         s.get("offering_id")
       )
@@ -387,9 +430,10 @@ public class SessionService {
       ? Set.<UUID>of()
       : new HashSet<>(
         db.queryForList(
-          "select question_id from student_question_flags where student_id=?",
+          "select question_id from student_question_flags where student_id=? and offering_id=?",
           UUID.class,
-          student
+          student,
+          s.get("offering_id")
         )
       );
     result.put("chapterId", s.get("chapter_id"));
@@ -410,7 +454,7 @@ public class SessionService {
       (guest == null ||
         (student != null && student.equals(s.get("claimed_by"))));
     var questions = db.query(
-      "select sq.session_question_id,sq.question_id,sq.review_flag,ck.first_response_payload,ck.is_correct as first_correct,(select sec.title from question_placements pl join sections sec on sec.section_id=pl.section_id where pl.placement_id=sq.placement_id) as topic_name,(select ch.title from question_placements pl join sections sec on sec.section_id=pl.section_id join chapters ch on ch.chapter_id=sec.chapter_id where pl.placement_id=sq.placement_id) as chapter_name,(select p.question_set from question_placements p where p.placement_id=sq.placement_id) as question_set,r.content_snapshot,d.response_payload as draft,a.response_payload as answer,a.is_correct from session_questions sq join question_revisions r on r.revision_id=sq.revision_id left join session_answer_drafts d on d.session_question_id=sq.session_question_id left join session_answer_checks ck on ck.session_question_id=sq.session_question_id left join question_attempts a on a.session_question_id=sq.session_question_id where sq.session_id=? order by sq.question_position",
+      "select sq.session_question_id,sq.question_id,sq.review_flag,sq.effective_difficulty,ck.first_response_payload,ck.is_correct as first_correct,(select sec.title from question_placements pl join sections sec on sec.section_id=pl.section_id where pl.placement_id=sq.placement_id) as topic_name,(select ch.title from question_placements pl join sections sec on sec.section_id=pl.section_id join chapters ch on ch.chapter_id=sec.chapter_id where pl.placement_id=sq.placement_id) as chapter_name,(select p.question_set from question_placements p where p.placement_id=sq.placement_id) as question_set,r.content_snapshot,d.response_payload as draft,a.response_payload as answer,a.is_correct from session_questions sq join question_revisions r on r.revision_id=sq.revision_id left join session_answer_drafts d on d.session_question_id=sq.session_question_id left join session_answer_checks ck on ck.session_question_id=sq.session_question_id left join question_attempts a on a.session_question_id=sq.session_question_id where sq.session_id=? order by sq.question_position",
       (rs, n) -> {
         var snapshot = parse(rs.getString("content_snapshot"));
         var q = json.createObjectNode();
@@ -452,6 +496,9 @@ public class SessionService {
           "difficulty",
           "examLevel"
         )) if (snapshot.has(field)) q.set(field, snapshot.get(field));
+        if (rs.getString("effective_difficulty") != null) {
+          q.put("difficulty", rs.getString("effective_difficulty"));
+        }
         if (rs.getString("draft") != null) q.set(
           "draft",
           parse(rs.getString("draft"))
@@ -667,20 +714,22 @@ public class SessionService {
         UUID.class,
         question
       );
-      if (flagged) {
-        db.update(
-          "insert into student_question_flags(student_id,question_id) select ?,? where not exists(select 1 from student_question_flags where student_id=? and question_id=?)",
-          student,
-          canonical,
-          student,
-          canonical
-        );
-      } else db.update(
-        "delete from student_question_flags where student_id=? and question_id=?",
-        student,
-        canonical
-      );
+      saveFlag(student, (UUID) session.get("offering_id"), canonical, flagged);
     }
+  }
+
+  @Transactional
+  public void saveFlag(UUID student, UUID offering, UUID question, boolean flagged) {
+    // Lock the owner to serialize flag changes across different sessions.
+    lockStudent(student);
+    if (flagged) db.update(
+      "insert into student_question_flags(student_id,offering_id,question_id) select ?,?,? where not exists(select 1 from student_question_flags where student_id=? and offering_id=? and question_id=?)",
+      student, offering, question, student, offering, question
+    );
+    else db.update(
+      "delete from student_question_flags where student_id=? and offering_id=? and question_id=?",
+      student, offering, question
+    );
   }
 
   @Transactional
@@ -817,7 +866,7 @@ public class SessionService {
         student,
         s.get("offering_id")
       );
-      refreshQuestionStats(student);
+      refreshQuestionStats(student, (UUID) s.get("offering_id"));
     }
     db.update(
       "delete from session_answer_drafts where session_question_id in(select session_question_id from session_questions where session_id=?)",
@@ -826,20 +875,28 @@ public class SessionService {
     return read(id, student, guest);
   }
 
-  private void refreshQuestionStats(UUID student) {
+  private void lockStudent(UUID student) {
     db.queryForObject(
       "select student_id from student_profiles where student_id=? for update",
       UUID.class,
       student
     );
-    db.update("delete from student_question_stats where student_id=?", student);
+  }
+
+  private void refreshQuestionStats(UUID student, UUID offering) {
+    lockStudent(student);
+    db.update("delete from student_question_stats where student_id=? and offering_id=?", student, offering);
     db.update(
       """
-      insert into student_question_stats(student_id,question_id,total_attempts,correct_attempts,last_attempted_at)
-      select a.student_id,sq.question_id,count(*),sum(case when coalesce(ck.is_correct,a.is_correct) then 1 else 0 end),max(a.submitted_at)
-      from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id left join session_answer_checks ck on ck.session_question_id=sq.session_question_id where a.student_id=? group by a.student_id,sq.question_id
+      insert into student_question_stats(student_id,offering_id,question_id,total_attempts,correct_attempts,last_attempted_at)
+      select a.student_id,ps.offering_id,sq.question_id,count(*),sum(case when coalesce(ck.is_correct,a.is_correct) then 1 else 0 end),max(a.submitted_at)
+      from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id
+      join practice_sessions ps on ps.session_id=sq.session_id
+      left join session_answer_checks ck on ck.session_question_id=sq.session_question_id
+      where a.student_id=? and ps.offering_id=? and a.grading_version<>'self-review-v1'
+      group by a.student_id,ps.offering_id,sq.question_id
       """,
-      student
+      student, offering
     );
   }
 

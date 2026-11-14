@@ -2,6 +2,9 @@ package com.istudy.learning;
 
 import static com.istudy.learning.LearningModels.*;
 
+import com.istudy.learning.LearningProfileService.Evidence;
+import com.istudy.learning.LearningProfileService.Status;
+
 import java.util.*;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +21,7 @@ public class QuestionSelector {
     );
     selected.sort(
       Comparator.comparingInt(c ->
-        switch (c.snapshot().path("difficulty").asText()) {
+        switch (c.difficulty()) {
           case "FOUNDATION" -> 0;
           case "INTERMEDIATE" -> 1;
           default -> 2;
@@ -28,41 +31,67 @@ public class QuestionSelector {
     return selected;
   }
 
-  public List<Candidate> select(List<Candidate> pool, int count) {
+  public List<Candidate> select(
+    List<Candidate> pool,
+    int count,
+    Set<String> selectedFamilies,
+    Map<UUID, Evidence> evidence,
+    boolean balancedTest
+  ) {
     var unique = new LinkedHashMap<UUID, Candidate>();
     pool
       .stream()
       .sorted(
-        Comparator.comparingInt(Candidate::attempts).thenComparing(c ->
-          c.questionId().toString()
-        )
+        Comparator.comparing((Candidate c) -> c.familySeen())
+          .thenComparingInt(c -> LearningProfileService.priority(
+            evidence.get(c.coverageKey())
+          ))
+          .thenComparingInt(Candidate::attempts)
+          .thenComparing(Candidate::questionId)
       )
       .forEach(c -> unique.putIfAbsent(c.questionId(), c));
     var sections = new LinkedHashMap<UUID, List<Candidate>>();
     unique
       .values()
       .forEach(c ->
-        sections.computeIfAbsent(c.sectionId(), key -> new ArrayList<>()).add(c)
+        sections.computeIfAbsent(c.coverageKey(), key -> new ArrayList<>()).add(c)
       );
-    // Balance sections first. Existing mistakes can raise a section's selection priority,
-    // but do not become a persistent label or prerequisite for the learner.
     var groups = new ArrayList<>(sections.values());
-    groups.sort(
-      Comparator.<List<Candidate>>comparingDouble(group -> {
+    if (evidence.isEmpty()) {
+      groups.sort(Comparator.<List<Candidate>>comparingDouble(group -> {
         int total = group.stream().mapToInt(Candidate::attempts).sum();
         int correct = group.stream().mapToInt(Candidate::correct).sum();
         return total == 0 ? 0.5 : (double) correct / total;
-      }).thenComparingInt(group ->
-        group.stream().mapToInt(Candidate::attempts).sum()
-      )
-    );
+      }).thenComparingInt(group -> group.stream().mapToInt(Candidate::attempts).sum()));
+    } else {
+      groups.sort(Comparator.comparingInt(group -> LearningProfileService.priority(
+        evidence.get(group.get(0).coverageKey())
+      )));
+      if (balancedTest) {
+        // Take a turn from each kind of evidence before filling from one category.
+        var categories = new EnumMap<Status, ArrayDeque<List<Candidate>>>(Status.class);
+        for (var group : groups) {
+          Evidence item = evidence.get(group.get(0).coverageKey());
+          Status status = item == null ? Status.UNASSESSED : item.status();
+          categories.computeIfAbsent(status, key -> new ArrayDeque<>()).add(group);
+        }
+        groups.clear();
+        var order = List.of(Status.NEEDS_PRACTICE, Status.STRENGTH, Status.UNASSESSED, Status.DEVELOPING);
+        while (categories.values().stream().anyMatch(queue -> !queue.isEmpty())) {
+          for (Status status : order) {
+            var category = categories.get(status);
+            if (category != null && !category.isEmpty()) groups.add(category.removeFirst());
+          }
+        }
+      }
+    }
     var queues = new ArrayList<ArrayDeque<Candidate>>();
     for (var group : groups) {
       var levels = new LinkedHashMap<String, ArrayDeque<Candidate>>();
       group.forEach(c ->
         levels
           .computeIfAbsent(
-            c.snapshot().path("difficulty").asText("FOUNDATION"),
+            c.difficulty(),
             key -> new ArrayDeque<>()
           )
           .add(c)
@@ -76,13 +105,24 @@ public class QuestionSelector {
       queues.add(mixed);
     }
     var result = new ArrayList<Candidate>();
-    while (result.size() < count) {
-      boolean added = false;
-      for (var queue : queues) if (!queue.isEmpty() && result.size() < count) {
-        result.add(queue.removeFirst());
-        added = true;
+    for (boolean allowRelated : List.of(false, true)) {
+      while (result.size() < count) {
+        boolean added = false;
+        for (var queue : queues) {
+          if (result.size() == count) break;
+          var choices = queue.iterator();
+          while (choices.hasNext()) {
+            Candidate candidate = choices.next();
+            if (!allowRelated && selectedFamilies.contains(candidate.familyKey())) continue;
+            result.add(candidate);
+            selectedFamilies.add(candidate.familyKey());
+            choices.remove();
+            added = true;
+            break;
+          }
+        }
+        if (!added) break;
       }
-      if (!added) break;
     }
     return result;
   }

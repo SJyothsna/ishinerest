@@ -28,7 +28,7 @@ public class SubjectOverviewController {
     );
     var attempted = new HashMap<UUID, Integer>();
     for (var row : db.queryForList(
-      "select c.chapter_id,count(distinct sq.question_id) as attempted from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id join question_placements p on p.placement_id=sq.placement_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id join questions q on q.question_id=sq.question_id where a.student_id=? and c.offering_id=? and q.approval_status='PUBLISHED' and q.visibility='GLOBAL' and exists(select 1 from question_placements available join sections topic on topic.section_id=available.section_id where available.question_id=sq.question_id and available.active and topic.chapter_id=c.chapter_id and topic.status='ACTIVE') group by c.chapter_id",
+      "select c.chapter_id,count(distinct sq.question_id) as attempted from question_attempts a join session_questions sq on sq.session_question_id=a.session_question_id join practice_sessions ps on ps.session_id=sq.session_id join question_placements p on p.placement_id=sq.placement_id join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id join questions q on q.question_id=sq.question_id where a.student_id=? and ps.offering_id=? and q.approval_status='PUBLISHED' and q.visibility='GLOBAL' and exists(select 1 from question_placements available join sections topic on topic.section_id=available.section_id where available.question_id=sq.question_id and available.active and topic.chapter_id=c.chapter_id and topic.status='ACTIVE') group by c.chapter_id",
       current.id(),
       offeringId
     )) attempted.put(

@@ -117,7 +117,19 @@ public class QuestionBankController {
   public List<Map<String, Object>> books() {
     admin();
     return db.queryForList(
-      "select d.document_id as \"documentId\",d.title,d.asset_id as \"assetId\",d.licence_status as \"licenceStatus\",d.created_at as \"createdAt\",case when d.document_type='TEXTBOOK' then 'TEXTBOOK' else 'ORIGINAL' end as \"sourceType\" from content_documents d join media_assets a on a.asset_id=d.asset_id where d.document_type='TEXTBOOK' or (d.document_type='OTHER' and a.content_type='application/json') order by d.created_at desc"
+      """
+      select d.document_id as "documentId",d.title,d.asset_id as "assetId",d.licence_status as "licenceStatus",
+        d.created_at as "createdAt",coalesce(d.bank_offering_id,history.offering_id) as "offeringId",
+        case when d.document_type='TEXTBOOK' then 'TEXTBOOK' else 'ORIGINAL' end as "sourceType"
+      from content_documents d
+      join media_assets a on a.asset_id=d.asset_id
+      left join (
+        select document_id,cast(min(cast(offering_id as varchar(36))) as uuid) as offering_id
+        from question_bank_imports group by document_id having count(distinct offering_id)=1
+      ) history on history.document_id=d.document_id
+      where d.document_type='TEXTBOOK' or (d.document_type='OTHER' and a.content_type='application/json')
+      order by d.created_at desc
+      """
     );
   }
 
@@ -188,11 +200,12 @@ public class QuestionBankController {
     String key = "question-sources/" + doc + (original ? ".json" : ".pdf");
     storage.write(key, new java.io.ByteArrayInputStream(bytes));
     db.update(
-      "insert into media_assets(asset_id,storage_provider,bucket_name,object_key,content_type,byte_size,scan_status,owner_user_id,licence_note) values(?,'LOCAL','istudy-local',?,?,?,'PENDING',?,'Use authorised by uploading content administrator')",
+      "insert into media_assets(asset_id,storage_provider,bucket_name,object_key,content_type,byte_size,sha256,scan_status,owner_user_id,licence_note) values(?,'LOCAL','istudy-local',?,?,?,?,'PENDING',?,'Use authorised by uploading content administrator')",
       asset,
       key,
       original ? "application/json" : "application/pdf",
       bytes.length,
+      digest(bytes),
       user
     );
     db.update(
@@ -205,7 +218,31 @@ public class QuestionBankController {
     return Map.of("documentId", doc, "assetId", asset);
   }
 
-  private void permitted(Bank bank) {
+  private String digest(byte[] bytes) {
+    try {
+      return HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));
+    } catch (java.security.NoSuchAlgorithmException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  @GetMapping("/question-bank-objectives")
+  public List<Map<String, Object>> objectives(@RequestParam UUID offeringId) {
+    admin();
+    return db.queryForList(
+      """
+      select o.section_id as "sectionId",o.code,o.title,o.required
+      from learning_objectives o
+      join sections s on s.section_id=o.section_id
+      join chapters c on c.chapter_id=s.chapter_id
+      where c.offering_id=? and c.status='ACTIVE' and s.status='ACTIVE'
+      order by c.sort_order,s.sort_order,o.code
+      """,
+      offeringId
+    );
+  }
+
+  private boolean permitted(Bank bank) {
     if (
       !Boolean.TRUE.equals(
         db.queryForObject(
@@ -229,18 +266,43 @@ public class QuestionBankController {
       HttpStatus.BAD_REQUEST,
       "The bank sourceType must match the selected source"
     );
-    if (
-      !Boolean.TRUE.equals(
-        db.queryForObject(
-          "select exists(select 1 from subject_offerings where offering_id=? and status='PUBLISHED')",
-          Boolean.class,
-          bank.offeringId()
-        )
-      )
-    ) throw new ResponseStatusException(
+    var tracks = db.queryForList(
+      "select track_code from subject_offerings where offering_id=? and status='PUBLISHED'",
+      String.class, bank.offeringId()
+    );
+    if (tracks.isEmpty()) throw new ResponseStatusException(
       HttpStatus.BAD_REQUEST,
       "Choose a published subject offering"
     );
+    boolean levelled = Set.of("ORDINARY", "HIGHER").contains(tracks.get(0));
+    UUID sourceOffering = db.queryForObject(
+      "select bank_offering_id from content_documents where document_id=?",
+      UUID.class, bank.documentId()
+    );
+    if (
+      (sourceOffering != null && !sourceOffering.equals(bank.offeringId())) ||
+      (levelled && Boolean.TRUE.equals(db.queryForObject(
+        """
+        select exists(
+          select 1 from question_bank_imports b
+          join content_documents d on d.document_id=b.document_id
+          join media_assets a on a.asset_id=d.asset_id
+          join content_documents incoming on incoming.document_id=?
+          join media_assets asset on asset.asset_id=incoming.asset_id
+          where b.offering_id<>? and (b.document_id=incoming.document_id or
+            (incoming.document_type='TEXTBOOK' and d.document_type='TEXTBOOK' and a.sha256=asset.sha256))
+        )
+        """,
+        Boolean.class, bank.documentId(), bank.offeringId()
+      )))
+    ) throw new ResponseStatusException(
+      HttpStatus.BAD_REQUEST, "Choose a question source for this course level"
+    );
+    if (levelled && !bank.manifest().path("formatVersion").asText().equals("2.0"))
+      throw new ResponseStatusException(
+        HttpStatus.BAD_REQUEST, "Use the format 2.0 template for this course level"
+      );
+    return levelled;
   }
 
   @PostMapping("/question-banks/validate")
@@ -254,13 +316,30 @@ public class QuestionBankController {
   @Transactional
   public Map<String, Object> upload(@Valid @RequestBody Bank bank) {
     UUID user = admin();
-    permitted(bank);
+    db.queryForList(
+      """
+      select d.document_id from content_documents d
+      join media_assets a on a.asset_id=d.asset_id
+      where d.document_id=? or (
+        d.document_type='TEXTBOOK' and a.sha256=(
+          select asset.sha256 from content_documents incoming join media_assets asset on asset.asset_id=incoming.asset_id
+          where incoming.document_id=? and incoming.document_type='TEXTBOOK'
+        )
+      ) order by d.document_id for update
+      """,
+      UUID.class, bank.documentId(), bank.documentId()
+    );
+    boolean levelled = permitted(bank);
     var result = validator.validate(bank.offeringId(), bank.manifest());
     if (
       !Boolean.TRUE.equals(result.get("valid"))
     ) throw new ResponseStatusException(
       HttpStatus.UNPROCESSABLE_ENTITY,
       "Fix the validation issues before uploading this bank"
+    );
+    if (levelled) db.update(
+      "update content_documents set bank_offering_id=? where document_id=? and bank_offering_id is null",
+      bank.offeringId(), bank.documentId()
     );
     String hash = LocalAuthService.hash(bank.manifest().toString());
     int set = bank.manifest().path("questionSet").asInt();
@@ -411,16 +490,26 @@ public class QuestionBankController {
       "The catalogue changed; validate this bank again before publishing"
     );
     int set = ((Number) bank.get("question_set")).intValue();
+    boolean planned = manifest.path("formatVersion").asText().equals("2.0");
     var published = new HashMap<String, UUID>();
     var reusable = new HashMap<JsonNode, UUID>();
     for (var existing : db.queryForList(
-      "select q.question_id,r.content_snapshot from questions q join question_revisions r on r.question_id=q.question_id and r.revision_number=q.current_revision where q.approval_status='PUBLISHED' and q.visibility='GLOBAL'"
+      """
+      select q.question_id,r.content_snapshot
+      from questions q
+      join question_revisions r on r.question_id=q.question_id and r.revision_number=q.current_revision
+      where q.approval_status='PUBLISHED' and q.visibility='GLOBAL' and exists (
+        select 1 from question_placements p
+        join sections s on s.section_id=p.section_id join chapters c on c.chapter_id=s.chapter_id
+        where p.question_id=q.question_id and p.active and c.offering_id=?
+      )
+      """,
+      offering
     )) {
-      ObjectNode body = (ObjectNode) json.readTree(
+      ObjectNode snapshot = (ObjectNode) json.readTree(
         existing.get("content_snapshot").toString()
       );
-      body.remove("difficulty");
-      reusable.put(body, (UUID) existing.get("question_id"));
+      reusable.put(reuseKey(snapshot), (UUID) existing.get("question_id"));
     }
     var chapters = new HashSet<UUID>();
     for (var chapter : manifest.path("chapters")) {
@@ -428,6 +517,9 @@ public class QuestionBankController {
       chapters.add(chapterId);
       for (var topic : chapter.path("topics")) {
         UUID section = catalogue.ensureSection(chapterId, topic);
+        var objectives = planned
+          ? prepareObjectives(section, topic, set)
+          : Map.<String, UUID>of();
         for (var q : topic.path("questions")) {
           String external = q.path("externalId").asText();
           UUID question = published.get(external);
@@ -443,33 +535,14 @@ public class QuestionBankController {
             );
             published.put(external, question);
           }
-          if (
-            db.queryForObject(
-              "select count(*) from question_placements where question_id=? and section_id=? and usage_type='BOTH' and question_set=?",
-              Integer.class,
-              question,
-              section,
-              set
-            ) ==
-            0
-          ) db.update(
-            "insert into question_placements(question_id,section_id,usage_type,question_set,difficulty_override) values(?,?,'BOTH',?,?)",
-            question,
-            section,
-            set,
-            validator.snapshot(q).path("difficulty").asText()
-          );
-          db.update(
-            "update question_placements set difficulty_override=? where question_id=? and section_id=? and question_set=? and usage_type='BOTH'",
-            validator.snapshot(q).path("difficulty").asText(),
-            question,
-            section,
-            set
+          placeQuestion(
+            question, section, set, validator.snapshot(q).path("difficulty").asText(),
+            objectives.get(q.path("objectiveCode").asText()), q.path("familyCode").asText(null)
           );
         }
       }
     }
-    if (set == 1) {
+    if (set == 1 && !published.isEmpty()) {
       if (starterReplacement) {
         var starterChapters = db.queryForList(
           "select distinct c.chapter_id from chapters c join sections s on s.chapter_id=c.chapter_id join question_placements p on p.section_id=s.section_id where c.offering_id=? and p.is_starter",
@@ -519,6 +592,52 @@ public class QuestionBankController {
     );
   }
 
+  private Map<String, UUID> prepareObjectives(UUID section, JsonNode topic, int set) {
+    var ids = new HashMap<String, UUID>();
+    for (var objective : topic.path("objectives")) {
+      String code = objective.path("code").asText();
+      var previous = db.queryForList(
+        "select objective_id from learning_objectives where section_id=? and code=?",
+        UUID.class, section, code
+      );
+      if (set == 2) {
+        ids.put(code, previous.get(0));
+        continue;
+      }
+      String title = objective.path("title").asText();
+      boolean required = objective.path("required").asBoolean();
+      if (previous.isEmpty()) {
+        UUID id = UUID.randomUUID();
+        db.update(
+          "insert into learning_objectives(objective_id,section_id,code,title,required) values(?,?,?,?,?)",
+          id, section, code, title, required
+        );
+        ids.put(code, id);
+      } else {
+        UUID id = previous.get(0);
+        db.update("update learning_objectives set title=?,required=? where objective_id=?", title, required, id);
+        ids.put(code, id);
+      }
+    }
+    return ids;
+  }
+
+  private void placeQuestion(UUID question, UUID section, int set, String difficulty, UUID objective, String family) {
+    int updated = objective == null
+      ? db.update(
+        "update question_placements set difficulty_override=? where question_id=? and section_id=? and question_set=? and usage_type='BOTH'",
+        difficulty, question, section, set
+      )
+      : db.update(
+        "update question_placements set difficulty_override=?,objective_id=?,family_code=? where question_id=? and section_id=? and question_set=? and usage_type='BOTH'",
+        difficulty, objective, family, question, section, set
+      );
+    if (updated == 0) db.update(
+      "insert into question_placements(question_id,section_id,usage_type,question_set,difficulty_override,objective_id,family_code) values(?,?,'BOTH',?,?,?,?)",
+      question, section, set, difficulty, objective, objective == null ? null : family
+    );
+  }
+
   private UUID publishQuestion(
     UUID document,
     int set,
@@ -542,9 +661,7 @@ public class QuestionBankController {
       !keys.isEmpty() && keys.get(0).get("content_hash").equals(hash)
     ) return question;
     if (keys.isEmpty()) {
-      var body = snapshot.deepCopy();
-      body.remove("difficulty");
-      UUID reused = reusable.get(body);
+      UUID reused = reusable.get(reuseKey(snapshot));
       if (reused != null) {
         db.update(
           "insert into external_question_keys values(?,?,?,?,?)",
@@ -637,9 +754,13 @@ public class QuestionBankController {
     );
     UUID saved = question;
     reusable.entrySet().removeIf(entry -> entry.getValue().equals(saved));
-    var body = snapshot.deepCopy();
-    body.remove("difficulty");
-    reusable.put(body, question);
+    reusable.put(reuseKey(snapshot), question);
     return question;
+  }
+
+  private ObjectNode reuseKey(ObjectNode snapshot) {
+    var body = snapshot.deepCopy();
+    body.remove(List.of("difficulty", "examLevel"));
+    return body;
   }
 }

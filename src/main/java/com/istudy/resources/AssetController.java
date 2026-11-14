@@ -71,16 +71,33 @@ public class AssetController {
   public ResponseEntity<byte[]> read(@PathVariable UUID id)
     throws java.io.IOException {
     UUID user = current.id();
-    if (
-      Boolean.TRUE.equals(
-        db.queryForObject(
-          "select exists(select 1 from media_assets a join content_documents d on d.asset_id=a.asset_id join app_users u on u.user_id=a.owner_user_id where a.asset_id=? and a.owner_user_id=? and u.content_admin=true and (d.document_type='TEXTBOOK' or (d.document_type='OTHER' and a.content_type='application/json')))",
-          Boolean.class,
-          id,
-          user
-        )
-      )
-    ) return content(id);
+    var sourceAccess = db.queryForList(
+      """
+      select d.licence_status,a.scan_status,u.content_admin
+      from content_documents d join media_assets a on a.asset_id=d.asset_id
+      join app_users u on u.user_id=?
+      where a.asset_id=? and (d.document_type='TEXTBOOK'
+        or (d.document_type='OTHER' and a.content_type='application/json'))
+      """,
+      user,
+      id
+    );
+    if (!sourceAccess.isEmpty()) {
+      boolean permitted = sourceAccess.stream().anyMatch(source ->
+        "PERMITTED".equals(source.get("licence_status")) &&
+        !"REJECTED".equals(source.get("scan_status")) &&
+        Boolean.TRUE.equals(source.get("content_admin"))
+      );
+      if (!permitted) throw new ResponseStatusException(
+        HttpStatus.NOT_FOUND,
+        "Source not found"
+      );
+      var document = content(id);
+      return ResponseEntity.status(document.getStatusCode())
+        .headers(document.getHeaders())
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment")
+        .body(document.getBody());
+    }
     boolean allowed = Boolean.TRUE.equals(
       db.queryForObject(
         "select exists(select 1 from media_assets a where a.asset_id=? and a.scan_status='CLEAN' and (a.owner_user_id=? or exists(select 1 from questions q where q.question_image_asset_id=a.asset_id and q.approval_status='PUBLISHED' and q.visibility='GLOBAL') or exists(select 1 from note_attachments na join study_notes n on n.note_id=na.note_id where na.asset_id=a.asset_id and (n.owner_user_id=? or n.note_type='GENERAL')) or exists(select 1 from content_documents d join past_papers p on p.document_id=d.document_id where d.asset_id=a.asset_id and d.licence_status='PERMITTED' and p.approval_status='PUBLISHED') or exists(select 1 from content_documents d join past_paper_marking_schemes m on m.document_id=d.document_id join past_papers p on p.paper_id=m.paper_id where d.asset_id=a.asset_id and d.licence_status='PERMITTED' and p.approval_status='PUBLISHED') or exists(select 1 from past_paper_question_assets qa join past_paper_questions pq on pq.paper_question_id=qa.paper_question_id join past_papers p on p.paper_id=pq.paper_id where qa.asset_id=a.asset_id and pq.review_status='APPROVED' and p.approval_status='PUBLISHED')))",
