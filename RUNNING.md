@@ -13,6 +13,12 @@ cd /Users/sanjeethreddy/Documents/IdeaProjects/ishinerest
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
+On Windows PowerShell, quote the `-D` argument; otherwise PowerShell splits it at the dot and Maven fails with `Unknown lifecycle phase ".run.profiles=local"`:
+
+```powershell
+./mvnw spring-boot:run "-Dspring-boot.run.profiles=local"
+```
+
 On another machine, use the actual checkout path. Run from the repository root so relative database and asset paths resolve correctly. Keep the terminal open. Stop with Ctrl+C.
 
 The backend listens on http://localhost:8080. Check readiness with:
@@ -31,6 +37,16 @@ java -jar target/ishinerest-0.0.1-SNAPSHOT.jar --spring.profiles.active=local
 ```
 
 Use one startup method at a time; two backends cannot share port 8080 or the same H2 file.
+
+## Inspect the H2 database (local profile)
+
+The `local` profile enables the H2 web console, reachable only while the backend is running. Open http://localhost:8080/h2-console and connect with:
+
+- JDBC URL: `jdbc:h2:file:./data/istudy-redesign-v1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE`
+- User name: `sa`
+- Password: leave empty
+
+Keep the file name exactly as shown; a different name silently creates a new empty database. The console is enabled by `spring.h2.console.enabled=true` in `application-local.properties` and permitted by `LocalH2ConsoleSecurity`, which is active only under the `local` profile. It is not available with the `postgres` profile.
 
 ## Database and uploaded content
 
